@@ -8,7 +8,7 @@ const Preloader = () => {
                 <div className="preloader-heading">
                     <div className="load-text">
                         <img 
-                            src="/assets/img/logo/Loader.gif" 
+                            src="/assets/img/logo/Preloader.gif" 
                             alt="Loading" 
                             style={{ 
                                 width: "100%",
