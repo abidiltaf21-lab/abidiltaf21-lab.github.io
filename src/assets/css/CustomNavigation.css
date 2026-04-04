@@ -1,0 +1,444 @@
+/* Custom Navigation Styles for Hover Dropdowns and Highlights */
+
+/* Desktop Hover Expansion */
+@media (min-width: 992px) {
+    nav.validnavs ul.nav li.dropdown:hover>.dropdown-menu {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        margin-top: 0 !important;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+    }
+
+    nav.validnavs ul.nav li.dropdown>.dropdown-menu {
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    /* Prevent clicking from toggling if we want hover only on desktop */
+    nav.validnavs ul.nav li.dropdown>a.dropdown-toggle {
+        pointer-events: auto;
+    }
+}
+
+/* Dropdown Item Highlight Effects */
+nav.validnavs ul.nav ul.dropdown-menu li a {
+    padding: 10px 20px !important;
+    transition: all 0.3s ease !important;
+    display: block !important;
+    position: relative;
+    overflow: hidden;
+    color: var(--color-heading) !important;
+}
+
+nav.validnavs ul.nav ul.dropdown-menu li a:hover {
+    color: var(--color-primary) !important;
+    background: rgba(255, 174, 0, 0.05) !important;
+    padding-left: 25px !important;
+}
+
+/* Add a small accent line on hover */
+nav.validnavs ul.nav ul.dropdown-menu li a::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--color-primary);
+    transition: all 0.3s ease;
+}
+
+nav.validnavs ul.nav ul.dropdown-menu li a:hover::before {
+    height: 70%;
+}
+
+/* Ensure dropdown menu looks premium */
+nav.validnavs .dropdown-menu {
+    border: none !important;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 10px !important;
+    padding: 15px 0 !important;
+    min-width: 220px !important;
+}
+
+/* Swiper Services Carousel Fixes */
+.services-carousel {
+    padding-bottom: 30px !important;
+    padding-top: 15px !important;
+}
+
+/* Pagination container styling */
+.services-pagination-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.services-swiper-pagination.swiper-pagination-style-two .swiper-pagination-bullet {
+    background: #ccc;
+    opacity: 1;
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    transition: all 0.3s ease;
+}
+
+.services-swiper-pagination.swiper-pagination-style-two .swiper-pagination-bullet-active {
+    background: var(--color-primary);
+    width: 25px;
+    border-radius: 5px;
+}
+
+/* Portfolio Gallery Video Card Enhancements */
+.gallery-style-one .info {
+    bottom: -60px;
+    /* Start a bit lower to account for extra text */
+    transition: all 0.4s ease-in-out;
+}
+
+.gallery-style-one:hover .info {
+    bottom: 0;
+}
+
+.portfolio-details-preview {
+    margin-top: 10px;
+}
+
+.portfolio-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #e0e0e0;
+    margin-top: 8px;
+    margin-bottom: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Service Details Banner - Responsive 16:9 (1920x1080) Support */
+.service-video-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+}
+
+.service-video-container iframe,
+.service-video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.service-single-thumb img,
+.thumb-style-two img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Modern Portfolio CSS Grid Layout */
+.modern-portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    margin-top: 30px;
+}
+
+@media (max-width: 991px) {
+    .modern-portfolio-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+.modern-portfolio-card {
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.modern-portfolio-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Strict 16:9 Video Thumbnail Wrapper */
+.portfolio-thumb-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: #1a1a1a;
+}
+
+.portfolio-thumb-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.modern-portfolio-card:hover .portfolio-thumb-wrapper img {
+    transform: scale(1.05);
+}
+
+/* Cinematic Hover Overlay with Play Button */
+.portfolio-hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.modern-portfolio-card:hover .portfolio-hover-overlay {
+    opacity: 1;
+}
+
+.play-icon-glow {
+    font-size: 48px;
+    color: #ffffff;
+    background: var(--color-primary);
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    text-align: center;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.6);
+    transform: scale(0.8);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding-left: 6px;
+    /* visually center play icon */
+}
+
+.modern-portfolio-card:hover .play-icon-glow {
+    transform: scale(1);
+}
+
+/* Portfolio Details Typography Below Image */
+.portfolio-details-bottom {
+    padding: 20px 5px 10px;
+}
+
+.pf-tags-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pf-tags-modern li a {
+    color: var(--color-primary);
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.portfolio-details-bottom h4 {
+    margin-bottom: 12px;
+    font-size: 24px;
+}
+
+.portfolio-details-bottom h4 a {
+    color: var(--color-heading);
+    transition: color 0.3s ease;
+}
+
+.portfolio-details-bottom h4 a:hover {
+    color: var(--color-primary);
+}
+
+.portfolio-desc-modern {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #a0a0a0;
+    margin: 0;
+}
+
+/* Infinite Scrolling Partner/Software Marquee */
+.infinite-partner-scroll-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 20px 0;
+    margin-top: 30px;
+    background: transparent;
+}
+
+/* Optional subtle gradient edge masks */
+.infinite-partner-scroll-wrapper::before,
+.infinite-partner-scroll-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 150px;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.infinite-partner-scroll-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, var(--color-bg), transparent);
+}
+
+.infinite-partner-scroll-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, var(--color-bg), transparent);
+}
+
+.infinite-partner-scroll-content {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: infiniteScroll 25s linear infinite;
+}
+
+.infinite-partner-scroll-content:hover {
+    animation-play-state: paused;
+}
+
+.infinite-partner-scroll-content .partner-style-one-item {
+    padding: 0 60px;
+    filter: grayscale(100%) opacity(0.6);
+    transition: all 0.4s ease;
+}
+
+.infinite-partner-scroll-content .partner-style-one-item:hover {
+    filter: grayscale(0%) opacity(1);
+    transform: scale(1.1);
+}
+
+.infinite-partner-scroll-content img {
+    max-height: 120px;
+    width: auto;
+    object-fit: contain;
+}
+
+@keyframes infiniteScroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        /* Move left by exactly half the total width (the width of the original set) */
+        transform: translateX(-50%);
+    }
+}
+
+/* Testimonial Style Three (Cards) */
+.testimonial-style-three-item {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    transition: all 0.35s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.bg-dark .testimonial-style-three-item {
+    background: var(--dark-secondary) !important;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.testimonial-style-three-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-style-three-item .info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.testimonial-style-three-item .thumb {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-gray-secondary);
+    border-radius: 12px;
+    padding: 8px;
+    transition: all 0.35s ease-in-out;
+}
+
+.bg-dark .testimonial-style-three-item .thumb {
+    background: var(--dark-optional);
+}
+
+.testimonial-style-three-item .thumb img {
+    max-height: 100%;
+    max-width: 100%;
+    filter: grayscale(1);
+    transition: all 0.35s ease-in-out;
+}
+
+.testimonial-style-three-item:hover .thumb img {
+    filter: grayscale(0);
+}
+
+.testimonial-style-three-item .provider h4 {
+    margin-bottom: 2px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.testimonial-style-three-item .provider span {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-primary);
+    font-weight: 600;
+    display: block;
+}
+
+.testimonial-style-three-item .rating {
+    margin-bottom: 5px;
+    color: #ffb400;
+    font-size: 11px;
+}
+
+.testimonial-style-three-item .content p {
+    margin: 0;
+    font-style: italic;
+    color: var(--color-paragraph);
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.bg-dark .testimonial-style-three-item .content p {
+    color: #ccc;
+}

@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "title": "Animation & Motion Graphics",
+        "icon": "fas fa-film",
+        "text": "Cinematic 2D animation and professional motion graphics solutions for brands."
+    },
+    {
+        "id": 2,
+        "title": "Explainer Videos",
+        "icon": "fas fa-lightbulb",
+        "text": "Engaging and clear visual storytelling to simplify complex ideas."
+    },
+    {
+        "id": 3,
+        "title": "Video Production & Editing",
+        "icon": "fas fa-video",
+        "text": "Professional post-production and high-impact video advertising."
+    },
+    {
+        "id": 4,
+        "title": "Product & Commercial Animation",
+        "icon": "fas fa-cube",
+        "text": "Photorealistic 3D product renders and commercial animations."
+    },
+    {
+        "id": 5,
+        "title": "Business & Corporate Media",
+        "icon": "fas fa-briefcase",
+        "text": "Professional branding and communication media for businesses."
+    },
+    {
+        "id": 6,
+        "title": "Design & Branding",
+        "icon": "fas fa-palette",
+        "text": "Timeless brand identity design and creative design kits."
+    },
+    {
+        "id": 7,
+        "title": "Web & App Animation",
+        "icon": "fas fa-mobile-alt",
+        "text": "Interactive UI motion design for digital products and websites."
+    }
+]

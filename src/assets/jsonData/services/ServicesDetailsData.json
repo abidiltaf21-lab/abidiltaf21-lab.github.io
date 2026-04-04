@@ -1,0 +1,291 @@
+[
+    {
+        "id": 1,
+        "title": "Animation & Motion Graphics",
+        "mainTitle": "Premium Animation & Motion Graphic Solutions",
+        "description": "High-end cinematic animation that brings stories to life. From character-driven 2D to advanced motion graphics, we provide industry-leading visual solutions.",
+        "secondaryDescription": "Our team specializes in creating fluid, high-impact motion content that elevates brand narratives across all digital platforms.",
+        "groups": [
+            {
+                "name": "2D Animation",
+                "items": [
+                    "Custom 2D Animation",
+                    "Frame-by-frame Animation",
+                    "Cut-out Animation",
+                    "Rigging & Character Setup",
+                    "Animated GIFs",
+                    "Text Animation",
+                    "Lottie & Web Animation"
+                ]
+            },
+            {
+                "name": "Motion Graphics",
+                "items": [
+                    "Corporate Motion Graphics",
+                    "UI Motion Graphics",
+                    "Social Media Motion Graphics",
+                    "Animated Typography",
+                    "Kinetic Text Videos"
+                ]
+            },
+            {
+                "name": "Logo Animation",
+                "items": [
+                    "Minimal Logo Animation",
+                    "3D Logo Reveal",
+                    "Particle Logo Animation",
+                    "Intro Logo Animation",
+                    "Outro Logo Animation"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Concept & Storyboard",
+                "text": "Mapping out the visual journey."
+            },
+            {
+                "title": "Illustration & Rigging",
+                "text": "Creating custom assets and setups."
+            },
+            {
+                "title": "Motion Design",
+                "text": "Bringing the story to life with animation."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": ""
+    },
+    {
+        "id": 2,
+        "title": "Explainer Videos",
+        "mainTitle": "High-Converting Professional Explainer Videos",
+        "description": "Simplifying complex products and services into engaging, high-retention video content. We cover a vast range of styles to fit your brand identity.",
+        "secondaryDescription": "Our explainer videos are designed to educate, inspire, and convert, tailored specifically for startups, SaaS, and corporate entities.",
+        "groups": [
+            {
+                "name": "Professional Styles",
+                "items": [
+                    "Linear Explainer",
+                    "Icon-Based Explainer",
+                    "Flat Explainer",
+                    "Character-Based Explainer",
+                    "Infographic Explainer",
+                    "Whiteboard Explainer",
+                    "SaaS Explainer",
+                    "Startup Explainer",
+                    "Product Explainer",
+                    "App Explainer",
+                    "Corporate Explainer",
+                    "Medical Explainer",
+                    "Educational Explainer",
+                    "Parallax Explainer",
+                    "Isometric Explainer"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Strategy & Scripting",
+                "text": "Defining the core message."
+            },
+            {
+                "title": "Visual Development",
+                "text": "Defining the style and assets."
+            },
+            {
+                "title": "Production",
+                "text": "Final high-end rendering."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": ""
+    },
+    {
+        "id": 3,
+        "title": "Video Production & Editing",
+        "mainTitle": "Cinematic Video Production & Post-Production",
+        "description": "Transforming raw footage into professional masterpieces. We handle everything from corporate documentaries to fast-paced social ads.",
+        "secondaryDescription": "Advanced editing, color grading, and sound design to ensure your video content stands out with a premium cinematic feel.",
+        "groups": [
+            {
+                "name": "Post-Production Services",
+                "items": [
+                    "Video Editing",
+                    "Corporate Videos",
+                    "Social Media Videos",
+                    "Slideshow Videos",
+                    "Intro & Outro Videos",
+                    "Subtitles & Captions",
+                    "Video Ads & Commercials",
+                    "Real Estate Promos",
+                    "App & Website Previews",
+                    "E-Commerce Product Videos"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Culling & Selection",
+                "text": "Choosing the best takes."
+            },
+            {
+                "title": "Editing & Flow",
+                "text": "Building the narrative rhythm."
+            },
+            {
+                "title": "VFX & Grading",
+                "text": "Final polish and color."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": ""
+    },
+    {
+        "id": 4,
+        "title": "Product & Commercial Animation",
+        "mainTitle": "Advanced Product & Commercial Visualization",
+        "description": "Photorealistic 3D and 2D animations that showcase your product's features and benefits with stunning detail.",
+        "secondaryDescription": "Perfect for E-Commerce, Amazon, and luxury brands looking for high-fidelity visual representations.",
+        "groups": [
+            {
+                "name": "Product Animation",
+                "items": [
+                    "3D Product Animation",
+                    "2D Product Animation",
+                    "E-Commerce Product Promo",
+                    "Amazon / Shopify Product Videos",
+                    "Product Demo Videos",
+                    "Unboxing Style Animation"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Modeling & Texturing",
+                "text": "Creating realistic 3D assets."
+            },
+            {
+                "title": "Lighting & Rendering",
+                "text": "Setting the cinematic mood."
+            },
+            {
+                "title": "Motion & Camera",
+                "text": "Dynamic angles and reveals."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": ""
+    },
+    {
+        "id": 5,
+        "title": "Business & Corporate Media",
+        "mainTitle": "High-Authority Business & Corporate Media",
+        "description": "Enhancing corporate communication through professional branding films, training videos, and pitch media.",
+        "secondaryDescription": "We create high-impact media that builds trust and authority for established companies and growing businesses alike.",
+        "groups": [
+            {
+                "name": "Corporate Media",
+                "items": [
+                    "Company Profile Videos",
+                    "Internal Training Videos",
+                    "Corporate Branding Videos",
+                    "Investor Pitch Videos",
+                    "Event Promo Videos"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Stakeholder Strategy",
+                "text": "Aligning with brand goals."
+            },
+            {
+                "title": "Production Planning",
+                "text": "Efficient and high-quality filming/edit."
+            },
+            {
+                "title": "Final Delivery",
+                "text": "On-brand and ready for broadcast."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": ""
+    },
+    {
+        "id": 6,
+        "title": "Design & Branding",
+        "mainTitle": "Strategic Brand Identity & Creative Design",
+        "description": "Crafting timeless visual identities that define your brand's future. From minimalist logos to complete brand kits.",
+        "secondaryDescription": "Strategic design thinking that ensures your brand is memorable, unique, and consistently represented.",
+        "groups": [
+            {
+                "name": "Branding & Design",
+                "items": [
+                    "Logo Design",
+                    "Brand Identity Design",
+                    "Social Media Branding Kits",
+                    "Animated Brand Kits"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Research & Discovery",
+                "text": "Understanding the market."
+            },
+            {
+                "title": "Conceptual Design",
+                "text": "Drafting multiple directions."
+            },
+            {
+                "title": "Final Polish",
+                "text": "Finalizing the identity system."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": ""
+    },
+    {
+        "id": 7,
+        "title": "Web & App Animation",
+        "mainTitle": "Interactive UX-Driven Interface Animation",
+        "description": "Interactive motion design that brings digital products to life. High-performance Lottie animations and UI micro-interactions.",
+        "secondaryDescription": "Improving user engagement and software feel with smooth, intuitive transitions and interface motion.",
+        "groups": [
+            {
+                "name": "UI & Interface Motion",
+                "items": [
+                    "Lottie Animation",
+                    "Web Micro Animations",
+                    "App UI Animation",
+                    "Landing Page Animation",
+                    "SaaS Dashboard Animation"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "UI Flow Analysis",
+                "text": "Mapping key interactions."
+            },
+            {
+                "title": "Animation Design",
+                "text": "Prototyping fluid motion."
+            },
+            {
+                "title": "Lottie Export",
+                "text": "Dev-ready high-performance files."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": ""
+    }
+]
