@@ -10,11 +10,15 @@ import ResumeV1 from "../../components/resume/ResumeV1";
 import ServicesV1 from "../../components/services/ServicesV1";
 import TestimonialV3 from "../../components/testimonial/TestimonialV3";
 import TestimonialData from "../../assets/jsonData/testimonial/TestimonialData.json";
-
+import SEO from "../../components/utilities/SEO";
 
 const Home = () => {
     return (
         <>
+            <SEO 
+                title="SmooothPixel – Motion Graphics & Digital Animation Portfolio" 
+                description="Explore SmooothPixel, the portfolio of Abidullah Iltaf, showcasing cutting-edge 2D & 3D animations, motion graphics, and digital design projects."
+            />
             <LayoutV1>
                 <BannerV1 />
                 <ServicesV1 sectionClass="default-padding" hasTitle={true} />
