@@ -9,7 +9,7 @@ const Preloader = () => {
                     <div className="load-text">
                         <img 
                             src="/assets/img/logo/Preloader.gif" 
-                            alt="Loading" 
+                            alt="Smooothpixel Logo" 
                             style={{ 
                                 width: "100%",
                                 maxWidth: "800px", 

@@ -25,6 +25,7 @@ const IsotopeGallery = ({ maxItems }: IsotopeGalleryProps) => {
                                         muted 
                                         loop 
                                         playsInline 
+                                        preload="metadata"
                                         className="w-100" 
                                         style={{ borderRadius: '10px', display: 'block', aspectRatio: '16/9', objectFit: 'cover' }} 
                                     />

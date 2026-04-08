@@ -8,7 +8,7 @@ const BannerV1 = () => {
     const [particles, setParticles] = useState<any[]>([]);
 
     useEffect(() => {
-        const particleCount = 20;
+        const particleCount = 12;
         const newParticles = Array.from({ length: particleCount }).map((_, i) => ({
             id: i,
             left: `${Math.random() * 100}%`,
@@ -54,7 +54,7 @@ const BannerV1 = () => {
                         <div className="col-lg-10 text-center">
                             <div className="banner-style-one-items">
                                 <div className="info">
-                                    <h1>From Simple Idea to Captivating Video</h1>
+                                    <h1>Smooothpixel: From Simple Idea to Captivating Video</h1>
                                     <h2>
                                         <span className="header-caption" id="page-top">
                                             <span className="cd-headline clip is-full-width">
