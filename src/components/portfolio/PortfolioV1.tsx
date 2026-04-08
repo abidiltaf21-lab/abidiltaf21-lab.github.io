@@ -5,9 +5,10 @@ import IsotopeGallery from '../project/IsotopeGallery.js'
 interface DataType {
     sectionClass?: string;
     hasTitle?: React.ReactNode;
+    maxItems?: number;
 }
 
-const PortfolioV1 = ({ sectionClass, hasTitle }: DataType) => {
+const PortfolioV1 = ({ sectionClass, hasTitle, maxItems }: DataType) => {
     return (
         <>
             <div id="portfolio" className={`portfolio-style-one-area ${sectionClass ? sectionClass : ""}`}>
@@ -32,17 +33,17 @@ const PortfolioV1 = ({ sectionClass, hasTitle }: DataType) => {
                     <div className="row">
                         <div className="col-md-12 gallery-content">
                             <div className="magnific-mix-gallery gallery-masonary">
-                                <IsotopeGallery />
+                                <IsotopeGallery maxItems={maxItems} />
                             </div>
-                            <div className="row">
-                                <div className="col-lg-12 text-center">
-                                    <div className="load-more-info text-center mt-60 mt-xs-30">
-                                        <p>
-                                            Are you interested to show more portfolios? <Link to="#" >Load More</Link>
-                                        </p>
+                            {hasTitle && (
+                                <div className="row">
+                                    <div className="col-lg-12 text-center">
+                                        <div className="load-more-info text-center mt-60 mt-xs-30">
+                                            <Link className="btn circle btn-theme-effect btn-sm" to="/projects" >View All Projects</Link>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>

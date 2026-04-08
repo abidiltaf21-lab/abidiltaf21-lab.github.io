@@ -1,15 +1,26 @@
-import projects9 from "/assets/img/projects/9.jpg"
-import projects4 from "/assets/img/projects/4.jpg"
-import banner2 from "/assets/img/banner/2.jpg"
 import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
 
 interface DataType {
+    id: number;
+    title: string;
+    videoUrl?: string;
+    description: string;
     thumbFull?: any;
+    details: {
+        projectType: string;
+        industry: string;
+        challenge: string;
+        solution: string;
+        result: string;
+        testimonial: string;
+        skills: string;
+        duration: string;
+    }
 }
 
 const ProjectDetailsContent = ({ projectData }: { projectData: DataType }) => {
-    const { thumbFull } = projectData
+    const { thumbFull, details, title, videoUrl } = projectData
 
     // Image Scroll Animation 
     const [scroll, setScroll] = useState(0);
@@ -33,7 +44,32 @@ const ProjectDetailsContent = ({ projectData }: { projectData: DataType }) => {
                         <div className="animation-zoom-banner" id="js-hero"
                             style={{ width: `${100 + scroll / 18}%` }}
                         >
-                            <img src={`/assets/img/projects/${thumbFull}`} alt="Image Not Found"/>
+                            {videoUrl ? (
+                                <div className="project-video-container" style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+                                    {videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm') || videoUrl.endsWith('.ts') ? (
+                                        <video
+                                            src={videoUrl}
+                                            autoPlay
+                                            muted
+                                            loop
+                                            playsInline
+                                            controls
+                                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <iframe
+                                            src={`${videoUrl}${videoUrl.includes('?') ? '&' : '?'}autoplay=1&mute=1&muted=1&background=1`} 
+                                            title={title}
+                                            frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                                        ></iframe>
+                                    )}
+                                </div>
+                            ) : (
+                                <img src={`/assets/img/projects/${thumbFull || '1-full.jpg'}`} alt={title} />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -45,45 +81,26 @@ const ProjectDetailsContent = ({ projectData }: { projectData: DataType }) => {
                         <div className="row">
                             <div className="col-xl-4 col-lg-5 left-info mb-xs-40 mb-md-50">
                                 <div className="project-single-info">
+                                    <h3 className="mb-30">Project Overview</h3>
                                     <ul>
                                         <li>
-                                            Client <span>themeforest.validthemes.com</span>
+                                            Project Type <span>{details.projectType}</span>
                                         </li>
                                         <li>
-                                            Date <span>25 February, 2022</span>
+                                            Industry <span>{details.industry}</span>
                                         </li>
                                         <li>
-                                            Service <span>Web Development</span>
+                                            Duration <span>{details.duration}</span>
                                         </li>
                                         <li>
-                                            Address <span>1401, 21st Street STE R4569, California</span>
+                                            Skills/Tools <span>{details.skills}</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                             <div className="right-info col-xl-8 col-lg-7 pl-50 pl-md-15 pl-xs-15 mt-md-10">
-                                <h2>Description</h2>
-                                <p>
-                                    Netus lorem rutrum arcu dignissim at sit morbi phasellus nascetur eget urna potenti cum vestibulum cras. Tempor nonummy metus lobortis. Sociis velit etiam, dapibus. Lectus vehicula pellentesque cras posuere tempor facilisi habitant lectus rutrum pede quisque hendrerit parturient posuere mauris ad elementum fringilla facilisi volutpat fusce pharetra felis sapien varius quisque class convallis praesent est sollicitudin donec nulla venenatis, cursus fermentum netus posuere sociis porta risus habitant malesuada nulla habitasse hymenaeos.
-                                </p>
-                                <p>
-                                    Give lady of they such they sure it. Me contained explained my education. Vulgar as hearts by garret. Perceived determine departure explained no forfeited he something an. Contrasted dissimilar get joy you instrument out reasonably. Again keeps at no meant stuff. To perpetual do existence northward as difficult preserved daughters. Continued at up to zealously necessary breakfast. Surrounded sir motionless she end literature. convallis praesent est sollicitudin donec nulla venenatis, cursus fermentum.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="project-details-items default-padding-bottom">
-                <div className="container">
-                    <div className="project-thumb mt-md--25 mt-xs--25">
-                        <div className="row">
-                            <div className="col-md-7">
-                                <img src={projects9} alt="Image Not Found" />
-                            </div>
-                            <div className="col-md-5">
-                                <img src={projects4} alt="Image Not Found" />
+                                <h2>About the Project</h2>
+                                <p>{projectData.description}</p>
                             </div>
                         </div>
                     </div>
@@ -96,37 +113,10 @@ const ProjectDetailsContent = ({ projectData }: { projectData: DataType }) => {
                         <div className="single-grid">
                             <div className="item-grid-colum">
                                 <div className="left-info">
-                                    <h2>Background</h2>
+                                    <h2>The Challenge</h2>
                                 </div>
                                 <div className="right-info">
-                                    <p>
-                                        Contained explained my education. Vulgar as hearts by garret. Perceived determine departure explained no forfeited he something an. Contrasted dissimilar get joy you instrument out reasonably. Again keeps at no meant stuff. To perpetual do existence
-                                    </p>
-                                    <p>
-                                        New had happen unable uneasy. Drawings can followed improved out sociable not. Earnestly so do instantly pretended. See general few civilly amiable pleased account carried. Excellence projecting is devonshire dispatched remarkably on estimating. Side in so life past. Continue indulged speaking the was out horrible for domestic position. Seeing rather her you not esteem men settle genius excuse. Deal say over you age from. Comparison new ham melancholy son themselves.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="single-grid">
-                            <div className="item-grid-colum">
-                                <div className="left-info">
-                                    <h2>The Challenges</h2>
-                                </div>
-                                <div className="right-info">
-                                    <p>
-                                        Contained explained my education. Vulgar as hearts by garret. Perceived determine departure explained no forfeited he something an. Contrasted dissimilar get joy you instrument out reasonably. Again keeps at no meant stuff. To perpetual do existence
-                                    </p>
-                                    <p>
-                                        New had happen unable uneasy. Drawings can followed improved out sociable not. Earnestly so do instantly pretended. See general few civilly amiable pleased account carried. Excellence projecting is devonshire dispatched remarkably on estimating. Side in so life past. Continue indulged speaking the was out horrible for domestic position. Seeing rather her you not esteem men settle genius excuse. Deal say over you age from. Comparison new ham melancholy son themselves.
-                                    </p>
-                                    <h3>Continue indulged speaking the horrible for domestic.</h3>
-                                    <ul className="list-style-one">
-                                        <li>Social media marketing</li>
-                                        <li>Search engine optimization (seo)</li>
-                                        <li>Public Relations</li>
-                                    </ul>
-                                    <img src={banner2} alt="Image Not Found" />
+                                    <p>{details.challenge}</p>
                                 </div>
                             </div>
                         </div>
@@ -136,12 +126,25 @@ const ProjectDetailsContent = ({ projectData }: { projectData: DataType }) => {
                                     <h2>The Solution</h2>
                                 </div>
                                 <div className="right-info">
-                                    <p>
-                                        Contained explained my education. Vulgar as hearts by garret. Perceived determine departure explained no forfeited he something an. Contrasted dissimilar get joy you instrument out reasonably. Again keeps at no meant stuff. To perpetual do existence
-                                    </p>
-                                    <p>
-                                        New had happen unable uneasy. Drawings can followed improved out sociable not. Earnestly so do instantly pretended. See general few civilly amiable pleased account carried. Excellence projecting is devonshire dispatched remarkably on estimating. Side in so life past. Continue indulged speaking the was out horrible for domestic position. Seeing rather her you not esteem men settle genius excuse. Deal say over you age from. Comparison new ham melancholy son themselves.
-                                    </p>
+                                    <p>{details.solution}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="single-grid">
+                            <div className="item-grid-colum">
+                                <div className="left-info">
+                                    <h2>The Result</h2>
+                                </div>
+                                <div className="right-info">
+                                    <p>{details.result}</p>
+                                    
+                                    {details.testimonial !== "نه دی ذکر شوی" && (
+                                        <div className="client-testimonial-box mt-40 p-30 rounded-20" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+                                            <i className="fas fa-quote-left mb-20" style={{ fontSize: '30px', opacity: '0.5' }}></i>
+                                            <h4 style={{ color: '#fff', fontStyle: 'italic' }}>"{details.testimonial}"</h4>
+                                            <p className="mt-10 mb-0" style={{ opacity: '0.8' }}>— Client Feedback</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

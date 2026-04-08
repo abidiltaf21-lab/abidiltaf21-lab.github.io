@@ -1,50 +1,398 @@
 [
     {
-        "id": 1,
-        "thumb": "1.jpg",
-        "thumbFull": "1-full.jpg",
+        "id": 17,
+        "thumb": "",
+        "thumbFull": "",
         "tags": [
-            "Video",
+            "Explainer",
+            "HealthTech"
+        ],
+        "title": "Resono – Mental Health Explainer",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775634213/VFX_SFX_sd6kfe.mp4",
+        "description": "A warm and human-toned 60-second explainer video for a mental health platform, delivered in record time.",
+        "details": {
+            "projectType": "2D Explainer Video & Brand Storytelling",
+            "industry": "Mental Health / HealthTech",
+            "challenge": "Deliver a 60-second video within a tight 5-day deadline while visualizing complex therapy cases without clinical clichés.",
+            "solution": "Used a minimal modern style with white backgrounds, green brand accents, and UI mockups for a clean, professional feel.",
+            "result": "Delivered within 5 days; client approved the storyboard without changes for their vision-focused launch.",
+            "testimonial": "The storyboard looks great—I have no further changes. I trust your creative direction on all of this.",
+            "skills": "Storyboarding, Scriptwriting, After Effects, Illustrator, UI Mockup Integration, Colour Grading",
+            "duration": "5 Days"
+        }
+    },
+    {
+        "id": 18,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "SaaS",
+            "Automation"
+        ],
+        "title": "Stravon – Email Automation Demo",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/q_auto/f_auto/v1775632422/SFX_VFX_hxcqmm.mp4",
+        "description": "A fast-paced, entrepreneur-friendly explainer video demonstrating technical email automation in under 30 seconds.",
+        "details": {
+            "projectType": "2D Explainer Video & SaaS Product Demo",
+            "industry": "Email Automation / SaaS",
+            "challenge": "Explain a technical automation system visually in under 30 seconds on a tight 4-day deadline.",
+            "solution": "Used a typography-first approach with Kurzgesagt-inspired clean visuals and specific UI animated mockups.",
+            "result": "Delivered in just 4 days; the client praised the clear call-to-action and efficient typography-based storytelling.",
+            "testimonial": "The typography solution saved us time and money. The final video explains exactly how our system works – no confusion!",
+            "skills": "Storyboarding, Scriptwriting, Typography Animation, After Effects, Illustrator, UI Mockup Integration, Sound Design",
+            "duration": "4 Days"
+        }
+    },
+    {
+        "id": 19,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "E-commerce",
             "Motion"
         ],
-        "title": "Corporate Motion Design",
-        "videoUrl": "https://vimeo.com/102604246",
-        "description": "A high-end corporate motion graphics piece showcasing professional visual storytelling and brand animation."
+        "title": "QuickPickPK – E-commerce Explainer",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775641203/App_Explainer_t13zox.mp4",
+        "description": "A 2D motion graphics explainer video showcasing the benefits and seamless user experience of the QuickPickPK online shopping platform.",
+        "details": {
+            "projectType": "2D Motion Graphics (App & Web Promotion)",
+            "industry": "E-commerce / Online Shopping",
+            "challenge": "Create a short, engaging video to communicate the purpose of a shopping platform using simple and modern visuals.",
+            "solution": "Designed a custom 2D explainer with character animation and mobile UI mockups to guide viewers from problem to solution.",
+            "result": "Improved user understanding and increased potential engagement for social media marketing campaigns.",
+            "testimonial": "The video was clean, engaging, and perfectly explained our platform. Great communication and professional delivery!",
+            "skills": "Motion Graphics, 2D Character Animation, Storyboarding, UI Animation, After Effects, Illustrator, Duik Angela",
+            "duration": "2 – 4 Days"
+        }
     },
     {
-        "id": 2,
-        "thumb": "2.jpg",
-        "thumbFull": "2-full.jpg",
+        "id": 20,
+        "thumb": "",
+        "thumbFull": "",
         "tags": [
-            "Editing",
-            "VFX"
+            "Blockchain",
+            "Gaming"
         ],
-        "title": "VFX Reel - SmoothPixel",
-        "videoUrl": "https://vimeo.com/791880481",
-        "description": "Showcasing advanced visual effects, compositing, and professional editing techniques for modern advertising."
+        "title": "Enjin Coin (ENJ) – Blockchain Token for Gamers & Developers",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775641824/Game_Trailer_animated_video_c7eari.mp4",
+        "description": "A powerful 2D animated trailer showcasing Enjin Coin (ENJ) as the leading blockchain token for the modern gaming ecosystem.",
+        "details": {
+            "projectType": "2D Motion Graphics Explainer Video (App/Website Promotion)",
+            "industry": "E-commerce / Online Shopping",
+            "challenge": "Create a short, engaging video to clearly communicate the purpose and benefits of an online shopping platform while keeping the visuals simple and modern.",
+            "solution": "Designed and animated a 2D explainer video using character animation and mobile UI visualization to demonstrate platform workflow.",
+            "result": "Delivered a visually appealing video that improved user understanding and increased potential engagement for marketing.",
+            "testimonial": "The video was clean, engaging, and perfectly explained our platform. Great communication and professional delivery!",
+            "skills": "Motion Graphics, 2D Character Animation, Storyboarding, Visual Storytelling, UI Animation, After Effects, Illustrator, Duik Angela",
+            "duration": "2 – 4 Days"
+        }
     },
     {
-        "id": 3,
-        "thumb": "3.jpg",
-        "thumbFull": "3-full.jpg",
+        "id": 21,
+        "thumb": "",
+        "thumbFull": "",
         "tags": [
-            "Animation",
+            "Healthcare",
+            "Product"
+        ],
+        "title": "Antimicrobial Screen Protector",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775642117/Healthcare_Video_by_smooothpixel_kmafeh.mp4",
+        "description": "A health-focused 2D explainer video highlighting the hygiene benefits and technical features of an antimicrobial screen protector.",
+        "details": {
+            "projectType": "2D Motion Graphics Explainer Video (Product Promotion)",
+            "industry": "Consumer Electronics / Health & Hygiene",
+            "challenge": "Explain the benefits of an antimicrobial protector, showing germ protection while maintaining screen clarity in a simple way.",
+            "solution": "Used clean visuals and iconography to demonstrate how the antimicrobial layer works to reduce bacteria on surfaces.",
+            "result": "Effectively communicated hygiene benefits and increased product appeal for marketing campaigns.",
+            "testimonial": "The video perfectly highlighted our product’s key benefits. Clean design, smooth animation, and very professional execution.",
+            "skills": "Motion Graphics, 2D Animation, Product Visualization, Storyboarding, After Effects, Illustrator",
+            "duration": "2 – 3 Days"
+        }
+    },
+    {
+        "id": 22,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Marketing",
+            "Social Media"
+        ],
+        "title": "Hashtag Engine – Social Media Tool",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775642478/Social_media_Marketing_explainer_video_we5qlk.mp4",
+        "description": "A dynamic 2D explainer video for Hashtag Engine, showing how to boost social media reach and visibility through hashtag optimization.",
+        "details": {
+            "projectType": "2D Motion Graphics Explainer Video (Marketing / Digital Tool Promotion)",
+            "industry": "Digital Marketing / Social Media",
+            "challenge": "Simplify a digital marketing concept and present it in a visually attractive format suitable for fast-paced online audiences.",
+            "solution": "Designed a dynamic explainer using modern typography and UI-style animations to demonstrate hashtag generation and trend analysis.",
+            "result": "Delivered a modern marketing video suitable for ads and promotions, increasing potential reach and understanding.",
+            "testimonial": "The video was engaging, modern, and clearly explained our product. It helped us communicate our value to users effectively.",
+            "skills": "Motion Graphics, 2D Animation, Typography Animation, UI Animation, After Effects, Illustrator",
+            "duration": "1 – 3 Days"
+        }
+    },
+    {
+        "id": 5,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Animation"
+        ],
+        "title": "Animation & Motion Graphics",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775568314/1_2_uwhyg8.mp4",
+        "description": "High-end cinematic animation that brings stories to life. From character-driven 2D to advanced motion graphics, we provide industry-leading visual solutions.",
+        "details": {
+            "projectType": "Animation Service",
+            "industry": "Content Creation",
+            "challenge": "Creating high-fidelity animations that tell a story without relying solely on voiceover.",
+            "solution": "Focused on fluid character movement and expressive environment design.",
+            "result": "A comprehensive showcase of motion graphic versatility.",
+            "testimonial": "Creative, responsive, and highly skilled in bringing abstract ideas to life.",
+            "skills": "Character Animation, Motion Graphics",
+            "duration": "Variable"
+        }
+    },
+    {
+        "id": 6,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Explainer"
+        ],
+        "title": "Explainer Videos",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775483992/2D_Explainer_Video_Example_-_HP_Daily_Mail_720P_HD_jxdlah.mp4",
+        "description": "Simplifying complex products and services into engaging, high-retention video content. We cover a vast range of styles to fit your brand identity.",
+        "details": {
+            "projectType": "2D Explainer Video",
+            "industry": "Tech & Software",
+            "challenge": "Condensing complex technical information into a simple, 60-second animated story.",
+            "solution": "Used a clear script-driven approach with custom vector illustrations and icons.",
+            "result": "The final video successfully explained the product features to non-technical users.",
+            "testimonial": "Highly professional and great at simplifying the complicated.",
+            "skills": "Storyboarding, Illustration, After Effects",
+            "duration": "2 Weeks"
+        }
+    },
+    {
+        "id": 7,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Video"
+        ],
+        "title": "Video Production & Editing",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775627867/2026_Video_Editor_Showreel___Freelance_Portfolio_720P_HD_upzf3d.mp4",
+        "description": "Transforming raw footage into professional masterpieces. We handle everything from corporate documentaries to fast-paced social ads.",
+        "details": {
+            "projectType": "Full Post-Production",
+            "industry": "Media Houses",
+            "challenge": "Maintaining high production value across diverse editing styles and genres.",
+            "solution": "Developed a specialized workflow for color grading and audio mastering.",
+            "result": "A high-retention showreel that demonstrates professional editing speed and quality.",
+            "testimonial": "Quick turnaround and fantastic editing sense. A pleasure to work with.",
+            "skills": "Premiere Pro, DaVinci Resolve",
+            "duration": "Weekly"
+        }
+    },
+    {
+        "id": 8,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Product"
+        ],
+        "title": "Product & Commercial Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775568824/2D_Explainer_Video_Animation_for_Healthcare_Product__GentleCath_Catheter___Motion_Graphics_Animation_720P_HD_bqqkmt.mp4",
+        "description": "Photorealistic 3D and 2D animations that showcase your product's features and benefits with stunning detail.",
+        "details": {
+            "projectType": "Commercial Animation",
+            "industry": "Healthcare & Retail",
+            "challenge": "Accurately representing product functionality while keeping the visuals engaging.",
+            "solution": "Combined realistic 2D/3D visualizations with clear, clinical-style motion graphics.",
+            "result": "Improved customer understanding of the product benefits.",
+            "testimonial": "The clarity of the animation significantly helped our marketing efforts.",
+            "skills": "2D Animation, Product Visualization",
+            "duration": "12 Days"
+        }
+    },
+    {
+        "id": 9,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Business"
+        ],
+        "title": "Business & Corporate Media",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775569318/main_sfx_dm4det.mp4",
+        "description": "Enhancing corporate communication through professional branding films, training videos, and pitch media.",
+        "details": {
+            "projectType": "Corporate Branding Video",
+            "industry": "Corporate Business",
+            "challenge": "Balancing informational content with emotional storytelling for corporate impact.",
+            "solution": "Used cinematic b-roll and professional soundscapes to create a premium feel.",
+            "result": "Successful deployment across internal and external shareholder meetings.",
+            "testimonial": "Stunning quality that exceeded our company’s expectations.",
+            "skills": "Art Direction, Video Production",
+            "duration": "3 Weeks"
+        }
+    },
+    {
+        "id": 10,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Design"
+        ],
+        "title": "Design & Branding",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775628092/SZEN_-_Branding_Agency_Showreel_2025_720P_HD_jcfhov.mp4",
+        "description": "Crafting timeless visual identities that define your brand's future. From minimalist logos to complete brand kits.",
+        "details": {
+            "projectType": "Visual Identity",
+            "industry": "Design Agency",
+            "challenge": "Creating a cohesive brand system that works across digital and print media.",
+            "solution": "Focused on minimalist principles and strong typographic hierarchies.",
+            "result": "A complete, ready-to-launch brand kit for the client.",
+            "testimonial": "Clean, modern, and perfectly aligned with our vision.",
+            "skills": "Graphic Design, Branding Kit",
+            "duration": "1 Month"
+        }
+    },
+    {
+        "id": 11,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Web"
+        ],
+        "title": "Web & App Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775569089/Exciting_SaaS_Explainer_Video___Bringing_Fintech_App_to_Life_with_Character_Animation_720P_HD_t39yyf.mp4",
+        "description": "Interactive motion design that brings digital products to life. High-performance Lottie animations and UI micro-interactions.",
+        "details": {
+            "projectType": "UI/UX Motion",
+            "industry": "Tech & SaaS",
+            "challenge": "Visualizing complex app interfaces in a way that feels natural and high-tech.",
+            "solution": "Integrated Figma designs directly into the animation workflow for pixel-perfect results.",
+            "result": "Enhanced user perception of the app's ease of use.",
+            "testimonial": "The UI animations are smooth and modern. Exactly what we needed.",
+            "skills": "Lottie, Figma, After Effects",
+            "duration": "1 Week"
+        }
+    },
+    {
+        "id": 12,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
             "Logo"
         ],
-        "title": "3D Logo Animation",
-        "videoUrl": "https://vimeo.com/1053744634",
-        "description": "Dynamic 3D logo reveal with custom textures and lighting to create a memorable brand entry."
+        "title": "Logo & Lottie Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775630686/sdgf_dahm7z.mp4",
+        "description": "Bring your brand identity to life with cinematic logo glows and high-performance Lottie animations.",
+        "details": {
+            "projectType": "Digital Asset Animation",
+            "industry": "Modern Branding",
+            "challenge": "Ensuring complex animations remain performant for web use through Lottie/JSON.",
+            "solution": "Optimized vectors and minimized keyframes to ensure fast load times.",
+            "result": "Lightweight, high-quality animations ready for any digital platform.",
+            "testimonial": "Amazing Lottie skills. High quality and extremely fast load times.",
+            "skills": "Lottie, JSON, Vector Art",
+            "duration": "4 Days"
+        }
     },
     {
-        "id": 4,
-        "thumb": "6.jpg",
-        "thumbFull": "6-full.jpg",
+        "id": 13,
+        "thumb": "",
+        "thumbFull": "",
         "tags": [
-            "Commercial",
-            "Promo"
+            "Service",
+            "3D"
         ],
-        "title": "Social Media Ad Promo",
-        "videoUrl": "https://vimeo.com/1018318182",
-        "description": "Fast-paced social media promotional video optimized for high engagement and conversion."
+        "title": "3D Product Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775631017/3D_Product_Animation_showreel_2026___Blender_720P_HD_ovsvd0.mp4",
+        "description": "Showcase your product's features and design with high-fidelity 3D animations.",
+        "details": {
+            "projectType": "3D Product Visualization",
+            "industry": "Consumer Tech",
+            "challenge": "Achieving photo-realism and complex camera movements around high-detail 3D models.",
+            "solution": "Used Blender's Cycles engine for high-end lighting and materials.",
+            "result": "A cinematic product showcase that highlight's premium design details.",
+            "testimonial": "The realism is breathtaking. A true 3D professional.",
+            "skills": "Blender, Cycles, Lighting",
+            "duration": "15 Days"
+        }
+    },
+    {
+        "id": 14,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Whiteboard"
+        ],
+        "title": "Whiteboard Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775641714/Whiteboard_explainer_video_mfh0jh.mp4",
+        "description": "Simplify complex ideas with the power of hand-drawn whiteboard animation.",
+        "details": {
+            "projectType": "Hand-Drawn Explainer",
+            "industry": "Educational Services",
+            "challenge": "Striking the right balance between hand-drawn sketches and smooth animation flow.",
+            "solution": "Focused on high-quality custom illustrations and rhythmic pacing.",
+            "result": "An easy-to-follow educational video with high retention rates.",
+            "testimonial": "Simplifies complex training modules perfectly. Highly recommended.",
+            "skills": "Illustration, Storytelling",
+            "duration": "1 Week"
+        }
+    },
+    {
+        "id": 15,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Typography"
+        ],
+        "title": "Text Animation & Typography",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775632422/SFX_VFX_hxcqmm.mp4",
+        "description": "Dynamic kinetic typography and engaging text animations that bring words to life.",
+        "details": {
+            "projectType": "Kinetic Typography",
+            "industry": "Music & Branding",
+            "challenge": "Matching the kinetic energy of the text with complex sound effects and music.",
+            "solution": "Synced every keyframe to the audio rhythm for a punchy, high-energy result.",
+            "result": "A visually dynamic video that keeps viewers hooked until the end.",
+            "testimonial": "The rhythm and timing are perfect. Great typography skills!",
+            "skills": "Typography, Rhythmic Sync",
+            "duration": "6 Days"
+        }
+    },
+    {
+        "id": 16,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Service",
+            "Infographic"
+        ],
+        "title": "Infographic Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775632810/Infographics___Squideo_Animated_Explainer_Videos_720P_60FPS_ewaaw6.mp4",
+        "description": "Transforming complex data and statistics into engaging animated infographics.",
+        "details": {
+            "projectType": "Data-Driven Animation",
+            "industry": "Financial & Strategy",
+            "challenge": "Presenting data-heavy charts and graphs in an engaging and non-boring manner.",
+            "solution": "Used vibrant color palettes and custom transitions to make numbers exciting.",
+            "result": "Transformed a dry financial report into a visually engaging video presentation.",
+            "testimonial": "Brought our annual data to life beautifully. Amazing work.",
+            "skills": "Data Viz, Illustration",
+            "duration": "10 Days"
+        }
     }
 ]

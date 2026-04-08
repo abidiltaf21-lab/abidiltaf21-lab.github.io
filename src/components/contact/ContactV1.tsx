@@ -99,7 +99,8 @@ const ContactV1 = ({ sectionClass }: DataType) => {
                                                 <div className="icon"><i className="fas fa-envelope"></i></div>
                                                 <div className="email-text">
                                                     <span>Official Email</span>
-                                                    <a href="mailto:info@smooothpixel.com">info@smooothpixel.com</a>
+                                                    <a href="mailto:info@smooothpixel.com" style={{ marginBottom: "2px" }}>info@smooothpixel.com</a>
+                                                    <a href="mailto:smooothpixelteam@gmail.com">smooothpixelteam@gmail.com</a>
                                                 </div>
                                             </div>
 
@@ -364,15 +365,15 @@ const ContactV1 = ({ sectionClass }: DataType) => {
                     transform: translateX(5px);
                 }
                 .contact-email-badge .icon {
-                    width: 40px;
-                    height: 40px;
+                    width: 52px;
+                    height: 52px;
                     background: var(--color-primary);
                     color: black;
-                    border-radius: 10px;
+                    border-radius: 12px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 18px;
+                    font-size: 24px;
                 }
                 .contact-email-badge .email-text {
                     display: flex;

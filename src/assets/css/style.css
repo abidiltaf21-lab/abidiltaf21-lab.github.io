@@ -5012,6 +5012,8 @@ a.btn-circle-large img {
 	z-index: 1;
 	margin-left: 30px;
 	font-size: 20px;
+	display: inline-block;
+	vertical-align: middle;
 }
 
 .promo-box-items .fa-skype {
@@ -5029,6 +5031,7 @@ a.btn-circle-large img {
 	width: 350%;
 	background: url('/assets/img/shape/14.png');
 	background-size: contain;
+	background-position: center center;
 	background-repeat: no-repeat;
 	z-index: -1;
 	transform: translate(-50%, -50%);

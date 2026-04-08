@@ -16,13 +16,25 @@ const ServicesDetailsContent = () => {
                             <div className="col-xl-12">
                                 {service.videoUrl ? (
                                     <div className="service-video-container">
-                                        <iframe
-                                            src={service.videoUrl}
-                                            title={`${service.title} Video`}
-                                            frameBorder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                            allowFullScreen
-                                        ></iframe>
+                                        {service.videoUrl.endsWith('.mp4') || service.videoUrl.endsWith('.webm') || service.videoUrl.endsWith('.ts') ? (
+                                            <video
+                                                src={service.videoUrl}
+                                                autoPlay
+                                                muted
+                                                loop
+                                                playsInline
+                                                controls
+                                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <iframe
+                                                src={`${service.videoUrl}${service.videoUrl.includes('?') ? '&' : '?'}autoplay=1&mute=1&muted=1&background=1`} 
+                                                title={`${service.title} Video`}
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                allowFullScreen
+                                            ></iframe>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="service-single-thumb">

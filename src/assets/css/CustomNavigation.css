@@ -128,6 +128,8 @@ nav.validnavs .dropdown-menu {
 .service-video-container {
     position: relative;
     width: 100%;
+    width: 100%;
+    width: 100%;
     aspect-ratio: 16 / 9;
     border-radius: 10px;
     overflow: hidden;
@@ -441,4 +443,14 @@ nav.validnavs .dropdown-menu {
 
 .bg-dark .testimonial-style-three-item .content p {
     color: #ccc;
+}
+/* Custom override for react-modal-video to limit size to 720x405 */
+.modal-video-inner {
+    width: 100% !important;
+    max-width: 1140px !important;
+    margin: 0 auto !important;
+}
+
+.modal-video-movie-wrap {
+    padding-bottom: 56.25% !important; /* Forces 16:9 aspect ratio */
 }

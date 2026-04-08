@@ -18,7 +18,7 @@ const Home = () => {
             <LayoutV1>
                 <BannerV1 />
                 <ServicesV1 sectionClass="default-padding" hasTitle={true} />
-                <PortfolioV1 sectionClass="bg-gray default-padding" hasTitle={true} />
+                <PortfolioV1 sectionClass="bg-gray default-padding" hasTitle={true} maxItems={6} />
                 <FactV1 />
                 <ResumeV1 sectionClass="bg-gray default-padding" />
                 <TestimonialV3 testimonials={TestimonialData} />

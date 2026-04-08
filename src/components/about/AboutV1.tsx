@@ -1,17 +1,21 @@
 import { useEffect } from 'react';
 import shape3 from "/assets/img/shape/3.png"
 import shape8 from "/assets/img/shape/8.png"
-import team14 from "/assets/img/team/14.jpg"
-import team15 from "/assets/img/team/15.jpg"
-import team16 from "/assets/img/team/16.jpg"
-import team17 from "/assets/img/team/17.jpg"
+import client1 from "/assets/img/clint image/1000_F_37433608_p1ubWlKot1KeZFxdBi4.jpg"
+import client2 from "/assets/img/clint image/3.jpg"
+import client3 from "/assets/img/clint image/53878917247_774aa88057_k-(1)b28bece.jpg"
+import client4 from "/assets/img/clint image/stylish-casual-hipster-girl-in-cap-.jpg"
 import CountUp from 'react-countup';
 import { Link } from "react-router-dom";
 import gsap from 'gsap';
+import PortfolioData from "../../assets/jsonData/portfolio/PortfolioData.json";
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const AboutV1 = () => {
+
+    const baseProjects = 1557;
+    const totalProjects = baseProjects + PortfolioData.length;
 
     // Scroll Animation 
     useEffect(() => {
@@ -80,7 +84,7 @@ const AboutV1 = () => {
                                     </div>
                                     <div className="fun-fact">
                                         <div className="counter">
-                                            <div className="timer"><CountUp end={1568} enableScrollSpy={true} /></div>
+                                            <div className="timer"><CountUp end={totalProjects} enableScrollSpy={true} /></div>
                                             <div className="operator">+</div>
                                         </div>
                                         <span className="medium">Projects Done</span>
@@ -90,10 +94,10 @@ const AboutV1 = () => {
                                 <div className="clieents-list mt-40 pt-30 border-top">
                                     <div className="d-flex align-center justify-between">
                                         <div className="thumb">
-                                            <img src={team14} alt="Client" />
-                                            <img src={team15} alt="Client" />
-                                            <img src={team16} alt="Client" />
-                                            <img src={team17} alt="Client" />
+                                            <img src={client1} style={{ objectFit: 'cover' }} alt="Client" />
+                                            <img src={client2} style={{ objectFit: 'cover' }} alt="Client" />
+                                            <img src={client3} style={{ objectFit: 'cover' }} alt="Client" />
+                                            <img src={client4} style={{ objectFit: 'cover' }} alt="Client" />
                                         </div>
                                         <div className="info text-right">
                                             <h5 className="mb-0">783 Clients</h5>

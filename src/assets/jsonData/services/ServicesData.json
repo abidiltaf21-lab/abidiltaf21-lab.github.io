@@ -40,5 +40,35 @@
         "title": "Web & App Animation",
         "icon": "fas fa-mobile-alt",
         "text": "Interactive UI motion design for digital products and websites."
+    },
+    {
+        "id": 8,
+        "title": "Logo & Lottie Animation",
+        "icon": "fas fa-magic",
+        "text": "Stunning animated logo reveals and high-performance Lottie animations for web and apps."
+    },
+    {
+        "id": 9,
+        "title": "3D Product Animation",
+        "icon": "fas fa-box-open",
+        "text": "High-quality 3D animations showcasing your products in realistic environments."
+    },
+    {
+        "id": 10,
+        "title": "Text Animation",
+        "icon": "fas fa-font",
+        "text": "Kinetic typography and engaging text animations that highlight your message."
+    },
+    {
+        "id": 11,
+        "title": "Whiteboard Animation",
+        "icon": "fas fa-pencil-alt",
+        "text": "Engaging hand-drawn whiteboard animations to simplify and explain your ideas."
+    },
+    {
+        "id": 12,
+        "title": "Infographic Animation",
+        "icon": "fas fa-chart-line",
+        "text": "Transforming complex data and statistics into engaging animated infographics."
     }
 ]

@@ -55,7 +55,7 @@
         ],
         "faq": [],
         "testimonials": [],
-        "videoUrl": ""
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775568314/1_2_uwhyg8.mp4"
     },
     {
         "id": 2,
@@ -101,7 +101,7 @@
         ],
         "faq": [],
         "testimonials": [],
-        "videoUrl": ""
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775483992/2D_Explainer_Video_Example_-_HP_Daily_Mail_720P_HD_jxdlah.mp4"
     },
     {
         "id": 3,
@@ -142,7 +142,7 @@
         ],
         "faq": [],
         "testimonials": [],
-        "videoUrl": ""
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775627867/2026_Video_Editor_Showreel___Freelance_Portfolio_720P_HD_upzf3d.mp4"
     },
     {
         "id": 4,
@@ -179,7 +179,7 @@
         ],
         "faq": [],
         "testimonials": [],
-        "videoUrl": ""
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775568824/2D_Explainer_Video_Animation_for_Healthcare_Product__GentleCath_Catheter___Motion_Graphics_Animation_720P_HD_bqqkmt.mp4"
     },
     {
         "id": 5,
@@ -215,7 +215,7 @@
         ],
         "faq": [],
         "testimonials": [],
-        "videoUrl": ""
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775569318/main_sfx_dm4det.mp4"
     },
     {
         "id": 6,
@@ -250,7 +250,7 @@
         ],
         "faq": [],
         "testimonials": [],
-        "videoUrl": ""
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775628092/SZEN_-_Branding_Agency_Showreel_2025_720P_HD_jcfhov.mp4"
     },
     {
         "id": 7,
@@ -286,6 +286,188 @@
         ],
         "faq": [],
         "testimonials": [],
-        "videoUrl": ""
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775569089/Exciting_SaaS_Explainer_Video___Bringing_Fintech_App_to_Life_with_Character_Animation_720P_HD_t39yyf.mp4"
+    },
+    {
+        "id": 8,
+        "title": "Logo & Lottie Animation",
+        "mainTitle": "High-Impact Logo & Lottie Animation Solutions",
+        "description": "Bring your brand identity to life with cinematic logo glows and high-performance Lottie animations. We specialize in creating memorable first impressions for web and mobile.",
+        "secondaryDescription": "From minimalist 2D reveals to dev-ready Lottie files, we ensure your motion assets are lightweight, scalable, and stunning.",
+        "groups": [
+            {
+                "name": "Service Styles",
+                "items": [
+                    "Minimalist 2D Logo Reveal",
+                    "3D Logo Reveal",
+                    "Lottie Web Animation",
+                    "Mobile App Lottie Icons",
+                    "Particle & VFX Animation",
+                    "Glitch & Tech Reveal",
+                    "Character-Based Reveal"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Vector Preparation",
+                "text": "Deconstructing your logo for animation."
+            },
+            {
+                "title": "Motion Concept",
+                "text": "Defining the rhythm and style."
+            },
+            {
+                "title": "VFX & Sound",
+                "text": "Final polish with visual and audio effects."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775630686/sdgf_dahm7z.mp4"
+    },
+    {
+        "id": 9,
+        "title": "3D Product Animation",
+        "mainTitle": "Photorealistic 3D Product Visualization & Animation",
+        "description": "Showcase your product's features and design with high-fidelity 3D animations. We create stunning visuals that highlight every detail.",
+        "secondaryDescription": "Perfect for tech gadgets, luxury goods, and industrial equipment where precision and realism are paramount.",
+        "groups": [
+            {
+                "name": "3D Services",
+                "items": [
+                    "Product Exploded Views",
+                    "Cinematic Product Promos",
+                    "Industrial Visualization",
+                    "Medical Device Animation",
+                    "E-commerce 360 Animation"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "3D Modeling",
+                "text": "Creating a precise digital twin."
+            },
+            {
+                "title": "Lighting & Materials",
+                "text": "Adding photorealistic textures."
+            },
+            {
+                "title": "Cinematic Motion",
+                "text": "Capturing the product from dynamic angles."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/v1775631017/3D_Product_Animation_showreel_2026___Blender_720P_HD_ovsvd0.mp4"
+    },
+    {
+        "id": 10,
+        "title": "Text Animation",
+        "mainTitle": "Dynamic Kinetic Typography & Text Animation",
+        "description": "Transforming static text into engaging visual messages. We use kinetic typography to communicate your story with impact.",
+        "secondaryDescription": "Our text animations are designed for high readability and engagement across social media and corporate presentations.",
+        "groups": [
+            {
+                "name": "Typography Styles",
+                "items": [
+                    "Kinetic Typography",
+                    "Lyric Videos",
+                    "Social Media Quote Animation",
+                    "Corporate Presentation Titles",
+                    "Animated Infographic Text"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Script & Rhythm",
+                "text": "Aligning text with timing and message."
+            },
+            {
+                "title": "Design & Layout",
+                "text": "Choosing fonts that match your brand."
+            },
+            {
+                "title": "Motion Keyframing",
+                "text": "Adding dynamic energy to every word."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775632422/SFX_VFX_hxcqmm.mp4"
+    },
+    {
+        "id": 11,
+        "title": "Whiteboard Animation",
+        "mainTitle": "Engaging & Educational Whiteboard Animation",
+        "description": "Simplify complex ideas with the power of hand-drawn whiteboard animation. We create visual stories that educate and inspire your audience.",
+        "secondaryDescription": "Perfect for training videos, educational content, and product explainers that need a personal touch.",
+        "groups": [
+            {
+                "name": "Service Styles",
+                "items": [
+                    "Classic Whiteboard Sketch",
+                    "Full-Color Whiteboard Animation",
+                    "Hybrid 2D & Whiteboard",
+                    "Custom Hand-Drawn Illustrations",
+                    "Educational Storytelling"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Script & Storyboard",
+                "text": "Outlining the visual and narrative flow."
+            },
+            {
+                "title": "Illustration",
+                "text": "Creating custom hand-drawn assets."
+            },
+            {
+                "title": "Animation",
+                "text": "Syncing the sketches with voiceover."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775631714/Whiteboard_explainer_video_mfh0jh.mp4"
+    },
+    {
+        "id": 12,
+        "title": "Infographic Animation",
+        "mainTitle": "Data-Driven Animated Infographics",
+        "description": "Visualize your data with impact. We transform complex statistics and information into engaging, easy-to-understand animated infographics.",
+        "secondaryDescription": "Perfect for corporate reports, educational presentations, and data-heavy marketing campaigns.",
+        "groups": [
+            {
+                "name": "Infographic Styles",
+                "items": [
+                    "Data Visualization Animation",
+                    "Statistical Motion Graphics",
+                    "Timeline Animation",
+                    "Process Flow Animation",
+                    "Interactive Data Charts"
+                ]
+            }
+        ],
+        "process": [
+            {
+                "title": "Data Analysis",
+                "text": "Simplifying the core information."
+            },
+            {
+                "title": "Visual Storyboarding",
+                "text": "Planning the flow of data."
+            },
+            {
+                "title": "Motion Design",
+                "text": "Animating numbers and graphics."
+            }
+        ],
+        "faq": [],
+        "testimonials": [],
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1775632810/Infographics___Squideo_Animated_Explainer_Videos_720P_60FPS_ewaaw6.mp4"
     }
 ]
