@@ -16,7 +16,7 @@ const Home = () => {
     return (
         <>
             <SEO 
-                title="SmooothPixel – Motion Graphics & Digital Animation Portfolio" 
+                title="Motion Graphics & Digital Animation Portfolio" 
                 description="Explore SmooothPixel, the portfolio of Abidullah Iltaf, showcasing cutting-edge 2D & 3D animations, motion graphics, and digital design projects."
             />
             <LayoutV1>

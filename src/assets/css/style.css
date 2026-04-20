@@ -6707,7 +6707,6 @@ body.loaded {
 .pf-tags-modern {
     display: flex;
     gap: 10px;
-    margin-bottom: 15px;
 }
 
 .pf-tags-modern li a {
@@ -6745,5 +6744,86 @@ body.loaded {
 @media (max-width: 767px) {
     .modern-portfolio-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================== 
+    # Professional Portfolio Filter
+=================================================================== */
+.portfolio-filter-nav {
+    margin-bottom: 60px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: block;
+    width: 100%;
+}
+
+.bg-dark .portfolio-filter-nav {
+    border-bottom-color: rgba(255,255,255,0.08);
+}
+
+.portfolio-filter-nav ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding-bottom: 15px;
+}
+
+.portfolio-filter-nav li {
+    position: relative;
+}
+
+.portfolio-filter-nav li button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-paragraph);
+    transition: all 0.3s;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.portfolio-filter-nav li button.active {
+    color: var(--color-primary);
+}
+
+.portfolio-filter-nav li button::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-primary);
+    transition: all 0.3s;
+}
+
+.portfolio-filter-nav li button.active::after {
+    width: 100%;
+}
+
+.portfolio-filter-nav li button:hover {
+    color: var(--color-primary);
+}
+
+@media (max-width: 991px) {
+    .portfolio-filter-nav ul {
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        padding-bottom: 20px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .portfolio-filter-nav ul::-webkit-scrollbar {
+        display: none;
+    }
+    .portfolio-filter-nav li {
+        margin-right: 15px;
     }
 }

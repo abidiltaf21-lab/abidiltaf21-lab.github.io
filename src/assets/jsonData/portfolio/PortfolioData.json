@@ -1,5 +1,74 @@
 [
     {
+        "id": 25,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Explainer",
+            "Infographic",
+            "Marketing"
+        ],
+        "title": "Dynamic Infographic & Data Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1776596153/Infographic_explainer_video_2_hu8phb.mp4",
+        "description": "A modern infographic explainer video designed to communicate information through animated charts and motion graphics. It transforms complex data into simple, engaging visual stories.",
+        "details": {
+            "projectType": "Infographic Explainer Video / Motion Graphics",
+            "industry": "Business / Marketing / Technology",
+            "challenge": "Transforming complex statistics and data into a visually powerful and engaging video format.",
+            "solution": "Used animated charts, icons, and custom transitions with smooth motion graphics to maintain audience engagement.",
+            "result": "Created a professional video that helps businesses explain services and present statistics effectively.",
+            "testimonial": "",
+            "skills": "Adobe After Effects, Motion Graphics, Infographic Animation, Data Visualization, Video Editing",
+            "duration": "4 Days"
+        }
+    },
+    {
+        "id": 24,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Explainer",
+            "Cybersecurity",
+            "Technology"
+        ],
+        "title": "Cybersecurity & Data Protection Explainer",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1776595156/Cybersecurity_explainer_video_2_ffcmfs.mp4",
+        "description": "A modern animated explainer video created for a cybersecurity business to present services clearly. It focuses on digital safety, data protection, and trust-building through smooth motion graphics.",
+        "details": {
+            "projectType": "2D Explainer Video / Cybersecurity Promo",
+            "industry": "Cybersecurity / Technology",
+            "challenge": "Simplify technical cybersecurity concepts into an attractive promotional format.",
+            "solution": "Used visual storytelling and clean motion graphics to illustrate complex data protection services.",
+            "result": "Helped the audience understand the value of the company's cybersecurity offerings professionally.",
+            "testimonial": "",
+            "skills": "Adobe After Effects, Motion Graphics, Explainer Animation, Storyboarding, Video Editing",
+            "duration": "5 Days"
+        }
+    },
+    {
+        "id": 23,
+        "thumb": "",
+        "thumbFull": "",
+        "tags": [
+            "Explainer",
+            "App Promo",
+            "SaaS"
+        ],
+        "title": "App Promo & SaaS Explainer Animation",
+        "videoUrl": "https://res.cloudinary.com/ddxrpqctk/video/upload/f_auto,q_auto/v1776593517/1_1_urtfzs.mp4",
+        "description": "A modern 2D explainer video and app promo created to highlight key features through clean motion graphics and smooth transitions.",
+        "details": {
+            "projectType": "2D Explainer Video / App Promo Animation",
+            "industry": "Technology / Mobile App / SaaS",
+            "challenge": "Capture attention and explain the service quickly to increase customer trust.",
+            "solution": "Used custom 2D illustrations and UI mockups with fluid animation for a professional promotional experience.",
+            "result": "Delivered a visually appealing 5-day project that simplifies complex app features into an engaging story.",
+            "testimonial": "",
+            "skills": "Adobe After Effects, Motion Graphics, UI Animation, Storyboarding, Video Editing",
+            "duration": "5 Days"
+        }
+    },
+    {
         "id": 17,
         "thumb": "",
         "thumbFull": "",
