@@ -42,10 +42,10 @@ const ProjectDetailsContent = ({ projectData }: { projectData: DataType }) => {
                 <div className="container">
                     <div className="image-move-bg">
                         <div className="animation-zoom-banner" id="js-hero"
-                            style={{ width: `${100 + scroll / 18}%` }}
+                            style={videoUrl ? { width: '100%', transition: 'none' } : { width: `${100 + scroll / 18}%` }}
                         >
                             {videoUrl ? (
-                                <div className="project-video-container" style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+                                <div className="project-video-container" style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', background: '#000' }}>
                                     {videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm') || videoUrl.endsWith('.ts') ? (
                                         <video
                                             src={videoUrl}
@@ -58,7 +58,7 @@ const ProjectDetailsContent = ({ projectData }: { projectData: DataType }) => {
                                         />
                                     ) : (
                                         <iframe
-                                            src={`${videoUrl}${videoUrl.includes('?') ? '&' : '?'}autoplay=1&mute=1&muted=1&background=1`} 
+                                            src={`${videoUrl}${videoUrl.includes('?') ? '&' : '?'}autoplay=1&mute=1&muted=1&background=1&controls=1&rel=0&showinfo=0`} 
                                             title={title}
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
