@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// In dev, prefer /api (Vite proxy → backend). Fallback to direct HTTPS URL.
+// Use the env variable set in Vercel / .env — NEVER fall back to localhost in production
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ||
-    (import.meta.env.DEV ? '/api' : 'https://localhost:7273/api');
+    (import.meta.env.DEV ? '/api' : '');
 
 export const apiClient = axios.create({
     baseURL: API_BASE_URL,
