@@ -1,0 +1,202 @@
+import { useEffect } from 'react';
+import shape3 from "/assets/img/shape/3.png"
+import shape8 from "/assets/img/shape/8.png"
+import client1 from "/assets/img/clint image/1000_F_37433608_p1ubWlKot1KeZFxdBi4.jpg"
+import client2 from "/assets/img/clint image/3.jpg"
+import client3 from "/assets/img/clint image/53878917247_774aa88057_k-(1)b28bece.jpg"
+import client4 from "/assets/img/clint image/stylish-casual-hipster-girl-in-cap-.jpg"
+import CountUp from 'react-countup';
+import { Link } from "react-router-dom";
+import gsap from 'gsap';
+import PortfolioData from "../../assets/jsonData/portfolio/PortfolioData.json";
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLanguage } from '../../context/LanguageContext';
+gsap.registerPlugin(ScrollTrigger);
+
+const AboutV1 = () => {
+    const { t } = useLanguage();
+    const baseProjects = 1557;
+    const totalProjects = baseProjects + PortfolioData.length;
+
+    // Scroll Animation 
+    useEffect(() => {
+        const upDown_Scroll = document.querySelector(".upDownScrol");
+
+        if (upDown_Scroll) {
+            gsap.set(upDown_Scroll, { yPercent: 105 });
+
+            const scrollAnimation = gsap.to(upDown_Scroll, {
+                yPercent: -105,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: upDown_Scroll,
+                    end: "bottom center",
+                    scrub: 1,
+                },
+            });
+
+            // Cleanup function to kill the animation on unmount
+            return () => {
+                scrollAnimation.kill();
+                const scrollTriggers = ScrollTrigger.getAll();
+                scrollTriggers.forEach((trigger) => trigger.kill());
+            };
+        }
+    }, []);
+
+    return (
+        <>
+            <div id="about" className="about-style-one-area bg-gray default-padding">
+                <div className="shape-style-one">
+                    <img src={shape3} alt="Image Not Found" />
+                    <img className="upDownScrol" src={shape8} alt="Image Not Found" />
+                </div>
+                <div className="container">
+                    <div className="row align-center">
+                        <div className="col-lg-7 pr-80 pr-md-15 pr-xs-15">
+                            <div className="about-style-one-info">
+                                <h4 className="sub-title">{t('about_sub')}</h4>
+                                <h2 className="title premium-gradient-title">{t('about_title')}</h2>
+                                <p>{t('about_p1')}</p>
+                                <p>{t('about_p2')}</p>
+                                <Link className="btn-style-four mt-20" to="#" >
+                                    {t('view_showreel')} <i className="fas fa-arrow-right" />
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="col-lg-5">
+                            <div className="about-stats-card sp-card p-40">
+                                <div className="profile-thumb-wrapper text-center mb-40">
+                                    <img src="/assets/img/about/profile.png" alt="Profile" className="profile-img" />
+                                    <div className="status-online"></div>
+                                </div>
+
+                                <div className="stats-grid">
+                                    <div className="fun-fact">
+                                        <div className="counter">
+                                            <div className="timer"> <CountUp end={15} enableScrollSpy={true} /></div>
+                                            <div className="operator">+</div>
+                                        </div>
+                                        <span className="medium">{t('years_experience')}</span>
+                                    </div>
+                                    <div className="fun-fact">
+                                        <div className="counter">
+                                            <div className="timer"><CountUp end={totalProjects} enableScrollSpy={true} /></div>
+                                            <div className="operator">+</div>
+                                        </div>
+                                        <span className="medium">{t('projects_done')}</span>
+                                    </div>
+                                </div>
+
+                                <div className="clieents-list mt-40 pt-30 border-top">
+                                    <div className="d-flex align-center justify-between">
+                                        <div className="thumb">
+                                            <img src={client1} style={{ objectFit: 'cover' }} alt="Client" />
+                                            <img src={client2} style={{ objectFit: 'cover' }} alt="Client" />
+                                            <img src={client3} style={{ objectFit: 'cover' }} alt="Client" />
+                                            <img src={client4} style={{ objectFit: 'cover' }} alt="Client" />
+                                        </div>
+                                        <div className="info text-right">
+                                            <h5 className="mb-0">783 {t('clients')}</h5>
+                                            <span className="text-sm opacity-70">{t('satisfied_globally')}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>{`
+                .premium-gradient-title {
+                    background: linear-gradient(90deg, var(--color-heading), var(--color-primary));
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                .bg-dark .premium-gradient-title {
+                    background: linear-gradient(90deg, #fff, var(--color-primary));
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                .profile-img {
+                    width: 140px;
+                    height: 140px;
+                    border-radius: 40px;
+                    object-fit: cover;
+                    border: 8px solid var(--bg-gray-secondary);
+                    transition: all 0.35s ease-in-out;
+                }
+                .bg-dark .profile-img {
+                    border-color: var(--dark-optional);
+                }
+                .about-stats-card:hover .profile-img {
+                    transform: scale(1.05) rotate(3deg);
+                    border-color: var(--color-primary);
+                }
+                .stats-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    text-align: center;
+                }
+                .about-stats-card .fun-fact .counter {
+                    font-size: 100px;
+                    font-weight: 900;
+                    background: linear-gradient(180deg, var(--color-primary), #ffed4a);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    line-height: 1;
+                    margin-bottom: 15px;
+                    letter-spacing: -2px;
+                    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.05));
+                }
+                .about-stats-card .fun-fact .timer {
+                    font-size: 100px;
+                    font-weight: 900;
+                }
+                .bg-dark .fun-fact .counter {
+                    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+                }
+                .fun-fact .counter .operator {
+                    font-size: 36px;
+                    font-weight: 800;
+                    margin-left: 5px;
+                    -webkit-text-fill-color: var(--color-primary);
+                    background: none;
+                }
+埋–                .fun-fact span {
+                    font-size: 15px;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    font-weight: 700;
+                    color: var(--color-primary);
+                }
+                .border-top {
+                    border-top: 1px solid rgba(0,0,0,0.05);
+                }
+                .bg-dark .border-top {
+                    border-top-color: rgba(255,255,255,0.05);
+                }
+                .status-online {
+                    position: absolute;
+                    bottom: 0;
+                    right: 35%;
+                    width: 25px;
+                    height: 25px;
+                    background: #2ecc71;
+                    border: 4px solid var(--white);
+                    border-radius: 50%;
+                }
+                .bg-dark .status-online {
+                    border-color: var(--dark-secondary);
+                }
+            `}</style>
+        </>
+    );
+};
+
+export default AboutV1;

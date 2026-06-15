@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "thumb": "1.jpg",
+        "tag": "Design",
+        "date": "July 24, 2024",
+        "title": "Picked up brussels burger signications with ham efforts.",
+        "animationDelay": "100ms"
+    },
+    {
+        "id": 2,
+        "thumb": "2.jpg",
+        "tag": "Mockup",
+        "date": "October 18, 2024",
+        "title": "This prefabrice passive house is highly sustainable with intent",
+        "animationDelay": "200ms"
+    },
+    {
+        "id": 3,
+        "thumb": "3.jpg",
+        "tag": "Discuss",
+        "date": "August 26, 2024",
+        "title": "Announcing if attachment resolution sentim commercial.",
+        "animationDelay": "400ms"
+    }
+]

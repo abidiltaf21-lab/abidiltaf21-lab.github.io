@@ -1,0 +1,179 @@
+/* Global Button Override Stylesheet */
+/* Implements the beautiful glassmorphic purple capsule theme from the provided screenshot */
+
+/* 1. Primary Action Buttons */
+.btn-theme, 
+.btn-primary,
+.btn-neon,
+.sp-pricing-cta-wrap a,
+.pricing-cta-btn,
+.btn-admin-primary,
+.btn-resume-premium,
+.login-page button[type="submit"],
+.btn-admin-primary-premium,
+.contact-form button[type="submit"],
+.form-group button[type="submit"] {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 100px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.2px !important;
+    font-size: 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35) !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+}
+
+.btn-theme:hover, 
+.btn-primary:hover,
+.btn-neon:hover,
+.sp-pricing-cta-wrap a:hover,
+.pricing-cta-btn:hover,
+.btn-admin-primary:hover,
+.btn-resume-premium:hover,
+.login-page button[type="submit"]:hover,
+.contact-form button[type="submit"]:hover,
+.form-group button[type="submit"]:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.55) !important;
+}
+
+/* 2. Secondary & Outline Buttons */
+.btn-secondary,
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-light,
+.btn-admin-secondary,
+.btn-neon-outline,
+.btn-close-v2 {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: #94a3b8 !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 100px !important;
+    padding: 11px 28px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.2px !important;
+    font-size: 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+}
+
+.btn-secondary:hover,
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover,
+.btn-outline-light:hover,
+.btn-admin-secondary:hover,
+.btn-neon-outline:hover {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* 3. Pricing Tier Tabs & Segmented Switchers (Matches Screenshot exactly) */
+.pricing-tier-tabs,
+.segmented-control,
+.premium-tabs-capsule {
+    display: inline-flex !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 100px !important;
+    padding: 5px !important;
+    width: 100% !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    margin-bottom: 25px !important;
+}
+
+.pricing-tier-tab,
+.segmented-item,
+.premium-tabs-capsule button {
+    flex: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    color: #94a3b8 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-size: 11px !important;
+    padding: 10px 15px !important;
+    border-radius: 100px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.pricing-tier-tab.active,
+.segmented-item.active,
+.premium-tabs-capsule button.active,
+.pricing-tier-tab:focus-visible,
+.pricing-tier-tab.active:hover {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5) !important;
+}
+
+.pricing-tier-tab:hover:not(.active),
+.segmented-item:hover:not(.active),
+.premium-tabs-capsule button:hover:not(.active) {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 4. Admin Panel Tabs Upgrade */
+.premium-tabs {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 100px !important;
+    padding: 5px !important;
+    display: inline-flex !important;
+    gap: 5px !important;
+    width: auto !important;
+    border-bottom: none !important;
+}
+
+.tab-btn {
+    border: none !important;
+    background: transparent !important;
+    color: #94a3b8 !important;
+    padding: 8px 20px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-size: 12px !important;
+    border-radius: 100px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%) !important;
+    color: #ffffff !important;
+    border-bottom-color: transparent !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Adjust size for smaller buttons */
+.btn-sm, 
+.btn-xs {
+    padding: 6px 15px !important;
+    font-size: 11px !important;
+}

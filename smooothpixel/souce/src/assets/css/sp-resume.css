@@ -1,0 +1,319 @@
+/**
+ * SmooothPixel — Premium Resume / Timeline Section
+ * Redesigned with glassmorphism, glowing nodes, gradient accents
+ */
+
+/* ─── Section wrapper ─────────────────────────────────────────────── */
+.sp-resume-area {
+    position: relative;
+    z-index: 1;
+}
+
+.sp-resume-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255, 174, 0, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 100% 100%, rgba(245, 66, 0, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ─── Column heading ──────────────────────────────────────────────── */
+.sp-resume-column {
+    position: relative;
+}
+
+.sp-resume-col-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 36px;
+}
+
+.sp-resume-col-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--sp-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(245, 66, 0, 0.3);
+}
+
+.sp-resume-col-header h2 {
+    font-size: clamp(22px, 2.5vw, 28px);
+    font-weight: 800;
+    color: var(--color-heading);
+    margin: 0;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+}
+
+.sp-resume-col-header h2 span {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sp-text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+/* ─── Timeline track ──────────────────────────────────────────────── */
+.sp-resume-track {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 36px;
+    list-style: none;
+}
+
+/* Vertical glow-line */
+.sp-resume-track::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+        180deg,
+        var(--sp-secondary) 0%,
+        var(--sp-primary) 50%,
+        rgba(255, 174, 0, 0.1) 100%
+    );
+    border-radius: 2px;
+}
+
+/* ─── Timeline item ───────────────────────────────────────────────── */
+.sp-resume-track-item {
+    position: relative;
+    margin-bottom: 24px;
+    transition: transform 0.3s ease;
+}
+
+.sp-resume-track-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Glowing node dot */
+.sp-resume-track-item::before {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 26px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--sp-gradient);
+    box-shadow:
+        0 0 0 3px var(--sp-bg-elevated),
+        0 0 0 5px rgba(245, 66, 0, 0.2),
+        0 0 18px rgba(245, 66, 0, 0.45);
+    z-index: 2;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.sp-resume-track-item:hover::before {
+    box-shadow:
+        0 0 0 3px var(--sp-bg-elevated),
+        0 0 0 6px rgba(255, 174, 0, 0.3),
+        0 0 28px rgba(255, 174, 0, 0.6);
+    transform: scale(1.2);
+}
+
+body.bg-dark .sp-resume-track-item::before {
+    box-shadow:
+        0 0 0 3px #141824,
+        0 0 0 5px rgba(245, 66, 0, 0.2),
+        0 0 22px rgba(245, 66, 0, 0.5);
+}
+
+body.bg-dark .sp-resume-track-item:hover::before {
+    box-shadow:
+        0 0 0 3px #141824,
+        0 0 0 6px rgba(255, 174, 0, 0.35),
+        0 0 32px rgba(255, 174, 0, 0.7);
+}
+
+/* ─── The card ────────────────────────────────────────────────────── */
+.sp-resume-card {
+    background: var(--sp-card-bg);
+    border: 1px solid var(--sp-card-border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--sp-card-shadow);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+    padding: 0 !important;
+    position: relative;
+}
+
+/* Accent top strip */
+.sp-resume-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--sp-gradient);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    border-radius: 20px 20px 0 0;
+}
+
+.sp-resume-card:hover {
+    transform: translateY(-5px) scale(1.005);
+    box-shadow: var(--sp-card-shadow-hover);
+    border-color: var(--sp-card-hover-border);
+}
+
+.sp-resume-card:hover::before {
+    opacity: 1;
+}
+
+/* ─── Card header ─────────────────────────────────────────────────── */
+.sp-resume-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--sp-card-border);
+}
+
+.sp-resume-card-head .left {
+    flex: 1;
+    min-width: 0;
+}
+
+.sp-resume-card-head h4 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-heading);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sp-resume-card-head p {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sp-text-muted);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ─── Date badge ──────────────────────────────────────────────────── */
+.sp-resume-date {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+    background: var(--sp-gradient);
+    box-shadow: 0 4px 14px rgba(245, 66, 0, 0.35);
+    white-space: nowrap;
+    line-height: 1;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.sp-resume-date::before {
+    content: '⏱';
+    font-size: 10px;
+}
+
+.sp-resume-card:hover .sp-resume-date {
+    box-shadow: 0 6px 20px rgba(255, 174, 0, 0.5);
+    transform: scale(1.05);
+}
+
+/* ─── Card body ───────────────────────────────────────────────────── */
+.sp-resume-card-body {
+    padding: 18px 24px 22px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--sp-text-muted);
+    font-weight: 500;
+    /* Fixed height so cards stay uniform */
+    min-height: 80px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+body.bg-dark .sp-resume-card-body {
+    color: var(--sp-text);
+}
+
+/* ─── Loading / empty states ──────────────────────────────────────── */
+.sp-resume-loading,
+.sp-resume-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--sp-text-muted);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.sp-resume-empty-icon {
+    font-size: 36px;
+    opacity: 0.35;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* ─── Section divider between columns on mobile ───────────────────── */
+@media (max-width: 991px) {
+    .sp-resume-col-divider {
+        height: 1px;
+        background: var(--sp-card-border);
+        margin: 40px 0;
+    }
+
+    .sp-resume-track::before {
+        left: 6px;
+    }
+
+    .sp-resume-track-item::before {
+        left: -28px;
+    }
+}
+
+/* ─── Dark mode glow track ────────────────────────────────────────── */
+body.bg-dark .sp-resume-track::before {
+    background: linear-gradient(
+        180deg,
+        rgba(245, 66, 0, 0.7) 0%,
+        rgba(255, 174, 0, 0.5) 50%,
+        rgba(255, 174, 0, 0.05) 100%
+    );
+}
+
+/* ─── Subtle inner glow on dark cards ────────────────────────────── */
+body.bg-dark .sp-resume-card {
+    background: linear-gradient(145deg, #161d2e 0%, #121726 100%);
+}
+
+body.bg-dark .sp-resume-card:hover {
+    background: linear-gradient(145deg, #1a2235 0%, #151a28 100%);
+}

@@ -1,0 +1,72 @@
+[
+    {
+        "name": "Olex Lubricants",
+        "role": "Marketing Director",
+        "text": "Smoooth Pixel delivered a stunning visual identity that perfectly captures our brand's essence. Their attention to detail and creative approach set them apart in the industry.",
+        "image": "/assets/img/partner/Olex.png",
+        "link": "https://olexlube.com/"
+    },
+    {
+        "name": "Solar-Tisch",
+        "role": "CEO",
+        "text": "Working with Smoooth Pixel was a game-changer for our digital presence. They transformed our vision into a professional reality with high-end design. The 5-star service is unmatched.",
+        "image": "/assets/img/partner/Logo _ Schrift GelbSchwarz.png",
+        "link": "https://www.solar-tisch.de"
+    },
+    {
+        "name": "Amazon",
+        "role": "Senior Creative Lead",
+        "text": "The cinematic motion graphics produced by Smoooth Pixel are of dynamic world-class quality. Their ability to handle complex animations with such ease is truly impressive.",
+        "image": "/assets/img/partner/1.png",
+        "link": "https://amazon.com"
+    },
+    {
+        "name": "Airbnb",
+        "role": "Product Designer",
+        "text": "Smoooth Pixel understands modern aesthetics perfectly. They delivered animations that feel organic and premium, elevating our brand story significantly.",
+        "image": "/assets/img/partner/2.png",
+        "link": "https://airbnb.com"
+    },
+    {
+        "name": "Shopify",
+        "role": "Brand Specialist",
+        "text": "Exceptional creativity and rapid delivery. Smoooth Pixel is our go-to for high-end promotional videos that require a deep understanding of e-commerce visuals.",
+        "image": "/assets/img/partner/3.png",
+        "link": "https://shopify.com"
+    },
+    {
+        "name": "LG Global",
+        "role": "Innovation Manager",
+        "text": "The technical precision in Smoooth Pixel's 3D work is outstanding. They bring a level of cinematic polish that is rare to find. Highly recommended for premium tech brands.",
+        "image": "/assets/img/partner/4.png",
+        "link": "https://lg.com"
+    },
+    {
+        "name": "Perch Mobile",
+        "role": "App Development Lead",
+        "text": "The technical expertise and creative flair at Smoooth Pixel are exceptional. They helped us launch our mobile presence with a design that is both intuitive and visually striking.",
+        "image": "/assets/img/partner/perch-mobile.png",
+        "link": "https://perchmobile.app"
+    },
+    {
+        "name": "MCFX",
+        "role": "Creative Producer",
+        "text": "Smoooth Pixel's motion graphics work is simply breathtaking. They took our project to the next level with cinematic quality and smooth animations. Pixel-perfect results every time.",
+        "image": "/assets/img/partner/mcfx-logo.png",
+        "link": "https://mcfx.netlify.app/"
+    },
+    {
+        "name": "KISO App",
+        "role": "Operations Manager",
+        "text": "Professionalism, creativity, and speed—Smoooth Pixel has it all. They redesigned our interface to be sleek and professional, significantly improving our user engagement.",
+        "image": "/assets/img/partner/KISO-App.png",
+        "link": "https://www.kiso-app.eu/"
+    },
+    {
+        "name": "Nike",
+        "role": "Digital Marketing Head",
+        "text": "Smoooth Pixel captures energy and movement like no other agency. Their fast-paced, high-impact animations helped our latest campaign reach record engagement levels.",
+        "image": "/assets/img/partner/5.png",
+        "link": "https://nike.com"
+    }
+]
