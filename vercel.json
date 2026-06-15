@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd smooothpixel/souce && npm install && npm run build",
+  "outputDirectory": "smooothpixel/souce/dist",
+  "installCommand": "echo 'install handled in buildCommand'",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
+}
