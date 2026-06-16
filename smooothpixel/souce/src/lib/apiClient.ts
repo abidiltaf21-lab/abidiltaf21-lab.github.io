@@ -2,6 +2,7 @@ import axios from 'axios';
 
 // Use the env variable set in Vercel / .env — NEVER fall back to localhost in production
 const API_BASE_URL =
+    import.meta.env.VITE_PRODUCTION_API_URL ||
     import.meta.env.VITE_API_BASE_URL ||
     (import.meta.env.DEV ? '/api' : '');
 

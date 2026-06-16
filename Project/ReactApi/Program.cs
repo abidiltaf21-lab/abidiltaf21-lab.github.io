@@ -53,7 +53,11 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        await db.Database.MigrateAsync();
+        if (app.Environment.IsProduction())
+            // Railway/PostgreSQL: create schema from DbContext model directly (no migrations needed)
+            await db.Database.EnsureCreatedAsync();
+        else
+            await db.Database.MigrateAsync();
     }
     catch (Exception ex)
     {

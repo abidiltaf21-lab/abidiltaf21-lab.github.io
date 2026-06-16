@@ -17,9 +17,9 @@ public static class InfrastructureRegistrationServices
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Register DbContext with SQL Server
+        // Register DbContext with PostgreSQL (Railway)
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
         services.AddTransient<Iuniteofwork, Uniteofwork>();
         // Register Identity services for ApplicationUser and ApplicationRole
         services.AddIdentity<ApplicationUser, ApplicationRole>() // Use ApplicationRole here

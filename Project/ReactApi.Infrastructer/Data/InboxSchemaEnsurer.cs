@@ -5,23 +5,30 @@ namespace ReactApi.Infrastructer.Data;
 
 /// <summary>
 /// Applies inbox column changes when EF history is behind (avoids 500 on GET /api/inbox).
+/// Rewritten for PostgreSQL (Railway deployment).
 /// </summary>
 public static class InboxSchemaEnsurer
 {
     public static async Task EnsureAsync(ApplicationDbContext db, ILogger? logger = null)
     {
+        // PostgreSQL-compatible: add columns if they don't exist
         const string sql = """
-            IF OBJECT_ID(N'[dbo].[ClientRequests]', N'U') IS NOT NULL
+            DO $$
             BEGIN
-                IF COL_LENGTH(N'dbo.ClientRequests', N'IsRead') IS NULL
-                    ALTER TABLE [dbo].[ClientRequests] ADD [IsRead] bit NOT NULL CONSTRAINT [DF_ClientRequests_IsRead] DEFAULT(0);
+                IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'ClientRequests') THEN
+                    IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'ClientRequests' AND column_name = 'IsRead') THEN
+                        ALTER TABLE "ClientRequests" ADD "IsRead" boolean NOT NULL DEFAULT false;
+                    END IF;
 
-                IF COL_LENGTH(N'dbo.ClientRequests', N'Phone') IS NULL
-                    ALTER TABLE [dbo].[ClientRequests] ADD [Phone] nvarchar(max) NULL;
+                    IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'ClientRequests' AND column_name = 'Phone') THEN
+                        ALTER TABLE "ClientRequests" ADD "Phone" text NULL;
+                    END IF;
 
-                IF COL_LENGTH(N'dbo.ClientRequests', N'Telegram') IS NULL
-                    ALTER TABLE [dbo].[ClientRequests] ADD [Telegram] nvarchar(max) NULL;
-            END
+                    IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'ClientRequests' AND column_name = 'Telegram') THEN
+                        ALTER TABLE "ClientRequests" ADD "Telegram" text NULL;
+                    END IF;
+                END IF;
+            END $$;
             """;
 
         try
@@ -31,8 +38,8 @@ public static class InboxSchemaEnsurer
         }
         catch (Exception ex)
         {
-            logger?.LogError(ex, "Failed to ensure inbox schema on ClientRequests.");
-            throw;
+            logger?.LogWarning(ex, "Inbox schema ensure failed — continuing (table may not exist yet).");
+            // Don't throw — EnsureCreated handles the schema on first boot
         }
     }
 }

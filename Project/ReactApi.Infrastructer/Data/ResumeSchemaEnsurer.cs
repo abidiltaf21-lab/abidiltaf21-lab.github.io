@@ -11,35 +11,43 @@ public static class ResumeSchemaEnsurer
 {
     public static async Task EnsureAsync(ApplicationDbContext db, ILogger? logger = null)
     {
+        // PostgreSQL-compatible DDL
         const string createTable = """
-            IF OBJECT_ID(N'[dbo].[ResumeEntries]', N'U') IS NULL
+            DO $$
             BEGIN
-                CREATE TABLE [dbo].[ResumeEntries] (
-                    [Id] int NOT NULL IDENTITY,
-                    [Type] nvarchar(32) NOT NULL,
-                    [Title] nvarchar(256) NOT NULL,
-                    [Subtitle] nvarchar(256) NOT NULL,
-                    [DateRange] nvarchar(64) NOT NULL,
-                    [Description] nvarchar(max) NOT NULL,
-                    [SortOrder] int NOT NULL CONSTRAINT [DF_ResumeEntries_SortOrder] DEFAULT(0),
-                    [IsActive] bit NOT NULL CONSTRAINT [DF_ResumeEntries_IsActive] DEFAULT(1),
-                    [TeamMemberId] int NULL,
-                    [Createdby] nvarchar(max) NULL,
-                    [CreatedbyDate] date NULL,
-                    [Updatedby] nvarchar(max) NULL,
-                    [UpdatedbyDate] date NULL,
-                    CONSTRAINT [PK_ResumeEntries] PRIMARY KEY ([Id]),
-                    CONSTRAINT [FK_ResumeEntries_TeamMembers_TeamMemberId] FOREIGN KEY ([TeamMemberId]) REFERENCES [dbo].[TeamMembers]([Id]) ON DELETE CASCADE
-                );
-            END
+                IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'ResumeEntries') THEN
+                    CREATE TABLE "ResumeEntries" (
+                        "Id" serial NOT NULL,
+                        "Type" varchar(32) NOT NULL,
+                        "Title" varchar(256) NOT NULL,
+                        "Subtitle" varchar(256) NOT NULL,
+                        "DateRange" varchar(64) NOT NULL,
+                        "Description" text NOT NULL,
+                        "SortOrder" int NOT NULL DEFAULT 0,
+                        "IsActive" boolean NOT NULL DEFAULT true,
+                        "TeamMemberId" int NULL,
+                        "Createdby" text NULL,
+                        "CreatedbyDate" date NULL,
+                        "Updatedby" text NULL,
+                        "UpdatedbyDate" date NULL,
+                        CONSTRAINT "PK_ResumeEntries" PRIMARY KEY ("Id"),
+                        CONSTRAINT "FK_ResumeEntries_TeamMembers" FOREIGN KEY ("TeamMemberId")
+                            REFERENCES "TeamMembers"("Id") ON DELETE CASCADE
+                    );
+                END IF;
+            END $$;
             """;
 
         const string alterTable = """
-            IF OBJECT_ID(N'[dbo].[ResumeEntries]', N'U') IS NOT NULL AND COL_LENGTH(N'[dbo].[ResumeEntries]', N'TeamMemberId') IS NULL
+            DO $$
             BEGIN
-                ALTER TABLE [dbo].[ResumeEntries] ADD [TeamMemberId] int NULL;
-                ALTER TABLE [dbo].[ResumeEntries] ADD CONSTRAINT [FK_ResumeEntries_TeamMembers_TeamMemberId] FOREIGN KEY ([TeamMemberId]) REFERENCES [dbo].[TeamMembers]([Id]) ON DELETE CASCADE;
-            END
+                IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'ResumeEntries')
+                   AND NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'ResumeEntries' AND column_name = 'TeamMemberId') THEN
+                    ALTER TABLE "ResumeEntries" ADD "TeamMemberId" int NULL;
+                    ALTER TABLE "ResumeEntries" ADD CONSTRAINT "FK_ResumeEntries_TeamMembers"
+                        FOREIGN KEY ("TeamMemberId") REFERENCES "TeamMembers"("Id") ON DELETE CASCADE;
+                END IF;
+            END $$;
             """;
 
         try
@@ -50,8 +58,8 @@ public static class ResumeSchemaEnsurer
         }
         catch (Exception ex)
         {
-            logger?.LogError(ex, "Failed to ensure ResumeEntries table.");
-            throw;
+            logger?.LogWarning(ex, "ResumeEntries schema ensure failed — continuing.");
+            // Don't throw — EnsureCreated handles schema on first boot
         }
     }
 
