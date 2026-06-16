@@ -64,9 +64,16 @@ using (var scope = app.Services.CreateScope())
         logger.LogWarning(ex, "EF MigrateAsync failed; continuing with inbox schema ensure.");
     }
 
-    await ReactApi.Infrastructer.Data.InboxSchemaEnsurer.EnsureAsync(db, logger);
-    await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.EnsureAsync(db, logger);
-    await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.SeedDefaultsAsync(db);
+    try
+    {
+        await ReactApi.Infrastructer.Data.InboxSchemaEnsurer.EnsureAsync(db, logger);
+        await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.EnsureAsync(db, logger);
+        await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.SeedDefaultsAsync(db);
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Database seeding failed; backend will start without database operations.");
+    }
 }
 
 app.UseStaticFiles();
