@@ -1,58 +1,43 @@
 # Deployment Guide - Smooothpixel
 
-This guide will help you deploy the Smooothpixel project to Railway (backend) and Vercel (frontend) so that the database runs from the cloud instead of your local machine.
+This guide will help you deploy the Smooothpixel project to Render (backend) and Vercel (frontend) so that the database runs from the cloud instead of your local machine.
 
 ## Overview
 
-- **Backend**: ASP.NET Core API deployed to Railway with PostgreSQL database
+- **Backend**: ASP.NET Core API deployed to Render with PostgreSQL database
 - **Frontend**: React application deployed to Vercel
-- **Database**: PostgreSQL hosted on Railway
+- **Database**: PostgreSQL hosted on Render
 
 ## Prerequisites
 
 1. GitHub account with the repository pushed
-2. Railway account (https://railway.app)
+2. Render account (https://render.com)
 3. Vercel account (https://vercel.com)
 4. Cloudinary account (for media uploads)
 
-## Step 1: Deploy Backend to Railway
+## Step 1: Deploy Backend to Render
 
-### 1.1 Create Railway Project
+### 1.1 Create Render Project
 
-1. Go to https://railway.app and log in
-2. Click "New Project" → "Deploy from GitHub repo"
-3. Select your `smooothpixel` repository
-4. Railway will detect the Dockerfile in the `Project` folder
+1. Go to https://render.com and log in
+2. Click "New" → "Web Service"
+3. Connect your GitHub repository
+4. Select the `smooothpixel` repository
+5. Render will detect the `render.yaml` file in the `Project` folder
 
-### 1.2 Configure Environment Variables
+### 1.2 Configure Build Settings
 
-After the project is created, go to the "Variables" tab and add:
+Render will automatically use the configuration from `render.yaml`:
+- Docker build from `Project/Dockerfile`
+- PostgreSQL database will be created automatically
+- Environment variables will be set automatically
 
-```
-DATABASE_URL = (Railway will auto-set this when you add PostgreSQL)
-JWT_KEY = A_Very_Complex_Secret_Key_That_Is_At_Least_32_Bytes_Long_123
-JWT_ISSUER = JwtIssuer
-JWT_AUDIENCE = JwtAudience
-JWT_SUBJECT = JwtSubject
-ASPNETCORE_ENVIRONMENT = Production
-```
+### 1.3 Deploy
 
-### 1.3 Add PostgreSQL Database
-
-1. In your Railway project, click "New Service"
-2. Select "Database" → "PostgreSQL"
-3. Railway will automatically set the `DATABASE_URL` environment variable
-
-### 1.4 Configure Build Settings
-
-Railway will automatically use the Dockerfile in the `Project` folder. The build settings are already configured in `railway.json`.
-
-### 1.5 Deploy
-
-1. Click "Deploy" to build and deploy
+1. Click "Create Web Service"
 2. Wait for the deployment to complete
-3. Railway will provide a URL like `https://your-app-name.railway.app`
-4. Test the health endpoint: `https://your-app-name.railway.app/api/health`
+3. Render will provide a URL like `https://your-app-name.onrender.com`
+4. Test the health endpoint: `https://your-app-name.onrender.com/api/health`
 
 ## Step 2: Deploy Frontend to Vercel
 
@@ -79,13 +64,13 @@ Vercel will automatically detect the root `vercel.json` file with these settings
 In Vercel project settings → Environment Variables, add:
 
 ```
-VITE_PRODUCTION_API_URL = https://your-railway-app.railway.app/api
+VITE_PRODUCTION_API_URL = https://your-render-app.onrender.com/api
 VITE_CLOUDINARY_CLOUD_NAME = your_cloud_name
 VITE_CLOUDINARY_API_KEY = your_api_key
 VITE_CLOUDINARY_API_SECRET = your_api_secret
 ```
 
-**Important**: Replace `https://your-railway-app.railway.app/api` with your actual Railway backend URL from Step 1.
+**Important**: Replace `https://your-render-app.onrender.com/api` with your actual Render backend URL from Step 1.
 
 ### 2.4 Deploy
 
@@ -103,9 +88,9 @@ If you want to use `smooothpixel.com`:
 2. Add `smooothpixel.com`
 3. Follow the DNS instructions provided by Vercel
 
-### For Railway (Backend)
+### For Render (Backend)
 
-1. Go to Railway project → Settings → Domains
+1. Go to Render project → Settings → Custom Domains
 2. Add `api.smooothpixel.com` (or similar)
 3. Update Vercel environment variable `VITE_PRODUCTION_API_URL` to use the custom domain
 
@@ -120,19 +105,19 @@ If you want to use `smooothpixel.com`:
 
 ### Backend not responding
 
-- Check Railway logs for errors
+- Check Render logs for errors
 - Verify PostgreSQL is running and connected
 - Ensure all environment variables are set correctly
 
 ### Frontend connection errors
 
 - Verify `VITE_PRODUCTION_API_URL` is set correctly in Vercel
-- Check Railway backend is running and accessible
+- Check Render backend is running and accessible
 - Test the backend health endpoint directly
 
 ### Database connection issues
 
-- Verify `DATABASE_URL` is set in Railway
+- Verify `DATABASE_URL` is set in Render
 - Check PostgreSQL service is running
 - Ensure the connection string format is correct for PostgreSQL
 
@@ -148,7 +133,7 @@ To continue local development:
 ## Summary
 
 After completing these steps:
-- Your backend will run on Railway with a cloud PostgreSQL database
+- Your backend will run on Render with a cloud PostgreSQL database
 - Your frontend will run on Vercel
 - The database will no longer depend on your local machine
 - Videos and content will load properly on smooothpixel.com
