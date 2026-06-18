@@ -109,8 +109,13 @@ const ProjectForm: React.FC = () => {
         const formData = new FormData();
         formData.append('file', file);
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${(import.meta.env.VITE_API_BASE_URL || '/api')}/cloudinary/upload`);
+        const xhr = new XMLHttpRequest();const apiBaseUrl =
+  import.meta.env.VITE_PRODUCTION_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  '';
+
+xhr.open('POST', `${apiBaseUrl}/cloudinary/upload`);
+        
 
         // Attach admin JWT if present — the endpoint requires [Authorize]
         const token = localStorage.getItem('adminToken');
