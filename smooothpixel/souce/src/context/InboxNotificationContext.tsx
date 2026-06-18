@@ -20,6 +20,8 @@ interface InboxNotificationContextValue {
 
 const InboxNotificationContext = createContext<InboxNotificationContextValue | null>(null);
 
+export { InboxNotificationContext };
+
 const POLL_MS = 8000;
 
 export const InboxNotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -132,12 +134,4 @@ export const InboxNotificationProvider: React.FC<{ children: React.ReactNode }> 
     );
 };
 
-export const useInboxNotifications = () => {
-    const ctx = useContext(InboxNotificationContext);
-    if (!ctx) {
-        throw new Error('useInboxNotifications must be used within InboxNotificationProvider');
-    }
-    return ctx;
-};
-
-export const useInboxNotificationsOptional = () => useContext(InboxNotificationContext);
+export default InboxNotificationProvider;

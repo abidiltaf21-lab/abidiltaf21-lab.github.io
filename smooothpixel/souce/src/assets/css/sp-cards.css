@@ -295,8 +295,8 @@ ul.home-blog-meta li a {
 }
 
 .testimonial-style-one .item .inner {
-    background: linear-gradient(135deg, var(--sp-accent-purple-light), var(--sp-accent-purple)) !important;
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+    background: var(--sp-gradient) !important;
+    box-shadow: 0 8px 24px rgba(245, 66, 0, 0.32), 0 0 28px rgba(255, 174, 0, 0.18);
 }
 
 /* Contact panel */
@@ -318,8 +318,8 @@ ul.home-blog-meta li a {
 }
 
 .process-style-one-item span {
-    background: linear-gradient(135deg, var(--sp-accent-purple-light), var(--sp-accent-purple)) !important;
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+    background: var(--sp-gradient) !important;
+    box-shadow: 0 4px 14px rgba(245, 66, 0, 0.35), 0 0 18px rgba(255, 174, 0, 0.18);
 }
 
 .timeline-style-one-item:not(.sp-resume-card) {
@@ -358,14 +358,15 @@ ul.home-blog-meta li a {
 }
 
 .accordion-item.accordion-style-one button.accordion-button:not(.collapsed) {
-    background: linear-gradient(135deg, var(--sp-accent-purple-light), var(--sp-accent-purple)) !important;
+    background: var(--sp-gradient) !important;
     color: #fff !important;
     border-radius: var(--sp-card-radius-sm) var(--sp-card-radius-sm) 0 0 !important;
+    box-shadow: 0 6px 18px rgba(245, 66, 0, 0.25);
 }
 
 .accordion-item.accordion-style-one button.accordion-button:not(.collapsed)::after {
     background: #fff !important;
-    color: var(--sp-accent-purple) !important;
+    color: var(--sp-primary) !important;
 }
 
 .faq-style-one-items .chat-card {
@@ -384,13 +385,13 @@ ul.home-blog-meta li a {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #a78bfa 0%, var(--sp-accent-purple) 100%);
+    background: var(--sp-gradient);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     margin-top: 2px;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 2px 8px rgba(245, 66, 0, 0.35), 0 0 12px rgba(255, 174, 0, 0.2);
 }
 
 .sp-pricing-check i {
@@ -522,9 +523,9 @@ body.bg-dark .sp-pricing-card .pricing-tier-tab {
 }
 
 .sp-pricing-card .pricing-tier-tab.active {
-    background: linear-gradient(135deg, var(--sp-accent-purple-light), var(--sp-accent-purple));
+    background: var(--sp-gradient);
     color: #fff;
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.45);
+    box-shadow: 0 6px 18px rgba(245, 66, 0, 0.4), 0 0 22px rgba(255, 174, 0, 0.25);
 }
 
 .sp-pricing-card .pricing-top {
@@ -676,9 +677,10 @@ body.bg-dark .sp-pricing-card .content ul.pricing-features-list li {
 
 .pricing-swiper-pagination .swiper-pagination-bullet-active,
 .services-pagination .swiper-pagination-bullet-active {
-    background: linear-gradient(135deg, var(--sp-accent-purple-light), var(--sp-tagline));
+    background: var(--sp-gradient);
     width: 28px;
     border-radius: 999px;
+    box-shadow: 0 0 12px rgba(255, 174, 0, 0.45);
 }
 
 .services-navigation-wrapper .slider-nav-btn {

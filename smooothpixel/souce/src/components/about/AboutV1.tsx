@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import gsap from 'gsap';
 import PortfolioData from "../../assets/jsonData/portfolio/PortfolioData.json";
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 gsap.registerPlugin(ScrollTrigger);
 
 const AboutV1 = () => {

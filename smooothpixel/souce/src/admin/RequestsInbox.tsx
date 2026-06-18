@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ClientRequest, useRequests } from '../hooks/useRequests';
-import { useInboxNotifications } from '../context/InboxNotificationContext';
+import { useInboxNotifications } from '../context/useInboxNotifications';
 import { openReplyByEmail } from '../utils/emailReply';
 import { toTelegramUrl } from '../utils/telegramLink';
 

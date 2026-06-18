@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import { ReactTyped } from 'react-typed';
 import '../../assets/css/HeroParticles.css';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useSettings } from '../../hooks/useSettings';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 
 const BannerV1 = () => {
     const { settings } = useSettings();
-    const { t } = useLanguage();
+    const { t, currentLanguage } = useLanguage();
     const [particles, setParticles] = useState<any[]>([]);
     const [showreelOpen, setShowreelOpen] = useState(false);
 
@@ -43,15 +43,74 @@ const BannerV1 = () => {
         };
     }, [showreelOpen, handleKeyDown]);
 
-    const textLines = [
-        '<b className="">Explainer Videos</b>',
-        '<b className="">Whiteboard Animation</b>',
-        '<b className="">Product Animation</b>',
-        '<b className="">App Explainer</b>',
-        '<b className="">App Promo</b>',
-        '<b className="">Logo Animation</b>',
-        '<b className="">Social Media Videos</b>'
-    ]
+    // Translate typing words per language
+    const textLines = useMemo(() => {
+        const lang = currentLanguage;
+        if (lang === 'ps') {
+            return [
+                '<b className="">تشریحي ویډیوګانې</b>',
+                '<b className="">وایټ بورډ انیمیشن</b>',
+                '<b className="">د محصول انیمیشن</b>',
+                '<b className="">د اپلیکیشن تشریح</b>',
+                '<b className="">د اپلیکیشن پرومو</b>',
+                '<b className="">د لوگو انیمیشن</b>',
+                '<b className="">د ټولنیزو رسنیو ویډیوګانې</b>'
+            ];
+        }
+        if (lang === 'ar') {
+            return [
+                '<b className="">فيديوهات توضيحية</b>',
+                '<b className="">أنيميشن السبورة</b>',
+                '<b className="">أنيميشن المنتج</b>',
+                '<b className="">شرح التطبيق</b>',
+                '<b className="">إعلان التطبيق</b>',
+                '<b className="">أنيميشن الشعار</b>',
+                '<b className="">فيديوهات التواصل الاجتماعي</b>'
+            ];
+        }
+        if (lang === 'fa') {
+            return [
+                '<b className="">ویدیوهای توضیحی</b>',
+                '<b className="">انیمیشن تخته سفید</b>',
+                '<b className="">انیمیشن محصول</b>',
+                '<b className="">توضیح اپلیکیشن</b>',
+                '<b className="">تبلیغ اپلیکیشن</b>',
+                '<b className="">انیمیشن لوگو</b>',
+                '<b className="">ویدیوهای شبکه‌های اجتماعی</b>'
+            ];
+        }
+        if (lang === 'de') {
+            return [
+                '<b className="">Erklärvideos</b>',
+                '<b className="">Whiteboard-Animation</b>',
+                '<b className="">Produktanimation</b>',
+                '<b className="">App-Erklärung</b>',
+                '<b className="">App-Promo</b>',
+                '<b className="">Logo-Animation</b>',
+                '<b className="">Social-Media-Videos</b>'
+            ];
+        }
+        if (lang === 'fr') {
+            return [
+                '<b className="">Vidéos explicatives</b>',
+                '<b className="">Animation tableau blanc</b>',
+                '<b className="">Animation produit</b>',
+                '<b className="">Explicatif d\'app</b>',
+                '<b className="">Promo d\'app</b>',
+                '<b className="">Animation de logo</b>',
+                '<b className="">Vidéos réseaux sociaux</b>'
+            ];
+        }
+        return [
+            '<b className="">Explainer Videos</b>',
+            '<b className="">Whiteboard Animation</b>',
+            '<b className="">Product Animation</b>',
+            '<b className="">App Explainer</b>',
+            '<b className="">App Promo</b>',
+            '<b className="">Logo Animation</b>',
+            '<b className="">Social Media Videos</b>'
+        ];
+    }, [currentLanguage]);
 
     const showreelUrl = settings?.heroVideoUrl || settings?.HeroVideoUrl;
 
@@ -133,8 +192,18 @@ const BannerV1 = () => {
                         <div style={{
                             position: 'absolute',
                             top: 0, left: 0, width: '100%', height: '100%',
-                            background: 'rgba(255,255,255,0.4)', 
+                            background:
+                                'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,250,240,0.35) 60%, rgba(255,235,210,0.5) 100%)',
                             zIndex: 1
+                        }} />
+                        {/* Soft brand glow on the right (orange→red radial) */}
+                        <div style={{
+                            position: 'absolute',
+                            top: 0, right: 0, width: '60%', height: '100%',
+                            background:
+                                'radial-gradient(ellipse 70% 60% at 100% 50%, rgba(255,174,0,0.18) 0%, rgba(245,66,0,0.1) 35%, transparent 70%)',
+                            zIndex: 1,
+                            pointerEvents: 'none'
                         }} />
                     </div>
                 )}
@@ -167,6 +236,7 @@ const BannerV1 = () => {
                                             <span className="cd-headline clip is-full-width">
                                                 <span className="cd-words-wrapper">
                                                     <ReactTyped
+                                                        key={currentLanguage}
                                                         strings={settings?.heroTypedText 
                                                             ? settings.heroTypedText.split(',').map(t => `<span style="background: ${settings.heroTypedColor}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;">${t.trim()}</span>`)
                                                             : textLines
@@ -191,8 +261,8 @@ const BannerV1 = () => {
                                             </Link>
                                         </div>
 
-                                        {/* ▶ Showreel Button */}
-                                        {showreelUrl && (
+                        {/* ▶ Showreel Button */}
+                        {showreelUrl && (
                                             <button
                                                 id="showreel-play-btn"
                                                 onClick={() => setShowreelOpen(true)}
@@ -200,10 +270,10 @@ const BannerV1 = () => {
                                                     display: 'inline-flex',
                                                     alignItems: 'center',
                                                     gap: '12px',
-                                                    background: 'rgba(255,255,255,0.12)',
-                                                    backdropFilter: 'blur(12px)',
-                                                    WebkitBackdropFilter: 'blur(12px)',
-                                                    border: '1.5px solid rgba(255,255,255,0.3)',
+                                                    background: 'rgba(255,255,255,0.14)',
+                                                    backdropFilter: 'blur(14px) saturate(160%)',
+                                                    WebkitBackdropFilter: 'blur(14px) saturate(160%)',
+                                                    border: '1.5px solid rgba(255, 174, 0, 0.4)',
                                                     borderRadius: '60px',
                                                     padding: '14px 28px',
                                                     color: '#fff',
@@ -211,17 +281,20 @@ const BannerV1 = () => {
                                                     fontSize: '15px',
                                                     cursor: 'pointer',
                                                     transition: 'all 0.3s ease',
-                                                    textShadow: '0 1px 4px rgba(0,0,0,0.3)',
-                                                    boxShadow: '0 8px 32px rgba(139,92,246,0.25)',
+                                                    textShadow: '0 1px 4px rgba(0,0,0,0.35)',
+                                                    boxShadow:
+                                                        '0 10px 32px rgba(245, 66, 0, 0.25), 0 0 0 1px rgba(255, 174, 0, 0.12) inset',
                                                 }}
                                                 onMouseEnter={e => {
-                                                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(139,92,246,0.35)';
-                                                    (e.currentTarget as HTMLButtonElement).style.borderColor = '#8b5cf6';
+                                                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 174, 0, 0.28)';
+                                                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255, 174, 0, 0.7)';
+                                                    (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 14px 38px rgba(245, 66, 0, 0.35), 0 0 28px rgba(255, 174, 0, 0.25)';
                                                     (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.04)';
                                                 }}
                                                 onMouseLeave={e => {
-                                                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)';
-                                                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.3)';
+                                                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.14)';
+                                                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255, 174, 0, 0.4)';
+                                                    (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 10px 32px rgba(245, 66, 0, 0.25), 0 0 0 1px rgba(255, 174, 0, 0.12) inset';
                                                     (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
                                                 }}
                                             >
@@ -231,22 +304,22 @@ const BannerV1 = () => {
                                                         position: 'absolute',
                                                         width: '42px', height: '42px',
                                                         borderRadius: '50%',
-                                                        background: 'rgba(139,92,246,0.4)',
+                                                        background: 'rgba(255, 174, 0, 0.45)',
                                                         animation: 'showreel-pulse 1.8s ease-out infinite',
                                                     }} />
                                                     <span style={{
                                                         width: '38px', height: '38px',
                                                         borderRadius: '50%',
-                                                        background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
+                                                        background: 'linear-gradient(135deg, #ffae00 0%, #f54200 100%)',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        boxShadow: '0 4px 15px rgba(139,92,246,0.5)',
+                                                        boxShadow: '0 4px 15px rgba(245, 66, 0, 0.5), 0 0 18px rgba(255, 174, 0, 0.3)',
                                                         position: 'relative',
                                                         zIndex: 1,
                                                         flexShrink: 0,
                                                     }}>
-                                                        <i className="fas fa-play" style={{ fontSize: '13px', marginLeft: '2px' }}></i>
+                                                        <i className="fas fa-play" style={{ fontSize: '13px', marginLeft: '2px', color: '#fff' }}></i>
                                                     </span>
                                                 </span>
                                                 {t('watch_showreel')}

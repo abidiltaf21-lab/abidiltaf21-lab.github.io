@@ -215,7 +215,7 @@ export const useRequests = (filters?: InboxFilters, autoRefreshMs = 0) => {
         } finally {
             setLoading(false);
         }
-    }, [filters?.status, filters?.search, filters?.sort, filters?.unreadOnly]);
+    }, [filters]);
 
     const updateRequestStatus = async (id: number, status: string) => {
         const current = requests.find((r) => r.id === id);

@@ -11,6 +11,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export { AuthContext };
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<any>(() => {
     // Immediate sync check from localStorage on init
@@ -62,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('adminUser');
     setUser(null);
     // Force hard reload to clear all states and redirect
-    window.location.href = '/admin-login'; 
+    window.location.href = '/login'; 
   };
 
   return (
@@ -72,10 +74,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export default AuthProvider;

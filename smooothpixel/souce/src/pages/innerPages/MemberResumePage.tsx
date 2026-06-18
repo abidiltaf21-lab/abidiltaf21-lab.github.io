@@ -4,7 +4,7 @@ import ReactWOW from 'react-wow';
 import { apiService } from '../../services/api';
 import LayoutV2 from '../../components/Layouts/LayoutV2';
 import SEO from '../../components/utilities/SEO';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 
 export interface ResumeEntryItem {
     id: number;

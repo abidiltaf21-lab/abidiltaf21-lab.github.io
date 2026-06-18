@@ -6,7 +6,7 @@ import ReactWOW from "react-wow";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { apiService } from '../../services/api';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 
 // Import Swiper styles
 import 'swiper/css';

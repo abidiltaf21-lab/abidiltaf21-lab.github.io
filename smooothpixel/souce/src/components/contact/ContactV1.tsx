@@ -7,7 +7,7 @@ import { apiService } from '../../services/api';
 import axios from 'axios';
 import { normalizeTelegramHandle } from '../../utils/telegramLink';
 import { CONTACT_BUDGET_OPTIONS } from '../../utils/contactBudgetOptions';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 
 interface FormEventHandler {
     (event: React.FormEvent<HTMLFormElement>): void;

@@ -2,7 +2,7 @@ import SmooothPixelLogo from "../logo/SmooothPixelLogo";
 import { Link, useLocation } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
 import useSidebarMenu from "../../hooks/useSidebarMenu";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 
 type NavChild = {
@@ -26,47 +26,6 @@ type NavItem = {
 };
 
 const SCROLL_OFFSET = -88;
-
-const NAV_CONFIG: NavItem[] = [
-    { label: "Home", to: "home" },
-    {
-        label: "Services",
-        to: "services",
-        mega: {
-            title: "Our expertise",
-            description:
-                "Premium 3D animation, SaaS explainers, and cinematic video production for ambitious brands.",
-            ctaLabel: "Free consultation",
-            ctaTo: "contact",
-        },
-        children: [
-            { label: "Animation & Motion", to: "services", description: "3D, VFX & motion graphics", icon: "🎬" },
-            { label: "SaaS & Explainers", to: "services", description: "Product demos & walkthroughs", icon: "💡" },
-            { label: "Video Production", to: "services", description: "Edit, grade & delivery", icon: "🎥" },
-        ],
-    },
-    {
-        label: "Work",
-        to: "portfolio",
-        children: [
-            { label: "Portfolio", to: "portfolio", description: "Selected client projects", icon: "🖼️" },
-            { label: "Showreel", to: "showreel", description: "Watch our best cuts", icon: "▶️" },
-        ],
-    },
-    { label: "Team", to: "team" },
-    { label: "Reviews", to: "reviews" },
-    {
-        label: "Price Calculator",
-        to: "calculator",
-        highlight: true,
-        children: [
-            { label: "Estimate budget", to: "calculator", description: "Interactive project cost tool", icon: "🧮" },
-            { label: "Pricing packages", to: "pricing", description: "Fixed plans & deliverables", icon: "📦" },
-        ],
-    },
-    { label: "About", to: "about" },
-    { label: "Contact", to: "contact" },
-];
 
 const scrollProps = {
     spy: true,
@@ -99,10 +58,52 @@ const HeaderV3 = () => {
     const isDark = location.pathname === "/home-dark";
     const [scrolled, setScrolled] = useState(false);
     const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
-    const { currentLanguage, setLanguage, t, languages } = useLanguage();
+    const { currentLanguage, setLanguage, t, languages, dir } = useLanguage();
+    const isRtl = dir === 'rtl';
     const [langDropdownOpen, setLangDropdownOpen] = useState(false);
     const activeLang = languages.find(l => l.code === currentLanguage) || languages[0];
     const langDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Build nav config with translated labels — recomputes on language change
+    const NAV_CONFIG = useMemo<NavItem[]>(() => [
+        { label: t('home'), to: "home" },
+        {
+            label: t('services'),
+            to: "services",
+            mega: {
+                title: t('our_expertise'),
+                description: t('expertise_desc'),
+                ctaLabel: t('free_consultation'),
+                ctaTo: "contact",
+            },
+            children: [
+                { label: t('animation_motion'), to: "services", description: t('motion_graphics_desc'), icon: "🎬" },
+                { label: t('saas_explainers'), to: "services", description: t('product_demos_desc'), icon: "💡" },
+                { label: t('video_production'), to: "services", description: t('edit_grade_delivery_desc'), icon: "🎥" },
+            ],
+        },
+        {
+            label: t('work'),
+            to: "portfolio",
+            children: [
+                { label: t('portfolio'), to: "portfolio", description: t('selected_projects_desc'), icon: "🖼️" },
+                { label: t('showreel'), to: "showreel", description: t('watch_best_cuts_desc'), icon: "▶️" },
+            ],
+        },
+        { label: t('team'), to: "team" },
+        { label: t('reviews'), to: "reviews" },
+        {
+            label: t('price_calculator'),
+            to: "calculator",
+            highlight: true,
+            children: [
+                { label: t('estimate_budget'), to: "calculator", description: t('cost_tool_desc'), icon: "🧮" },
+                { label: t('pricing_packages'), to: "pricing", description: t('fixed_plans_desc'), icon: "📦" },
+            ],
+        },
+        { label: t('about'), to: "about" },
+        { label: t('contact'), to: "contact" },
+    ], [t]);
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 48);
@@ -135,7 +136,7 @@ const HeaderV3 = () => {
                 <div className="sp-dropdown-panel sp-dropdown-mega" role="menu">
                     <div className="sp-mega-grid">
                         <div className="sp-mega-aside">
-                            <span className="sp-mega-kicker">Services</span>
+                            <span className="sp-mega-kicker">{t('services')}</span>
                             <h5>{item.mega.title}</h5>
                             <p>{item.mega.description}</p>
                             <ScrollLink to={item.mega.ctaTo} {...scrollProps} className="sp-mega-cta">
@@ -447,10 +448,10 @@ const HeaderV3 = () => {
                 /* ===== Dark theme (home-dark only) ===== */
                 .sp-header.sp-theme-dark {
                     --sp-bar-bg: linear-gradient(135deg, rgba(18,20,32,0.94), rgba(10,12,20,0.96));
-                    --sp-bar-border: rgba(255,255,255,0.1);
+                    --sp-bar-border: rgba(255, 174, 0, 0.18);
                     --sp-bar-shadow: 0 16px 48px rgba(0,0,0,0.45);
-                    --sp-bar-shadow-scrolled: 0 20px 56px rgba(0,0,0,0.55);
-                    --sp-glow: linear-gradient(120deg, rgba(255,174,0,0.35), rgba(139,92,246,0.2), rgba(56,189,248,0.25));
+                    --sp-bar-shadow-scrolled: 0 20px 56px rgba(245, 66, 0, 0.25);
+                    --sp-glow: linear-gradient(120deg, rgba(255,174,0,0.45), rgba(245,66,0,0.3), rgba(255,200,80,0.35));
                     --sp-tabs-track: rgba(255,255,255,0.04);
                     --sp-tabs-border: rgba(255,255,255,0.06);
                     --sp-text: rgba(255,255,255,0.72);
@@ -539,7 +540,7 @@ const HeaderV3 = () => {
                     overflow: visible;
                 }
                 .sp-nav-tabs-scroll {
-                    max-width: min(100%, 58vw);
+                    max-width: min(100%, 64vw);
                     overflow: visible;
                 }
                 .sp-nav-tabs {
@@ -551,6 +552,8 @@ const HeaderV3 = () => {
                     border: 1px solid var(--sp-tabs-border);
                     border-radius: 999px;
                     overflow: visible;
+                    flex-wrap: nowrap;
+                    white-space: nowrap;
                 }
 
                 .sp-nav-tab {
@@ -566,8 +569,16 @@ const HeaderV3 = () => {
                     border-radius: 999px;
                     cursor: pointer;
                     white-space: nowrap;
+                    max-width: 170px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                     transition: color 0.2s, background 0.2s, box-shadow 0.2s, border-color 0.2s;
                     border: 1px solid transparent;
+                }
+                html[dir='rtl'] .sp-nav-tab {
+                    letter-spacing: 0;
+                    font-size: 12.5px;
+                    padding: 10px 12px;
                 }
                 .sp-nav-tab:hover {
                     color: var(--sp-text-hover);
@@ -577,7 +588,9 @@ const HeaderV3 = () => {
                     color: var(--sp-text-active);
                     background: var(--sp-tab-active-bg);
                     border-color: var(--sp-tab-active-border);
-                    box-shadow: 0 4px 16px rgba(255, 174, 0, 0.15);
+                    box-shadow:
+                        0 4px 16px rgba(255, 174, 0, 0.18),
+                        0 0 18px rgba(255, 174, 0, 0.14);
                 }
                 .sp-nav-tab-accent {
                     color: var(--sp-accent-tab);
@@ -607,7 +620,7 @@ const HeaderV3 = () => {
                 .sp-dropdown-panel {
                     position: absolute;
                     top: calc(100% + 6px);
-                    left: 50%;
+                    inset-inline-start: 50%;
                     transform: translateX(-50%) translateY(8px) scale(0.98);
                     min-width: 260px;
                     padding: 10px;
@@ -620,6 +633,10 @@ const HeaderV3 = () => {
                     pointer-events: none;
                     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
                     z-index: 10060;
+                }
+                html[dir='rtl'] .sp-dropdown-panel {
+                    inset-inline-start: 50%;
+                    transform: translateX(-50%) translateY(8px) scale(0.98);
                 }
                 .sp-dropdown-panel::before {
                     content: '';

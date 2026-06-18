@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import ReactWOW from 'react-wow';
 import { apiService } from '../../services/api';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 
 const PricingCalculator: React.FC = () => {
     const { t } = useLanguage();

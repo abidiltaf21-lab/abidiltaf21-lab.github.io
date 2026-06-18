@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 import { apiService } from '../../services/api';
 import { toast } from 'react-toastify';
 

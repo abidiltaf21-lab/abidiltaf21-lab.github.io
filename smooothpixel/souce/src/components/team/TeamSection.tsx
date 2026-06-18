@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiService } from '../../services/api';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 
 const FALLBACK: any[] = [
     { id: 1, name: "Abidullah Iltaf", role: "Creative Director", bio: "Visionary motion designer with 10+ years crafting cinematic brand stories.", image: "https://i.pravatar.cc/400?u=abidullah", skills: "After Effects,Cinema 4D,Motion Design", linkedin: "#", twitter: "#", instagram: "#" },

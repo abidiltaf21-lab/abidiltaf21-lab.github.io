@@ -16,12 +16,14 @@ import '../src/assets/css/unit-test.css';
 import '../src/assets/css/style.css';
 import '../src/assets/css/sp-cards.css';
 import '../src/assets/css/sp-resume.css';
+import '../src/assets/css/sp-rtl.css';
 import '../src/assets/css/CustomNavigation.css';
 import '../src/assets/css/admin.css';
 import '../src/assets/css/buttons-override.css';
 
 import Routers from './Routers';
 import { ToastContainer } from 'react-toastify';
+import { Analytics } from '@vercel/analytics/react';
 import RoutesScrollToTop from './components/utilities/RoutesScrollToTop';
 import Dependency from './components/utilities/Dependency';
 import { useEffect, useState } from 'react';
@@ -50,6 +52,7 @@ function App() {
           <RoutesScrollToTop />
           <ToastContainer />
           <Dependency />
+          <Analytics />
         </>
       }
     </>

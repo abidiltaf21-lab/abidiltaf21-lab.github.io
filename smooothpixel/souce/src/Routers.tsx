@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
+import { useAuth } from "./context/useAuth";
 
 // ── Lazy load every page so only the current page's JS is downloaded ──
 const Home                   = lazy(() => import("./pages/homePages/Home"));
@@ -38,6 +39,14 @@ const PageLoader = () => (
     </div>
 );
 
+// ── Auth guard: shows loader while verifying session, redirects if not authed ──
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    const { isAuthenticated, loading } = useAuth();
+    if (loading) return <PageLoader />;
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    return <>{children}</>;
+};
+
 const Routers = () => {
     return (
         <Suspense fallback={<PageLoader />}>
@@ -54,7 +63,11 @@ const Routers = () => {
                 <Route path="/service"                       element={<ServicePage />} />
                 <Route path="/services-details/:id"          element={<ServicesDetailsPage />} />
                 <Route path="/login"                         element={<LoginPage />} />
-                <Route path="/admin/*"                       element={<AdminPage />} />
+                <Route path="/admin/*"                       element={
+                    <ProtectedRoute>
+                        <AdminPage />
+                    </ProtectedRoute>
+                } />
                 <Route path="*"                              element={<Navigate to="/" />} />
             </Routes>
         </Suspense>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useInboxNotifications } from '../../context/InboxNotificationContext';
+import { useAuth } from '../../context/useAuth';
+import { useInboxNotifications } from '../../context/useInboxNotifications';
 
 export const AdminSidebar: React.FC = () => {
     const { logout } = useAuth();

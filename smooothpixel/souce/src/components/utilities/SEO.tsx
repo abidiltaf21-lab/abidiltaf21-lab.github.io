@@ -1,10 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-
-interface SEOProps {
-  title: string;
-  description: string;
-  canonical?: string;
-}
+import type { SEOProps } from './SEOTypes';
 
 const SEO = ({ title, description, canonical }: SEOProps) => {
   return (

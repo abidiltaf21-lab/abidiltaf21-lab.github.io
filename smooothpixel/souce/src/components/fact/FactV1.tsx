@@ -1,6 +1,6 @@
 import CountUp from 'react-countup'
 import ReactWOW from "react-wow"
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../context/useLanguage';
 
 const FactV1 = () => {
     const { t } = useLanguage();
