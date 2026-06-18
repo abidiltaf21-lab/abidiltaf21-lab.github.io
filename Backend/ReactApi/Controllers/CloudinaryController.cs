@@ -28,20 +28,15 @@ namespace ReactApi.Controllers
             var cloudName = _config["Cloudinary:CloudName"];
             var uploadPreset = GetUploadPreset();
 
-            var configured =
-                !string.IsNullOrWhiteSpace(cloudName) &&
-                !string.IsNullOrWhiteSpace(uploadPreset);
-
             return Ok(new
             {
-                configured,
+                configured = !string.IsNullOrWhiteSpace(cloudName) &&
+                             !string.IsNullOrWhiteSpace(uploadPreset),
                 cloudName = cloudName ?? "",
                 uploadPreset,
                 hasCloudName = !string.IsNullOrWhiteSpace(cloudName),
                 hasUploadPreset = !string.IsNullOrWhiteSpace(uploadPreset),
-                message = configured
-                    ? "Cloudinary unsigned upload is configured."
-                    : "Cloudinary CloudName or UploadPreset is missing."
+                message = "Cloudinary unsigned upload is configured."
             });
         }
 
@@ -55,22 +50,21 @@ namespace ReactApi.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                return BadRequest(new
-                {
-                    error = "No file provided."
-                });
+                return BadRequest(new { error = "No file provided." });
             }
 
             var cloudName = _config["Cloudinary:CloudName"];
             var uploadPreset = GetUploadPreset();
-            var defaultFolder = GetDefaultFolder();
+            var targetFolder = string.IsNullOrWhiteSpace(folder)
+                ? GetDefaultFolder()
+                : folder;
 
             if (string.IsNullOrWhiteSpace(cloudName) ||
                 string.IsNullOrWhiteSpace(uploadPreset))
             {
                 return StatusCode(503, new
                 {
-                    error = "Cloudinary is not configured on the server. Set Cloudinary__CloudName and Cloudinary__UploadPreset."
+                    error = "Cloudinary is not configured. Missing Cloudinary__CloudName or Cloudinary__UploadPreset."
                 });
             }
 
@@ -78,16 +72,15 @@ namespace ReactApi.Controllers
 
             try
             {
-                var targetFolder = string.IsNullOrWhiteSpace(folder)
-                    ? defaultFolder
-                    : folder;
+                var resourceType = "auto";
 
-                var resourceType =
-                    file.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase)
-                        ? "video"
-                        : file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase)
-                            ? "image"
-                            : "auto";
+                if (!string.IsNullOrWhiteSpace(file.ContentType))
+                {
+                    if (file.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
+                        resourceType = "video";
+                    else if (file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                        resourceType = "image";
+                }
 
                 using var form = new MultipartFormDataContent();
 
@@ -109,6 +102,25 @@ namespace ReactApi.Controllers
                     form.Add(new StringContent(targetFolder), "folder");
                 }
 
+                _logger.LogWarning(
+                    "UPLOAD DEBUG => CloudName={CloudName}, ResourceType={ResourceType}, Preset={Preset}, Folder={Folder}, FileName={FileName}, ContentType={ContentType}, Size={Size}",
+                    cloudName,
+                    resourceType,
+                    uploadPreset,
+                    targetFolder,
+                    file.FileName,
+                    file.ContentType,
+                    file.Length
+                );
+
+                foreach (var item in form)
+                {
+                    _logger.LogWarning(
+                        "UPLOAD FORM FIELD => {FieldName}",
+                        item.Headers.ContentDisposition?.Name
+                    );
+                }
+
                 var uploadUrl =
                     $"https://api.cloudinary.com/v1_1/{cloudName}/{resourceType}/upload";
 
@@ -123,13 +135,24 @@ namespace ReactApi.Controllers
                     _logger.LogError(
                         "Cloudinary upload failed: {Status} {Body}",
                         response.StatusCode,
-                        body);
+                        body
+                    );
 
                     return StatusCode((int)response.StatusCode, new
                     {
                         error = "Cloudinary rejected the upload.",
                         cloudinaryStatus = (int)response.StatusCode,
-                        cloudinaryBody = body
+                        cloudinaryBody = body,
+                        debug = new
+                        {
+                            cloudName,
+                            resourceType,
+                            uploadPreset,
+                            targetFolder,
+                            fileName = file.FileName,
+                            file.ContentType,
+                            file.Length
+                        }
                     });
                 }
 
@@ -156,7 +179,7 @@ namespace ReactApi.Controllers
 
             return string.IsNullOrWhiteSpace(preset)
                 ? "smooothpixel_upload"
-                : preset;
+                : preset.Trim();
         }
 
         private string GetDefaultFolder()
@@ -165,7 +188,7 @@ namespace ReactApi.Controllers
 
             return string.IsNullOrWhiteSpace(folder)
                 ? "smooothpixel"
-                : folder;
+                : folder.Trim();
         }
     }
 }
