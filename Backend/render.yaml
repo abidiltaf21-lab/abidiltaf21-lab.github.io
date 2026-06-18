@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: smooothpixel-api
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      # generateValue: true makes Render create a strong random secret at first deploy
+      # and store it securely. The value is never committed to git.
+      - key: JWT_KEY
+        generateValue: true
+      - key: JWT_ISSUER
+        value: SmooothPixel
+      - key: JWT_AUDIENCE
+        value: SmooothPixelClients
+      - key: JWT_SUBJECT
+        value: SmooothPixelAuth
+      # Cloudinary — used by the backend for signed uploads and Media Library auth.
+      # Set these in Render's Environment tab before deploying.
+      - key: Cloudinary__CloudName
+        value: ddxrpqctk
+      - key: Cloudinary__ApiKey
+        value: 963385473771588
+      - key: Cloudinary__ApiSecret
+        sync: false
+      - key: Cloudinary__UploadPreset
+        value: smooothpixel_upload
+      - key: Cloudinary__Folder
+        value: smooothpixel
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smooothpixel-db
+          property: connectionString
+
+databases:
+  - name: smooothpixel-db
+    databaseName: reactapi
+    user: reactapi
+    plan: free

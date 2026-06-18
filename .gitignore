@@ -68,3 +68,6 @@ Thumbs.db
 *.bak
 *.tmp
 *.orig
+*.db
+*.db-shm
+*.db-wal
