@@ -122,7 +122,7 @@ namespace ReactApi.Controllers
                 }
 
                 var uploadUrl =
-                    $"https://api.cloudinary.com/v1_1/{cloudName}/{resourceType}/upload";
+                    $"https://api.cloudinary.com/v1_1/{cloudName}/auto/upload";
 
                 var http = _httpClientFactory.CreateClient();
                 http.Timeout = TimeSpan.FromMinutes(5);
