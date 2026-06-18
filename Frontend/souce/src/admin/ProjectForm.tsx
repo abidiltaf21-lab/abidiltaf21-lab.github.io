@@ -32,7 +32,7 @@ const ProjectForm: React.FC = () => {
     const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const getEmbedUrl = (url: string) => {
+    function getEmbedUrl(url: string) {
         if (!url) return '';
         let embedUrl = url;
         if (url.includes('youtube.com/shorts/')) embedUrl = url.replace('youtube.com/shorts/', 'youtube.com/embed/');
@@ -47,15 +47,15 @@ const ProjectForm: React.FC = () => {
             embedUrl += `${sep}modestbranding=1&rel=0&showinfo=0`;
         }
         return embedUrl;
-    };
+    }
 
-    const getYoutubeThumbnail = (url: string) => {
+    function getYoutubeThumbnail(url: string) {
         let vidId = '';
         if (url.includes('v=')) vidId = url.split('v=')[1]?.split('&')[0];
         else if (url.includes('shorts/')) vidId = url.split('shorts/')[1]?.split('?')[0];
         else if (url.includes('youtu.be/')) vidId = url.split('youtu.be/')[1]?.split('?')[0];
         return vidId ? `https://img.youtube.com/vi/${vidId}/maxresdefault.jpg` : '';
-    };
+    }
 
     // Auto-extract thumbnail for YouTube videos
     useEffect(() => {
@@ -185,17 +185,13 @@ const ProjectForm: React.FC = () => {
         xhr.send(formData);
     };
 
-    useEffect(() => { 
-        if (id) fetchProject(); 
-    }, [id, fetchProject]);
-
     const fetchProject = useCallback(async () => {
         try {
             const { data } = await apiService.getProject(id as string);
             if (data) {
-                setFormData({ 
-                    ...data, 
-                    tags: data.tags || '', 
+                setFormData({
+                    ...data,
+                    tags: data.tags || '',
                     projectDate: data.projectDate?.split('T')[0] || '',
                     projectType: data.projectType || '',
                     industry: data.industry || '',
@@ -206,11 +202,17 @@ const ProjectForm: React.FC = () => {
                     testimonial: data.testimonial || ''
                 });
             }
-        } catch (err: any) { 
+        } catch (err: any) {
             console.error("Sync failed:", err);
             // Non-blocking error, just continue
         }
     }, [id]);
+
+    useEffect(() => {
+        if (id) {
+            fetchProject();
+        }
+    }, [id, fetchProject]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
