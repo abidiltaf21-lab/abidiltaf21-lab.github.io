@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy solution & csproj files first for layer caching
-COPY ["ReactApi/ReactApi.sln", "./"]
+COPY ["ReactApi/ReactApi.sln", "ReactApi/"]
 COPY ["ReactApi/ReactApi.csproj",                                 "ReactApi/"]
 COPY ["ReactApi.Application/ReactApi.Application.csproj",         "ReactApi.Application/"]
 COPY ["ReactApi.Domin/ReactApi.Domin.csproj",                     "ReactApi.Domin/"]
