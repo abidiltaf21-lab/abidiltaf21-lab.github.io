@@ -30,7 +30,9 @@ namespace ReactApi.Controllers
             var cloudName = _config["Cloudinary:CloudName"];
             var apiKey = _config["Cloudinary:ApiKey"];
             var apiSecret = _config["Cloudinary:ApiSecret"];
-            var uploadPreset = _config["Cloudinary:UploadPreset"] ?? "smooothpixel_upload";
+            var uploadPreset = string.IsNullOrWhiteSpace(_config["Cloudinary:UploadPreset"])
+    ? "smooothpixel_upload"
+    : _config["Cloudinary:UploadPreset"];
 
             var configured =
                 !string.IsNullOrEmpty(cloudName) &&
@@ -57,7 +59,9 @@ namespace ReactApi.Controllers
             var cloudName = _config["Cloudinary:CloudName"];
             var apiKey = _config["Cloudinary:ApiKey"];
             var apiSecret = _config["Cloudinary:ApiSecret"];
-            var uploadPreset = _config["Cloudinary:UploadPreset"] ?? "smooothpixel_upload";
+            var uploadPreset = string.IsNullOrWhiteSpace(_config["Cloudinary:UploadPreset"])
+    ? "smooothpixel_upload"
+    : _config["Cloudinary:UploadPreset"];
             var defaultFolder = _config["Cloudinary:Folder"] ?? "smooothpixel";
 
             if (string.IsNullOrEmpty(cloudName) ||
@@ -119,7 +123,9 @@ namespace ReactApi.Controllers
             var cloudName = _config["Cloudinary:CloudName"];
             var apiKey = _config["Cloudinary:ApiKey"];
             var apiSecret = _config["Cloudinary:ApiSecret"];
-            var uploadPreset = _config["Cloudinary:UploadPreset"] ?? "smooothpixel_upload";
+            var uploadPreset = string.IsNullOrWhiteSpace(_config["Cloudinary:UploadPreset"])
+    ? "smooothpixel_upload"
+    : _config["Cloudinary:UploadPreset"];
             var defaultFolder = _config["Cloudinary:Folder"] ?? "smooothpixel";
 
             if (string.IsNullOrEmpty(cloudName) ||
