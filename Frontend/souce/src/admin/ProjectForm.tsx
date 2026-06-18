@@ -109,12 +109,15 @@ const ProjectForm: React.FC = () => {
         const formData = new FormData();
         formData.append('file', file);
 
-        const xhr = new XMLHttpRequest();const apiBaseUrl =
-  import.meta.env.VITE_PRODUCTION_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  '';
+        const xhr = new XMLHttpRequest();
 
-xhr.open('POST', `${apiBaseUrl}/cloudinary/upload`);
+        const apiBaseUrl = (
+            import.meta.env.VITE_PRODUCTION_API_URL ||
+            import.meta.env.VITE_API_BASE_URL ||
+            ''
+        ).replace(/\/$/, '');
+
+        xhr.open('POST', `${apiBaseUrl}/cloudinary/upload`);
         
 
         // Attach admin JWT if present — the endpoint requires [Authorize]
@@ -146,12 +149,24 @@ xhr.open('POST', `${apiBaseUrl}/cloudinary/upload`);
             } else if (xhr.status === 503) {
                 alert('Upload failed: Cloudinary is not configured on the server. Set Cloudinary__* env vars in Backend/appsettings.');
             } else {
-                // Try to extract Cloudinary's error message
                 let msg = `Upload failed (HTTP ${xhr.status})`;
                 try {
                     const err = JSON.parse(xhr.responseText);
-                    if (err?.error) msg = `Upload failed: ${err.error}`;
-                } catch { /* keep generic */ }
+
+                    if (err?.cloudinaryBody) {
+                        try {
+                            const cloudinaryError = JSON.parse(err.cloudinaryBody);
+                            msg = `Upload failed: ${cloudinaryError?.error?.message || err.error || msg}`;
+                        } catch {
+                            msg = `Upload failed: ${err.cloudinaryBody}`;
+                        }
+                    } else if (err?.error) {
+                        msg = `Upload failed: ${err.error}`;
+                    }
+                } catch {
+                    // keep generic
+                }
+
                 alert(msg);
             }
             setUploadProgress(prev => ({ ...prev, [field]: 0 }));
