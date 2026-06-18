@@ -30,22 +30,20 @@ namespace ReactApi.Controllers
             var cloudName = _config["Cloudinary:CloudName"];
             var apiKey = _config["Cloudinary:ApiKey"];
             var apiSecret = _config["Cloudinary:ApiSecret"];
-            var uploadPreset = string.IsNullOrWhiteSpace(_config["Cloudinary:UploadPreset"])
-    ? "smooothpixel_upload"
-    : _config["Cloudinary:UploadPreset"];
+            var uploadPreset = GetUploadPreset();
 
             var configured =
-                !string.IsNullOrEmpty(cloudName) &&
-                !string.IsNullOrEmpty(apiKey) &&
-                !string.IsNullOrEmpty(apiSecret);
+                !string.IsNullOrWhiteSpace(cloudName) &&
+                !string.IsNullOrWhiteSpace(apiKey) &&
+                !string.IsNullOrWhiteSpace(apiSecret);
 
             return Ok(new
             {
                 configured,
                 cloudName = cloudName ?? "",
                 uploadPreset,
-                hasApiKey = !string.IsNullOrEmpty(apiKey),
-                hasApiSecret = !string.IsNullOrEmpty(apiSecret),
+                hasApiKey = !string.IsNullOrWhiteSpace(apiKey),
+                hasApiSecret = !string.IsNullOrWhiteSpace(apiSecret),
                 message = configured
                     ? "Cloudinary is configured."
                     : "Cloudinary credentials are missing."
@@ -59,14 +57,12 @@ namespace ReactApi.Controllers
             var cloudName = _config["Cloudinary:CloudName"];
             var apiKey = _config["Cloudinary:ApiKey"];
             var apiSecret = _config["Cloudinary:ApiSecret"];
-            var uploadPreset = string.IsNullOrWhiteSpace(_config["Cloudinary:UploadPreset"])
-    ? "smooothpixel_upload"
-    : _config["Cloudinary:UploadPreset"];
-            var defaultFolder = _config["Cloudinary:Folder"] ?? "smooothpixel";
+            var uploadPreset = GetUploadPreset();
+            var defaultFolder = GetDefaultFolder();
 
-            if (string.IsNullOrEmpty(cloudName) ||
-                string.IsNullOrEmpty(apiKey) ||
-                string.IsNullOrEmpty(apiSecret))
+            if (string.IsNullOrWhiteSpace(cloudName) ||
+                string.IsNullOrWhiteSpace(apiKey) ||
+                string.IsNullOrWhiteSpace(apiSecret))
             {
                 return BadRequest(new
                 {
@@ -75,23 +71,12 @@ namespace ReactApi.Controllers
             }
 
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            var targetFolder = string.IsNullOrEmpty(folder)
-                ? defaultFolder
-                : folder;
+            var targetFolder = string.IsNullOrWhiteSpace(folder) ? defaultFolder : folder;
 
-            var sb = new StringBuilder();
-            sb.Append($"folder={targetFolder}&timestamp={timestamp}&upload_preset={uploadPreset}");
-            sb.Append(apiSecret);
+            var signaturePayload =
+                $"folder={targetFolder}&timestamp={timestamp}&upload_preset={uploadPreset}{apiSecret}";
 
-            using var sha1 = SHA1.Create();
-
-            var hashBytes = sha1.ComputeHash(
-                Encoding.UTF8.GetBytes(sb.ToString()));
-
-            var signature = BitConverter
-                .ToString(hashBytes)
-                .Replace("-", "")
-                .ToLowerInvariant();
+            var signature = GenerateSha1(signaturePayload);
 
             return Ok(new
             {
@@ -123,14 +108,11 @@ namespace ReactApi.Controllers
             var cloudName = _config["Cloudinary:CloudName"];
             var apiKey = _config["Cloudinary:ApiKey"];
             var apiSecret = _config["Cloudinary:ApiSecret"];
-            var uploadPreset = string.IsNullOrWhiteSpace(_config["Cloudinary:UploadPreset"])
-    ? "smooothpixel_upload"
-    : _config["Cloudinary:UploadPreset"];
-            var defaultFolder = _config["Cloudinary:Folder"] ?? "smooothpixel";
+            var defaultFolder = GetDefaultFolder();
 
-            if (string.IsNullOrEmpty(cloudName) ||
-                string.IsNullOrEmpty(apiKey) ||
-                string.IsNullOrEmpty(apiSecret))
+            if (string.IsNullOrWhiteSpace(cloudName) ||
+                string.IsNullOrWhiteSpace(apiKey) ||
+                string.IsNullOrWhiteSpace(apiSecret))
             {
                 return StatusCode(503, new
                 {
@@ -138,13 +120,12 @@ namespace ReactApi.Controllers
                 });
             }
 
+            Stream? stream = null;
+
             try
             {
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-                var targetFolder = string.IsNullOrEmpty(folder)
-                    ? defaultFolder
-                    : folder;
+                var targetFolder = string.IsNullOrWhiteSpace(folder) ? defaultFolder : folder;
 
                 var resourceType =
                     file.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase)
@@ -153,48 +134,35 @@ namespace ReactApi.Controllers
                             ? "image"
                             : "auto";
 
-                var sb = new StringBuilder();
-                sb.Append($"folder={targetFolder}&timestamp={timestamp}&upload_preset={uploadPreset}");
-                sb.Append(apiSecret);
+                // IMPORTANT:
+                // For server-side signed upload, upload_preset is not required.
+                // This avoids Cloudinary "Upload preset must be specified when using unsigned upload" errors.
+                var signaturePayload =
+                    $"folder={targetFolder}&timestamp={timestamp}{apiSecret}";
 
-                using var sha1 = SHA1.Create();
-
-                var signature = BitConverter
-                    .ToString(
-                        sha1.ComputeHash(
-                            Encoding.UTF8.GetBytes(sb.ToString())))
-                    .Replace("-", "")
-                    .ToLowerInvariant();
+                var signature = GenerateSha1(signaturePayload);
 
                 using var form = new MultipartFormDataContent();
 
-                var stream = file.OpenReadStream();
+                stream = file.OpenReadStream();
 
                 var streamContent = new StreamContent(stream);
-
                 streamContent.Headers.ContentType =
-                    new System.Net.Http.Headers.MediaTypeHeaderValue(
-                        file.ContentType);
+                    new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
 
                 form.Add(streamContent, "file", file.FileName);
-
                 form.Add(new StringContent(apiKey), "api_key");
                 form.Add(new StringContent(timestamp.ToString()), "timestamp");
                 form.Add(new StringContent(signature), "signature");
-                form.Add(new StringContent(uploadPreset), "upload_preset");
                 form.Add(new StringContent(targetFolder), "folder");
 
                 var uploadUrl =
                     $"https://api.cloudinary.com/v1_1/{cloudName}/{resourceType}/upload";
 
                 var http = _httpClientFactory.CreateClient();
-
                 http.Timeout = TimeSpan.FromMinutes(5);
 
                 var response = await http.PostAsync(uploadUrl, form);
-
-                stream.Dispose();
-
                 var body = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -223,6 +191,38 @@ namespace ReactApi.Controllers
                     error = ex.ToString()
                 });
             }
+            finally
+            {
+                stream?.Dispose();
+            }
+        }
+
+        private string GetUploadPreset()
+        {
+            var preset = _config["Cloudinary:UploadPreset"];
+            return string.IsNullOrWhiteSpace(preset)
+                ? "smooothpixel_upload"
+                : preset;
+        }
+
+        private string GetDefaultFolder()
+        {
+            var folder = _config["Cloudinary:Folder"];
+            return string.IsNullOrWhiteSpace(folder)
+                ? "smooothpixel"
+                : folder;
+        }
+
+        private static string GenerateSha1(string input)
+        {
+            using var sha1 = SHA1.Create();
+            var bytes = Encoding.UTF8.GetBytes(input);
+            var hashBytes = sha1.ComputeHash(bytes);
+
+            return BitConverter
+                .ToString(hashBytes)
+                .Replace("-", "")
+                .ToLowerInvariant();
         }
     }
 }
