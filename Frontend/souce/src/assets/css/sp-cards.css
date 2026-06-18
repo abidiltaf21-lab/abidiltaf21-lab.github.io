@@ -1,0 +1,702 @@
+/**
+ * SmooothPixel — unified public-site card design (matches pricing cards)
+ * Loaded after style.css to override legacy gradients.
+ */
+
+/* ─── Base card shell ─── */
+.sp-card,
+.service-style-one-item.modern-card,
+.funfact-style-two-item.software-card,
+.about-stats-card,
+.modern-team-card-light .card-inner,
+.contact-style-one-items,
+.gallery-style-one,
+.home-blog-style-one-item,
+.process-style-one-item,
+.timeline-style-one-item,
+.testimonial-style-one .item,
+.calculator-card.glass-panel,
+.metric-item.glass-panel,
+.faq-style-one-items .chat-card,
+.accordion-item.accordion-style-one,
+.modern-portfolio-card,
+.review-card-v2,
+.google-widget-container,
+.sp-pricing-card.pricing-style-one {
+    background: var(--sp-card-bg) !important;
+    background-image: none !important;
+    border: 1px solid var(--sp-card-border) !important;
+    border-radius: var(--sp-card-radius) !important;
+    box-shadow: var(--sp-card-shadow) !important;
+    transition:
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.35s ease,
+        border-color 0.35s ease !important;
+}
+
+.sp-card:hover,
+.service-style-one-item.modern-card:hover,
+.funfact-style-two-item.software-card:hover,
+.about-stats-card:hover,
+.modern-team-card-light:hover .card-inner,
+.gallery-style-one:hover,
+.home-blog-style-one-item:hover,
+.process-style-one-item:hover,
+.timeline-style-one-item:hover,
+.testimonial-style-one .item:hover,
+.modern-portfolio-card:hover,
+.review-card-v2:hover,
+.google-widget-container:hover,
+.sp-pricing-card.pricing-style-one:hover {
+    transform: translateY(var(--sp-card-lift));
+    box-shadow: var(--sp-card-shadow-hover) !important;
+    border-color: var(--sp-card-hover-border) !important;
+}
+
+/* Portfolio */
+.modern-portfolio-card {
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+
+.modern-portfolio-card .portfolio-details-bottom {
+    padding: 20px 22px 24px;
+}
+
+.portfolio-hover-overlay {
+    background: rgba(15, 23, 42, 0.5) !important;
+}
+
+.play-icon-glow {
+    color: #fff !important;
+    text-shadow: 0 0 20px var(--sp-primary);
+}
+
+/* Reviews */
+.review-card-v2 {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 28px !important;
+}
+
+.google-widget-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 24px !important;
+}
+
+/* Service cards */
+.service-style-one-item.modern-card {
+    padding: 40px 30px !important;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+
+.service-style-one-item.modern-card .icon-wrapper i {
+    font-size: 50px;
+    background: var(--sp-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.service-style-one-item.modern-card h4,
+.service-style-one-item.modern-card h4 a {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-heading);
+}
+
+.service-style-one-item.modern-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--sp-text-muted);
+}
+
+body.bg-dark .service-style-one-item.modern-card h4,
+body.bg-dark .service-style-one-item.modern-card h4 a {
+    color: var(--sp-heading);
+}
+
+body.bg-dark .service-style-one-item.modern-card p {
+    color: var(--sp-text-muted);
+}
+
+/* Software / stats cards */
+.funfact-style-two-item.software-card {
+    padding: 30px 20px !important;
+    border-radius: var(--sp-card-radius) !important;
+    margin-top: 0 !important;
+    min-height: 100%;
+}
+
+.funfact-style-two-item.software-card .icon {
+    height: auto;
+    width: auto;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-bottom: 20px;
+}
+
+.funfact-style-two-item.software-card .icon i {
+    font-size: 45px;
+    background: var(--sp-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.funfact-style-two-item.software-card .fun-fact {
+    margin-top: 0 !important;
+}
+
+.funfact-style-two-item.software-card .fun-fact .timer {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--sp-primary);
+}
+
+.funfact-style-two-item.software-card .fun-fact .operator {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sp-primary);
+}
+
+.funfact-style-two-item.software-card .fun-fact span.medium,
+.funfact-style-two-item.software-card .fun-fact .medium {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-heading);
+}
+
+.funfact-style-two-item.software-card .fun-fact .counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+/* About stats */
+.about-stats-card {
+    padding: 40px !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* Team */
+.modern-team-card-light .card-inner {
+    border-radius: var(--sp-card-radius) !important;
+    overflow: hidden;
+    height: 460px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modern-team-card-light:hover .card-inner {
+    transform: translateY(var(--sp-card-lift));
+}
+
+.team-area {
+    background: var(--sp-bg-muted) !important;
+}
+
+body.bg-dark .team-area {
+    background: var(--sp-bg) !important;
+}
+
+.modern-team-card-light .role-tag {
+    background: rgba(var(--sp-primary-rgb), 0.12);
+    color: #b45309;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+body.bg-dark .modern-team-card-light .role-tag {
+    color: var(--sp-primary);
+}
+
+.modern-team-card-light .member-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-heading);
+}
+
+.modern-team-card-light .member-bio {
+    font-size: 13px;
+    color: var(--sp-text-muted);
+}
+
+.modern-team-card-light .skill-pill {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 10px;
+    color: #475569;
+}
+
+body.bg-dark .modern-team-card-light .skill-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--sp-text);
+}
+
+/* Portfolio gallery */
+.gallery-style-one {
+    padding: 16px !important;
+    overflow: hidden;
+}
+
+.gallery-style-one img {
+    border-radius: var(--sp-card-radius-sm) !important;
+}
+
+.gallery-style-one .overlay .icon a {
+    background: var(--sp-cta-gradient) !important;
+    box-shadow: var(--sp-cta-shadow);
+}
+
+/* Blog */
+.home-blog-style-one-item {
+    padding: 20px !important;
+    overflow: hidden;
+}
+
+.home-blog-style-one-item .home-blog-thumb {
+    border-radius: var(--sp-card-radius-sm) !important;
+    margin-bottom: 20px;
+}
+
+ul.home-blog-meta li a {
+    border-color: var(--sp-card-border);
+    color: var(--sp-text-muted);
+}
+
+/* Testimonials */
+.testimonial-style-one .item {
+    padding: 48px 40px !important;
+    border: 1px solid var(--sp-card-border) !important;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.testimonial-style-one .item::before,
+.testimonial-style-one .item::after {
+    display: none !important;
+}
+
+.testimonial-style-one .item .inner {
+    background: var(--sp-gradient) !important;
+    box-shadow: 0 8px 24px rgba(245, 66, 0, 0.32), 0 0 28px rgba(255, 174, 0, 0.18);
+}
+
+/* Contact panel */
+.contact-style-one-items {
+    padding: 60px 48px !important;
+    border-width: 1px !important;
+    overflow: hidden;
+}
+
+@media (min-width: 992px) {
+    .contact-style-one-items {
+        padding: 80px 64px !important;
+    }
+}
+
+/* Process / timeline (inner pages) */
+.process-style-one-item {
+    padding: 28px 24px !important;
+}
+
+.process-style-one-item span {
+    background: var(--sp-gradient) !important;
+    box-shadow: 0 4px 14px rgba(245, 66, 0, 0.35), 0 0 18px rgba(255, 174, 0, 0.18);
+}
+
+.timeline-style-one-item:not(.sp-resume-card) {
+    margin-bottom: 24px !important;
+}
+
+/* Resume cards use sp-resume.css timeline layout */
+.sp-resume-card.timeline-style-one-item {
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+}
+
+.sp-resume-card.timeline-style-one-item::after {
+    display: none !important;
+}
+
+.sp-resume-area .timeline-header {
+    border-bottom: 1px solid var(--sp-card-border) !important;
+    padding: 0 !important;
+    flex-direction: row !important;
+}
+
+.sp-resume-area .timeline-body {
+    padding: 0 !important;
+}
+
+.timeline-style-one-item::after {
+    border-color: var(--sp-card-bg) !important;
+}
+
+/* FAQ accordion */
+.accordion-item.accordion-style-one {
+    border-radius: var(--sp-card-radius-sm) !important;
+    margin-bottom: 12px !important;
+    overflow: hidden;
+}
+
+.accordion-item.accordion-style-one button.accordion-button:not(.collapsed) {
+    background: var(--sp-gradient) !important;
+    color: #fff !important;
+    border-radius: var(--sp-card-radius-sm) var(--sp-card-radius-sm) 0 0 !important;
+    box-shadow: 0 6px 18px rgba(245, 66, 0, 0.25);
+}
+
+.accordion-item.accordion-style-one button.accordion-button:not(.collapsed)::after {
+    background: #fff !important;
+    color: var(--sp-primary) !important;
+}
+
+.faq-style-one-items .chat-card {
+    padding: 24px !important;
+    border-radius: var(--sp-card-radius) !important;
+}
+
+/* Calculator */
+.calculator-card.glass-panel,
+.metric-item.glass-panel {
+    border-radius: var(--sp-card-radius) !important;
+}
+
+/* Shared checkmark (pricing + lists) */
+.sp-pricing-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--sp-gradient);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 2px 8px rgba(245, 66, 0, 0.35), 0 0 12px rgba(255, 174, 0, 0.2);
+}
+
+.sp-pricing-check i {
+    color: #fff;
+    font-size: 9px;
+}
+
+/* Shared CTA button */
+.sp-btn-cta,
+.pricing-cta-btn {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-height: 52px;
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none !important;
+    background: var(--sp-cta-gradient) !important;
+    box-shadow: var(--sp-cta-shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: none;
+}
+
+.sp-btn-cta:hover,
+.pricing-cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px rgba(255, 95, 0, 0.45);
+    color: #fff !important;
+}
+
+.sp-pricing-cta-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.sp-pricing-cta-arrow {
+    width: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.22);
+    position: relative;
+}
+
+.sp-pricing-cta-arrow::before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    background: rgba(255, 255, 255, 0.18);
+    transform: skewX(-18deg);
+}
+
+.sp-pricing-cta-arrow i {
+    font-size: 16px;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+}
+
+/* ─── Pricing card (full layout) ─── */
+.pricing-carousel {
+    padding: 24px 8px 48px;
+}
+
+.pricing-carousel .swiper-slide {
+    height: auto;
+    display: flex;
+}
+
+.pricing-carousel .swiper-slide > div {
+    display: flex;
+    width: 100%;
+}
+
+.sp-pricing-card.pricing-style-one {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1;
+    margin: 0;
+    padding: 28px 26px 30px;
+}
+
+.sp-pricing-card .pricing-tier-tabs {
+    display: flex;
+    gap: 0;
+    padding: 5px;
+    margin-bottom: 26px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+body.bg-dark .sp-pricing-card .pricing-tier-tabs {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sp-pricing-card .pricing-tier-tab {
+    flex: 1;
+    border: none;
+    border-radius: 999px;
+    padding: 11px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+body.bg-dark .sp-pricing-card .pricing-tier-tab {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.sp-pricing-card .pricing-tier-tab.active {
+    background: var(--sp-gradient);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(245, 66, 0, 0.4), 0 0 22px rgba(255, 174, 0, 0.25);
+}
+
+.sp-pricing-card .pricing-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none !important;
+    flex-direction: row !important;
+}
+
+.sp-pricing-card .pricing-service-name {
+    display: block;
+    font-size: clamp(18px, 2vw, 24px);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    color: #1e293b;
+    margin: 0 0 6px;
+}
+
+body.bg-dark .sp-pricing-card .pricing-service-name {
+    color: #f1f5f9;
+}
+
+.sp-pricing-card .pricing-pack-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0 0 8px;
+}
+
+body.bg-dark .sp-pricing-card .pricing-pack-name {
+    color: #94a3b8;
+}
+
+.sp-pricing-card .pricing-tagline {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sp-tagline) !important;
+    margin: 0;
+}
+
+.sp-pricing-card .pricing-top-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.12);
+}
+
+.sp-pricing-card .pricing-top-icon i {
+    font-size: 28px;
+    color: var(--sp-tagline);
+}
+
+.sp-pricing-card .content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sp-pricing-card .price {
+    padding: 22px 0;
+    margin: 4px 0 0;
+    border-top: 1px solid #e8ecf1;
+    border-bottom: 1px solid #e8ecf1;
+}
+
+body.bg-dark .sp-pricing-card .price {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.sp-pricing-card .price h2 {
+    font-size: clamp(44px, 5vw, 58px);
+    font-weight: 800;
+    margin: 0;
+    color: #1e293b;
+    line-height: 1;
+}
+
+body.bg-dark .sp-pricing-card .price h2,
+body.bg-dark .sp-pricing-card .price h2 sup {
+    color: #fff;
+}
+
+.sp-pricing-card .price h2 sup {
+    font-size: 0.42em;
+    font-weight: 700;
+    top: -0.35em;
+    margin-right: 4px;
+}
+
+.sp-pricing-card .content ul.pricing-features-list {
+    flex-grow: 1;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 24px 0 28px !important;
+    min-height: 168px;
+    overflow: visible !important;
+}
+
+.sp-pricing-card .content ul.pricing-features-list li {
+    float: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 0 16px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    color: #334155 !important;
+    line-height: 1.45 !important;
+    position: static !important;
+}
+
+body.bg-dark .sp-pricing-card .content ul.pricing-features-list li {
+    color: #e2e8f0 !important;
+}
+
+.sp-pricing-card .content ul.pricing-features-list li::before,
+.sp-pricing-card .content ul.pricing-features-list li::after {
+    display: none !important;
+    content: none !important;
+}
+
+.sp-pricing-cta-wrap {
+    margin-top: auto;
+}
+
+/* Swiper bullets — public carousels */
+.pricing-swiper-pagination .swiper-pagination-bullet,
+.services-pagination .swiper-pagination-bullet {
+    background: #cbd5e1;
+    opacity: 1;
+    width: 10px;
+    height: 10px;
+}
+
+.pricing-swiper-pagination .swiper-pagination-bullet-active,
+.services-pagination .swiper-pagination-bullet-active {
+    background: var(--sp-gradient);
+    width: 28px;
+    border-radius: 999px;
+    box-shadow: 0 0 12px rgba(255, 174, 0, 0.45);
+}
+
+.services-navigation-wrapper .slider-nav-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--sp-gradient);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(var(--sp-primary-rgb), 0.35);
+    transition: transform 0.25s ease;
+}
+
+.services-navigation-wrapper .slider-nav-btn:hover {
+    transform: translateY(-2px);
+}
