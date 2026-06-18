@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd smooothpixel/souce && npm install && npm run build",
-  "outputDirectory": "smooothpixel/souce/dist",
+  "buildCommand": "cd Frontend/source && npm install && npm run build",
+  "outputDirectory": "Frontend/source/dist",
   "installCommand": "echo 'install handled in buildCommand'",
   "rewrites": [
     {
