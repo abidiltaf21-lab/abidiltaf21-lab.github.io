@@ -240,10 +240,27 @@ using (var scope = app.Services.CreateScope())
 
         if (!tablesExist)
         {
-            logger.LogInformation("Database tables do not exist. Generating and executing DDL creation script...");
+            logger.LogInformation("Database tables do not exist or are incomplete. Generating and executing DDL creation script...");
             var createScript = db.Database.GenerateCreateScript();
-            await db.Database.ExecuteSqlRawAsync(createScript);
-            logger.LogInformation("Database tables successfully created via DDL script.");
+            
+            // Split the script into individual SQL statements
+            var statements = createScript.Split(new[] { ";\r\n", ";\n", ";\r" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var statement in statements)
+            {
+                var trimmed = statement.Trim();
+                if (string.IsNullOrEmpty(trimmed)) continue;
+
+                try
+                {
+                    await db.Database.ExecuteSqlRawAsync(trimmed);
+                }
+                catch (Exception stmtEx)
+                {
+                    // Ignore errors for individual statements (e.g. if table or index already exists)
+                    logger.LogWarning("DDL statement execution skipped (might already exist): {Message}", stmtEx.Message);
+                }
+            }
+            logger.LogInformation("Database tables check and creation completed.");
         }
     }
     catch (Exception ex)
