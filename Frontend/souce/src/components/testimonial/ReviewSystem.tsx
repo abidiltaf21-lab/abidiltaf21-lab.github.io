@@ -159,26 +159,53 @@ const ReviewSystem: React.FC = () => {
         if (!file) return;
 
         setIsUploading(true);
-        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ddxrpqctk';
-        const uploadData = new FormData();
-        uploadData.append('file', file);
-        uploadData.append('upload_preset', 'smooothpixel_upload');
 
-        fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+        // Use the backend signed-upload endpoint so we never expose the
+        // Cloudinary API secret in the browser and we don't hit the
+        // "Upload preset must be whitelisted for unsigned uploads" error.
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const apiBaseUrl = (
+            import.meta.env.VITE_PRODUCTION_API_URL ||
+            import.meta.env.VITE_API_BASE_URL ||
+            ''
+        ).replace(/\/$/, '');
+
+        const headers: Record<string, string> = {};
+        const token = localStorage.getItem('adminToken');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        fetch(`${apiBaseUrl}/cloudinary/upload`, {
             method: 'POST',
-            body: uploadData
+            headers,
+            body: formData
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.secure_url) {
-                setImage(data.secure_url);
-            } else {
-                alert('Image upload failed.');
+        .then(async res => {
+            if (res.status === 401) {
+                alert('Image upload failed: not authorized.');
+                return null;
             }
+            if (res.status === 503) {
+                alert('Image upload failed: Cloudinary is not configured on the server.');
+                return null;
+            }
+            const data = await res.json();
+            if (!res.ok) {
+                const msg = data?.cloudinaryBody
+                    ? (() => { try { return JSON.parse(data.cloudinaryBody)?.error?.message || data.error; } catch { return data.error; } })()
+                    : data?.error;
+                throw new Error(msg || `Upload failed (HTTP ${res.status})`);
+            }
+            return data;
+        })
+        .then(data => {
+            if (data?.secure_url) setImage(data.secure_url);
+            else if (data) alert('Image upload failed.');
         })
         .catch(err => {
             console.error("Cloudinary upload error:", err);
-            alert('Upload error.');
+            alert(`Upload error: ${err.message || err}`);
         })
         .finally(() => {
             setIsUploading(false);
@@ -242,623 +269,13 @@ const ReviewSystem: React.FC = () => {
         }
     };
 
-    // Google review cards list (60 premium reviews averaging exactly 4.9 stars, highly randomized, multilingual, and spanning 3 years)
-    const googleReviews = useMemo(() => [
-        {
-            id: 'google-1',
-            author: "Sarah Jenkins",
-            project: "Verified Client",
-            rating: 5,
-            text: "We worked with SmooothPixel on a product animation video and were very happy with the results. The team is highly professional, and the overall experience of working with them was excellent. We will definitely collaborate on future projects",
-            image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-2',
-            author: "David Chen",
-            project: "Aura Creative",
-            rating: 5,
-            text: "Exceptional 3D product visualization! Delivered fast work on our corporate explainer video. A professional product that exceeded our standards.",
-            image: "",
-            isGoogle: true,
-            time: "6 months ago"
-        },
-        {
-            id: 'google-3',
-            author: "Felix Weber",
-            project: "Brand Campaign",
-            rating: 5,
-            text: "Unglaublich talentierte Animatoren! Die Beleuchtung, die Texturen und die flüssigen Bewegungen, die sie für unsere Premium-Uhrenmarke entworfen haben, waren absolut erstklassig. Sehr empfehlenswert!",
-            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "3 days ago"
-        },
-        {
-            id: 'google-4',
-            author: "Niklas Schmidt",
-            project: "Explainer Video",
-            rating: 4,
-            text: "Sehr reibungslose Kommunikation und qualitativ hochwertiges Rendering. Die kreative Ausrichtung war großartig, am Ende waren nur minimale Anpassungen im letzten Entwurf nötig.",
-            image: "",
-            isGoogle: true,
-            time: "1 week ago"
-        },
-        {
-            id: 'google-5',
-            author: "Emily Larson",
-            project: "Medical Device Co",
-            rating: 5,
-            text: "The 3D animation they created for our surgical instrument explainer video was absolutely flawless. They made complex scientific concepts easy to understand.",
-            image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "3 years ago"
-        },
-        {
-            id: 'google-6',
-            author: "Claire Dupont",
-            project: "Luxury Cosmetics",
-            rating: 5,
-            text: "Une attention aux détails tout simplement bluffante ! Les simulations de fluides et le rendu des reflets brillants pour notre gamme de soins sont incroyablement réalistes et luxueux.",
-            image: "",
-            isGoogle: true,
-            time: "3 weeks ago"
-        },
-        {
-            id: 'google-7',
-            author: "Thomas Müller",
-            project: "Automotive Launch",
-            rating: 5,
-            text: "Atemberaubendes Auto-Animationsvideo! Die fotorealistische Beleuchtung, die physikalische Simulation und die dramatischen Kamerawinkel passten perfekt zu unserem Produktlaunch. Absolute Profis.",
-            image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "1 month ago"
-        },
-        {
-            id: 'google-8',
-            author: "Sebastian Kroll",
-            project: "SaaS Product",
-            rating: 5,
-            text: "Schnelle Arbeit und erstklassige Professionalität. Sie haben innerhalb der vereinbarten Frist ein hochkonvertierendes Erklärvideo für unsere Plattform geliefert. Gerne wieder!",
-            image: "",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-9',
-            author: "Jonas Fischer",
-            project: "Industrial Dynamics",
-            rating: 3,
-            text: "Gute Renderings, aber die Feedback-Schleifen waren extrem mühsam. Wir mussten viele Korrekturen mehrfach erklären. Am Ende okay, aber sehr anstrengend.",
-            image: "",
-            isGoogle: true,
-            time: "2 months ago"
-        },
-        {
-            id: 'google-10',
-            author: "Youssef Mansour",
-            project: "Creative Solutions",
-            rating: 5,
-            text: "عمل إبداعي مذهل! حركات ثلاثية الأبعاد فائقة الدقة والاحترافية. تم تسليم المشروع في الوقت المحدد وبجودة ممتازة جداً. نوصي بشدة بالتعامل معهم.",
-            image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "5 months ago"
-        },
-        {
-            id: 'google-11',
-            author: "Oliver Poulsen",
-            project: "Zenith Watch Co",
-            rating: 5,
-            text: "We needed a premium 3D commercial for our new chronograph. SmooothPixel delivered breathtaking close-up renders and mechanical movements.",
-            image: "",
-            isGoogle: true,
-            time: "2 months ago"
-        },
-        {
-            id: 'google-12',
-            author: "Amélie Laurent",
-            project: "Fashion Editorial",
-            rating: 5,
-            text: "J'ai adoré l'animation de particules abstraites qu'ils ont développée pour notre toile de fond de défilé. Une équipe très créative avec un goût exceptionnel !",
-            image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "3 months ago"
-        },
-        {
-            id: 'google-13',
-            author: "Jan de Vries",
-            project: "Logistics Corp",
-            rating: 5,
-            text: "Professional team, clear feedback cycles, and highly scalable pipeline. Our supply chain explainer video was delivered with great clarity.",
-            image: "",
-            isGoogle: true,
-            time: "8 months ago"
-        },
-        {
-            id: 'google-14',
-            author: "Isabella Rossi",
-            project: "Jewelry Brand",
-            rating: 5,
-            text: "The diamond reflection and refraction in our latest ring commercial were so realistic. Beautiful rendering and highly professional product.",
-            image: "",
-            isGoogle: true,
-            time: "3 months ago"
-        },
-        {
-            id: 'google-15',
-            author: "Lukas Novak",
-            project: "Game Studio",
-            rating: 2,
-            text: "Die 3D-Modelle sind zwar qualitativ hochwertig, aber die Kommunikation war extrem zäh und die Lieferung verzögerte sich um fast drei Wochen. Für diesen Preis erwarte ich besseren Service.",
-            image: "",
-            isGoogle: true,
-            time: "3 years ago"
-        },
-        {
-            id: 'google-16',
-            author: "Anna Lindstrom",
-            project: "GreenTech Ltd",
-            rating: 5,
-            text: "Our clean energy explainer video turned out fantastic. They managed to make complex thermal system processes look simple and visually appealing.",
-            image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "4 months ago"
-        },
-        {
-            id: 'google-17',
-            author: "Fatima Al-Sayed",
-            project: "BioLabs Tech",
-            rating: 5,
-            text: "الرسوم المتحركة الطبية التي صمموها لنا كانت مذهلة ومبسطة للغاية. التفاصيل الدقيقة للخلايا ثلاثية الأبعاد كانت دقيقة وعلمية بشكل لا يصدق.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-18',
-            author: "Hans Weymann",
-            project: "Solar Solutions",
-            rating: 5,
-            text: "Zuverlässiges Rendering-Studio mit tiefem Verständnis für technische Spezifikationen. Sehr zu empfehlen für präzise industrielle Animationen.",
-            image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "5 months ago"
-        },
-        {
-            id: 'google-19',
-            author: "Nina Kovac",
-            project: "BioLabs Inc",
-            rating: 5,
-            text: "Great attention to our cellular modeling guidelines. There was a minor delay in texturing, but the final 3D animation is beautiful.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-20',
-            author: "Alexander Wright",
-            project: "Capital Partners",
-            rating: 5,
-            text: "An absolute pleasure to work with. Clean storyboard, gorgeous color styling, and smooth delivery of our corporate overview animation.",
-            image: "",
-            isGoogle: true,
-            time: "3 years ago"
-        },
-        {
-            id: 'google-21',
-            author: "Marie Dubois",
-            project: "Eco Packaging",
-            rating: 5,
-            text: "Ils ont créé une superbe animation de style papier découpé pour nos emballages écologiques. Cela correspond parfaitement à la personnalité de notre marque.",
-            image: "",
-            isGoogle: true,
-            time: "5 months ago"
-        },
-        {
-            id: 'google-22',
-            author: "Stefan Meyer",
-            project: "Tech Innovations",
-            rating: 5,
-            text: "Schnelle Arbeit und hervorragende technische Präzision! Die Explosionsdarstellungs-Animation unseres intelligenten Schlosses zeigte genau, wie die mechanischen Teile zusammenpassen.",
-            image: "",
-            isGoogle: true,
-            time: "6 months ago"
-        },
-        {
-            id: 'google-23',
-            author: "Chloe Higgins",
-            project: "Creative Agency",
-            rating: 5,
-            text: "We partnered with SmooothPixel for a client's 3D product render. The communication was flawless, and the final results exceeded all metrics.",
-            image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-24',
-            author: "Daniel Petrov",
-            project: "Aero Engineering",
-            rating: 5,
-            text: "High-fidelity aerodynamics visualization. They captured air flow turbulence beautifully. Quality is absolutely outstanding.",
-            image: "",
-            isGoogle: true,
-            time: "6 months ago"
-        },
-        {
-            id: 'google-25',
-            author: "Laura Martinez",
-            project: "Food & Beverage",
-            rating: 5,
-            text: "Splendides simulations de liquides ! L'animation d'éclaboussure de jus d'orange avait l'air incroyablement fraîche et naturelle. Produit extrêmement professionnel.",
-            image: "",
-            isGoogle: true,
-            time: "7 months ago"
-        },
-        {
-            id: 'google-26',
-            author: "Tariq Al-Fahad",
-            project: "Fintech App",
-            rating: 5,
-            text: "فيديو توضيحي ممتاز للتطبيق الخاص بنا! المؤثرات البصرية وتصميم شاشات التطبيق كان عصرياً وجذاباً للغاية. سرعة استجابة مذهلة من الفريق.",
-            image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "2 months ago"
-        },
-        {
-            id: 'google-27',
-            author: "Charlotte Berg",
-            project: "Architecture Hub",
-            rating: 5,
-            text: "Very realistic fly-through animation for our modern villa design. The interior styling looked absolutely photorealistic. Incredible work!",
-            image: "",
-            isGoogle: true,
-            time: "7 months ago"
-        },
-        {
-            id: 'google-28',
-            author: "Christian Wolff",
-            project: "Cyber Security",
-            rating: 5,
-            text: "Sie haben unsere Server-Infrastruktur und Netzwerkprotokolle durch dynamische Cyber-Neon-Grafiken extrem anschaulich dargestellt. Geniale Arbeit!",
-            image: "",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-29',
-            author: "Clara Schuster",
-            project: "Kids Entertainment",
-            rating: 5,
-            text: "Die Charakteranimationen, die sie für unsere Kinderbuch-App entworfen haben, waren so süß, farbenfroh und flüssig. Absolut empfehlenswert!",
-            image: "",
-            isGoogle: true,
-            time: "8 months ago"
-        },
-        {
-            id: 'google-30',
-            author: "Paul Neumann",
-            project: "Berlin Smart Mobiles",
-            rating: 5,
-            text: "SmoothPixel ist mit Abstand das beste Motion-Design-Studio in Deutschland. Hochprofessionell, reaktionsschnell und unglaublich kreativ.",
-            image: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "8 months ago"
-        },
-        {
-            id: 'google-31',
-            author: "Mia Hansen",
-            project: "Danish Design Co",
-            rating: 5,
-            text: "Elegant, minimalistic Nordic style design and animation. They perfectly captured our brand aesthetics in a 15-second product film.",
-            image: "",
-            isGoogle: true,
-            time: "9 months ago"
-        },
-        {
-            id: 'google-32',
-            author: "Eric Laurent",
-            project: "Smart Energy",
-            rating: 5,
-            text: "Good workflow, high quality output. We had to do two revisions to get the solar panel angle right, but the team was very cooperative.",
-            image: "",
-            isGoogle: true,
-            time: "9 months ago"
-        },
-        {
-            id: 'google-33',
-            author: "Natalia Ortiz",
-            project: "Luxury Fragrance",
-            rating: 5,
-            text: "Un rendu de flacon et des simulations de brume tout simplement magnifiques. La publicité pour le parfum ressemble à un film de cinéma haut de gamme.",
-            image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "3 years ago"
-        },
-        {
-            id: 'google-34',
-            author: "Michael Brown",
-            project: "Venture Corp",
-            rating: 5,
-            text: "SmooothPixel delivered exactly what we needed: a fast, sleek, professional pitch-deck video with stunning 3D data visualizations.",
-            image: "",
-            isGoogle: true,
-            time: "10 months ago"
-        },
-        {
-            id: 'google-35',
-            author: "Zainab Hashim",
-            project: "Al-Noor Luxury",
-            rating: 5,
-            text: "تفاصيل بريق المجوهرات وانعكاسات الإضاءة على قطع الألماس كانت مذهلة ومتقنة للغاية. قدموا لنا فيديو إعلاني فاخر تجاوز كل توقعاتنا.",
-            image: "",
-            isGoogle: true,
-            time: "11 months ago"
-        },
-        {
-            id: 'google-36',
-            author: "Lars Gustafsson",
-            project: "Nordic Marine",
-            rating: 5,
-            text: "Highly impressive simulation of ocean waves and vessel stability. We will use this rendering for all our official presentations.",
-            image: "",
-            isGoogle: true,
-            time: "10 months ago"
-        },
-        {
-            id: 'google-37',
-            author: "Sarah Connolly",
-            project: "Travel Booking Co",
-            rating: 5,
-            text: "A gorgeous 3D character explainer video that boosted our conversion rate by 35%. The team is exceptionally talented and easy to work with.",
-            image: "",
-            isGoogle: true,
-            time: "3 years ago"
-        },
-        {
-            id: 'google-38',
-            author: "Fabian Richter",
-            project: "Smart Home Systems",
-            rating: 5,
-            text: "Perfekte Explosionsdarstellung unseres Thermostat-Hubs. Die Präzision des 3D-Modells und die Logik der Systembaugruppe sind hervorragend!",
-            image: "",
-            isGoogle: true,
-            time: "11 months ago"
-        },
-        {
-            id: 'google-39',
-            author: "Giulia Rossi",
-            project: "Espresso Labs",
-            rating: 5,
-            text: "The coffee pouring and steam rendering inside the espresso cup was absolutely gorgeous. Superb attention to liquid styling.",
-            image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "11 months ago"
-        },
-        {
-            id: 'google-40',
-            author: "Oscar Larsson",
-            project: "Sound Systems",
-            rating: 5,
-            text: "Unbelievable speaker cone vibration animation and sound-wave visualization! Truly professional product that sounds and looks great.",
-            image: "",
-            isGoogle: true,
-            time: "11 months ago"
-        },
-        {
-            id: 'google-41',
-            author: "Linda Vance",
-            project: "Prime Real Estate",
-            rating: 5,
-            text: "Amazing 3D architectural walkthrough! They captured the premium finishes, ambient sunset lighting, and landscape details perfectly.",
-            image: "",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-42',
-            author: "Victor Hugo",
-            project: "Paris Media",
-            rating: 5,
-            text: "Un travail rapide, une qualité hors du commun et une équipe hautement professionnelle. Ils ont conçu l'animation d'introduction de notre chaîne.",
-            image: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-43',
-            author: "Maria Ivanova",
-            project: "EdTech Ltd",
-            rating: 5,
-            text: "We commissioned a series of educational biology animations. SmoothPixel delivered extremely accurate and visually stunning cellular graphics.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-44',
-            author: "Patrick Higgins",
-            project: "Logistics Tech",
-            rating: 5,
-            text: "Outstanding route map optimization explainer. The motion flow is super smooth, and the narrative matches the speed perfectly.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-45',
-            author: "Sophie Dubois",
-            project: "Organic Skincare",
-            rating: 5,
-            text: "Les chutes de pétales de fleurs et les textures de crème sont si pures et naturelles. Convient parfaitement aux valeurs durables de notre marque.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-46',
-            author: "Martin Luther",
-            project: "Tech Solutions",
-            rating: 5,
-            text: "Fantastische 3D-Darstellung unserer Server-Chips. Die mikroskopischen Kupferpfade und das Glühen der Wärmeableitung wirken extrem hochwertig.",
-            image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-47',
-            author: "Lisa Campbell",
-            project: "Fitness App",
-            rating: 5,
-            text: "We are super happy with the UI motion design and screen animations for our new iOS application. Highly engaging product!",
-            image: "",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-48',
-            author: "Kamal Mansouri",
-            project: "Tunis Media",
-            rating: 5,
-            text: "فريق محترف للغاية ومبدع! قمنا بتصميم مقدمة الرسوم المتحركة لشبكتنا الإعلامية وكانت النتيجة رائعة ومبهرة للجميع. شكرًا لكم.",
-            image: "",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-49',
-            author: "Andreas Baader",
-            project: "Berlin Sound Systems",
-            rating: 5,
-            text: "Die metallischen Audiotreiber-Texturen und Lautsprechergitter-Animationen sehen extrem realistisch aus. Absolute Spitzenqualität aus Berlin!",
-            image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-50',
-            author: "Natalie Portman",
-            project: "Act Studio",
-            rating: 5,
-            text: "High-end corporate video animation. The team helped bring our brand deck to life with incredible elegance and fast turnarounds.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-51',
-            author: "James Cole",
-            project: "Aero Tech",
-            rating: 5,
-            text: "The turbofan jet engine simulation was exceptionally detailed, showing perfect fan blades rotation and exhaust particles.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-52',
-            author: "Helen Hunt",
-            project: "Medical Care",
-            rating: 5,
-            text: "They transformed complex medical data into a visually compelling, easy-to-follow explainer video. Highly recommend their work.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-53',
-            author: "Arthur Pendragon",
-            project: "Camelot Media",
-            rating: 5,
-            text: "Breathtaking visual design and VFX. SmoothPixel really knows how to capture atmospheric lighting and grand cinematic scale.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-54',
-            author: "Bruce Wayne",
-            project: "Gotham Tech",
-            rating: 5,
-            text: "The military-grade prototype animation was flawlessly detailed, showing accurate mechanical joints and thermal vision overlays.",
-            image: "https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-55',
-            author: "Tony Stark",
-            project: "Arc Industries",
-            rating: 5,
-            text: "Brilliant holographic UI concept designs and high-fidelity rendering. The holographic assembly animation was superb.",
-            image: "",
-            isGoogle: true,
-            time: "2 years ago"
-        },
-        {
-            id: 'google-56',
-            author: "Peter Parker",
-            project: "Web Solutions",
-            rating: 5,
-            text: "Awesome particle simulations and web movement animations! They are fast, friendly, and produce incredibly clean designs.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-57',
-            author: "Diana Prince",
-            project: "Themis Agency",
-            rating: 5,
-            text: "They created a gorgeous, majestic brand film using gold typography and graceful cinematic motion. Truly professional product.",
-            image: "",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-58',
-            author: "Clark Kent",
-            project: "Daily Planet",
-            rating: 5,
-            text: "Very smooth transitions and clean, professional visuals. The global connectivity explainer video was outstanding.",
-            image: "",
-            isGoogle: true,
-            time: "3 years ago"
-        },
-        {
-            id: 'google-59',
-            author: "Barry Allen",
-            project: "Speed Labs",
-            rating: 5,
-            text: "Fast work is an understatement! They delivered a stunning lightning VFX intro video in record time. Phenomenal speed!",
-            image: "https://images.unsplash.com/photo-1500048993953-d23a436266cf?auto=format&fit=crop&w=150&h=150&q=80",
-            isGoogle: true,
-            time: "1 year ago"
-        },
-        {
-            id: 'google-60',
-            author: "Hal Jordan",
-            project: "Emerald Corp",
-            rating: 5,
-            text: "Spectacular light and glass refraction simulations! The green energy rings animation was absolutely mesmerizing.",
-            image: "",
-            isGoogle: true,
-            time: "2 years ago"
-        }
-    ], []);
 
     // Separate reviews by source
     const websiteReviewsList = useMemo(() => {
         return fetchedReviews.filter(r => r.company?.toLowerCase() !== 'google review');
     }, [fetchedReviews]);
 
-    const displayWebsiteReviews = useMemo(() => {
-        if (websiteReviewsList.length > 0) return websiteReviewsList;
-        return [
-            { id: 1, author: "David Chen", project: "TechFlow Systems", rating: 5, text: "The motion system delivered by SmoothPixel completely transformed our brand identity." },
-            { id: 2, author: "Sarah Jenkins", project: "Aura Creative", rating: 5, text: "Exceptional 3D product visualization. Photorealistic quality with a stylistic edge." },
-            { id: 3, author: "Marcus Aurelius", project: "Rome Holdings", rating: 5, text: "Top-notch animation work, delivered precisely on time. Highly recommended creative studio!" }
-        ];
-    }, [websiteReviewsList]);
+    const displayWebsiteReviews = websiteReviewsList; // No more fake fallback reviews.
 
     const allGoogleReviews = useMemo(() => {
         const dbGoogleReviews = fetchedReviews
@@ -875,8 +292,9 @@ const ReviewSystem: React.FC = () => {
                 isGoogle: true,
                 time: "Recently"
             }));
-        return [...googleReviews, ...dbGoogleReviews];
-    }, [fetchedReviews, googleReviews]);
+        // Only show real reviews from the database; no hardcoded placeholders.
+        return dbGoogleReviews;
+    }, [fetchedReviews]);
 
     // Google widget Topic Badges
     const googleTopics = [
@@ -941,6 +359,7 @@ const ReviewSystem: React.FC = () => {
                         <h2 className="rv-title">{t('review_title')}</h2>
                     </div>
                     <div className="col-lg-5 d-flex justify-content-lg-end align-items-center gap-3 flex-wrap">
+                        {allGoogleReviews.length > 0 && (
                         <div className="rv-stat-pill">
                             <span className="rv-stat-num">{ratingStats.avg}</span>
                             <span className="rv-stat-stars">
@@ -950,6 +369,7 @@ const ReviewSystem: React.FC = () => {
                             </span>
                             <span className="rv-stat-label">Google Rating</span>
                         </div>
+                        )}
                         <button className="rv-cta-pill" onClick={() => openWriteModal('website')}>
                             <i className="fas fa-pen-nib" />
                             <span>{t('write_review')}</span>
@@ -958,6 +378,12 @@ const ReviewSystem: React.FC = () => {
                 </div>
 
                 {/* 2. WEBSITE TESTIMONIALS — Premium Glass Cards */}
+                {displayWebsiteReviews.length === 0 ? (
+                    <div className="rv-empty-state mb-4">
+                        <i className="far fa-comment-dots" />
+                        <p>No client testimonials yet — be the first to share your experience.</p>
+                    </div>
+                ) : (
                 <Swiper
                     modules={[Autoplay, Pagination]}
                     spaceBetween={28}
@@ -1036,13 +462,22 @@ const ReviewSystem: React.FC = () => {
                         );
                     })}
                 </Swiper>
+                )}
 
                 {/* Custom Swiper Bullets */}
+                {displayWebsiteReviews.length > 0 && (
                 <div className="rv-swiper-bullets-wrap">
                     <div className="rv-swiper-bullets" />
                 </div>
+                )}
 
                 {/* 3. GOOGLE LIVE WIDGET — Premium Glass Panel */}
+                {allGoogleReviews.length === 0 && !loading ? (
+                    <div className="rv-empty-state rv-empty-state-google mt-5">
+                        <i className="fab fa-google" />
+                        <p>No Google reviews yet — connect your Google Business profile or share your first review.</p>
+                    </div>
+                ) : (
                 <div className="rv-widget mt-5">
                     <div className="rv-widget-head">
                         <div className="rv-widget-head-left">
@@ -1309,6 +744,7 @@ const ReviewSystem: React.FC = () => {
                     </div>
                 </div>
             </div>
+                )}
 
             {/* UNIFIED DUAL-THEME MODAL FORM POPUP */}
             {showModal && (
@@ -1622,6 +1058,29 @@ const ReviewSystem: React.FC = () => {
                    REVIEWS SECTION — Premium Glass Design
                    (matches HeaderV3 pill + glow + Banner glass language)
                 ===================================================================== */
+                .rv-empty-state {
+                    background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(245,247,252,0.85) 100%);
+                    border: 1px dashed rgba(13, 36, 64, 0.18);
+                    border-radius: 18px;
+                    padding: 48px 24px;
+                    text-align: center;
+                    color: #4a5874;
+                }
+                .rv-empty-state i {
+                    font-size: 38px;
+                    margin-bottom: 12px;
+                    display: inline-block;
+                    background: linear-gradient(135deg, #ff7a18, #ffb347);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    color: transparent;
+                }
+                .rv-empty-state p {
+                    margin: 0;
+                    font-size: 15px;
+                    font-weight: 500;
+                }
                 .rv-section {
                     position: relative;
                     padding-top: 100px;

@@ -50,12 +50,25 @@ const ShowreelForm: React.FC = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Use the backend signed-upload endpoint. The backend holds the
+        // Cloudinary API secret and signs the request, so we don't expose
+        // any secret in the browser and the "Upload preset must be whitelisted
+        // for unsigned uploads" error goes away.
         const uploadData = new FormData();
         uploadData.append('file', file);
-        uploadData.append('upload_preset', 'smooothpixel_upload');
 
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/auto/upload`);
+
+        const apiBaseUrl = (
+            import.meta.env.VITE_PRODUCTION_API_URL ||
+            import.meta.env.VITE_API_BASE_URL ||
+            ''
+        ).replace(/\/$/, '');
+
+        xhr.open('POST', `${apiBaseUrl}/cloudinary/upload`);
+
+        const token = localStorage.getItem('adminToken');
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
         xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
@@ -71,16 +84,32 @@ const ShowreelForm: React.FC = () => {
                 if (field === 'videoUrl' && !formData.thumb) {
                     setFormData(prev => ({ ...prev, thumb: res.secure_url.replace(/\.(mp4|webm|mov|ts)$/i, '.jpg') }));
                 }
+            } else if (xhr.status === 401) {
+                alert('Upload failed: not authorized. Please log in again.');
+            } else if (xhr.status === 503) {
+                alert('Upload failed: Cloudinary is not configured on the server. Set Cloudinary__* env vars.');
             } else {
-                const errorText = xhr.responseText || '{}';
-                let errorMsg = 'Upload failed';
+                let errorMsg = `Upload failed (HTTP ${xhr.status})`;
                 try {
-                    const errorJson = JSON.parse(errorText);
-                    errorMsg = errorJson.error?.message || errorMsg;
-                } catch (_e) { /* ignore JSON parse error */ }
-                const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'MISSING';
-                alert('Upload Error: ' + errorMsg + ' (Status: ' + xhr.status + ') | Cloud: ' + cloudName);
+                    const err = JSON.parse(xhr.responseText);
+                    if (err?.cloudinaryBody) {
+                        try {
+                            const cloudErr = JSON.parse(err.cloudinaryBody);
+                            errorMsg = `Upload failed: ${cloudErr?.error?.message || err.error || errorMsg}`;
+                        } catch {
+                            errorMsg = `Upload failed: ${err.cloudinaryBody}`;
+                        }
+                    } else if (err?.error) {
+                        errorMsg = `Upload failed: ${err.error}`;
+                    }
+                } catch { /* keep generic */ }
+                alert(errorMsg);
             }
+            setUploadProgress(prev => ({ ...prev, [field]: 0 }));
+        };
+
+        xhr.onerror = () => {
+            alert('Upload failed: could not reach the upload server.');
             setUploadProgress(prev => ({ ...prev, [field]: 0 }));
         };
 

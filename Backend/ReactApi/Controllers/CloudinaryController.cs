@@ -1,3 +1,6 @@
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -25,18 +28,24 @@ namespace ReactApi.Controllers
         [HttpGet("status")]
         public IActionResult Status()
         {
-            var cloudName = _config["Cloudinary:CloudName"];
+            var cloudName = _config["Cloudinary:CloudName"]?.Trim().Trim('"');
+            var apiKey = _config["Cloudinary:ApiKey"]?.Trim().Trim('"');
+            var apiSecret = _config["Cloudinary:ApiSecret"]?.Trim().Trim('"');
             var uploadPreset = GetUploadPreset();
 
             return Ok(new
             {
                 configured = !string.IsNullOrWhiteSpace(cloudName) &&
-                             !string.IsNullOrWhiteSpace(uploadPreset),
+                             !string.IsNullOrWhiteSpace(uploadPreset) &&
+                             !string.IsNullOrWhiteSpace(apiKey) &&
+                             !string.IsNullOrWhiteSpace(apiSecret),
                 cloudName = cloudName ?? "",
-                uploadPreset,
                 hasCloudName = !string.IsNullOrWhiteSpace(cloudName),
+                hasApiKey = !string.IsNullOrWhiteSpace(apiKey),
+                hasApiSecret = !string.IsNullOrWhiteSpace(apiSecret),
                 hasUploadPreset = !string.IsNullOrWhiteSpace(uploadPreset),
-                message = "Cloudinary unsigned upload is configured."
+                uploadPreset,
+                message = "Cloudinary signed upload is configured."
             });
         }
 
@@ -53,18 +62,22 @@ namespace ReactApi.Controllers
                 return BadRequest(new { error = "No file provided." });
             }
 
-            var cloudName = _config["Cloudinary:CloudName"];
+            var cloudName = _config["Cloudinary:CloudName"]?.Trim().Trim('"');
+            var apiKey = _config["Cloudinary:ApiKey"]?.Trim().Trim('"');
+            var apiSecret = _config["Cloudinary:ApiSecret"]?.Trim().Trim('"');
             var uploadPreset = GetUploadPreset();
             var targetFolder = string.IsNullOrWhiteSpace(folder)
                 ? GetDefaultFolder()
                 : folder;
 
             if (string.IsNullOrWhiteSpace(cloudName) ||
+                string.IsNullOrWhiteSpace(apiKey) ||
+                string.IsNullOrWhiteSpace(apiSecret) ||
                 string.IsNullOrWhiteSpace(uploadPreset))
             {
                 return StatusCode(503, new
                 {
-                    error = "Cloudinary is not configured. Missing Cloudinary__CloudName or Cloudinary__UploadPreset."
+                    error = "Cloudinary is not configured. Missing one of: Cloudinary__CloudName, Cloudinary__ApiKey, Cloudinary__ApiSecret, Cloudinary__UploadPreset."
                 });
             }
 
@@ -82,6 +95,20 @@ namespace ReactApi.Controllers
                         resourceType = "image";
                 }
 
+                // Compute signed-upload timestamp + signature.
+                // Cloudinary signature = SHA1("folder=...&timestamp=...&upload_preset=...&<api_secret>")
+                // Params are sorted alphabetically by key.
+                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                var signatureParams = new SortedDictionary<string, string>(StringComparer.Ordinal)
+                {
+                    { "folder", targetFolder },
+                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) },
+                    { "upload_preset", uploadPreset }
+                };
+
+                var signature = ComputeCloudinarySignature(signatureParams, apiSecret!);
+
                 using var form = new MultipartFormDataContent();
 
                 stream = file.OpenReadStream();
@@ -95,15 +122,14 @@ namespace ReactApi.Controllers
                 }
 
                 form.Add(streamContent, "file", file.FileName);
+                form.Add(new StringContent(apiKey!), "api_key");
+                form.Add(new StringContent(timestamp.ToString(CultureInfo.InvariantCulture)), "timestamp");
+                form.Add(new StringContent(signature), "signature");
                 form.Add(new StringContent(uploadPreset), "upload_preset");
-
-                if (!string.IsNullOrWhiteSpace(targetFolder))
-                {
-                    form.Add(new StringContent(targetFolder), "folder");
-                }
+                form.Add(new StringContent(targetFolder), "folder");
 
                 _logger.LogWarning(
-                    "UPLOAD DEBUG => CloudName={CloudName}, ResourceType={ResourceType}, Preset={Preset}, Folder={Folder}, FileName={FileName}, ContentType={ContentType}, Size={Size}",
+                    "UPLOAD DEBUG (signed) => CloudName={CloudName}, ResourceType={ResourceType}, Preset={Preset}, Folder={Folder}, FileName={FileName}, ContentType={ContentType}, Size={Size}",
                     cloudName,
                     resourceType,
                     uploadPreset,
@@ -113,16 +139,8 @@ namespace ReactApi.Controllers
                     file.Length
                 );
 
-                foreach (var item in form)
-                {
-                    _logger.LogWarning(
-                        "UPLOAD FORM FIELD => {FieldName}",
-                        item.Headers.ContentDisposition?.Name
-                    );
-                }
-
                 var uploadUrl =
-                    $"https://api.cloudinary.com/v1_1/{cloudName}/auto/upload";
+                    $"https://api.cloudinary.com/v1_1/{cloudName}/{resourceType}/upload";
 
                 var http = _httpClientFactory.CreateClient();
                 http.Timeout = TimeSpan.FromMinutes(5);
@@ -171,6 +189,33 @@ namespace ReactApi.Controllers
             {
                 stream?.Dispose();
             }
+        }
+
+        private static string ComputeCloudinarySignature(
+            SortedDictionary<string, string> parameters,
+            string apiSecret)
+        {
+            // Build "key1=value1&key2=value2&..." (already sorted by SortedDictionary).
+            var sb = new StringBuilder();
+            var first = true;
+            foreach (var kv in parameters)
+            {
+                if (!first) sb.Append('&');
+                sb.Append(kv.Key);
+                sb.Append('=');
+                sb.Append(kv.Value);
+                first = false;
+            }
+            sb.Append(apiSecret);
+
+            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+            var hash = SHA1.HashData(bytes);
+            var hex = new StringBuilder(hash.Length * 2);
+            foreach (var b in hash)
+            {
+                hex.Append(b.ToString("x2", CultureInfo.InvariantCulture));
+            }
+            return hex.ToString();
         }
 
         private string GetUploadPreset()

@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom';
 import { apiService } from '../../services/api';
 import { useLanguage } from '../../context/useLanguage';
 
-const FALLBACK: any[] = [
-    { id: 1, name: "Abidullah Iltaf", role: "Creative Director", bio: "Visionary motion designer with 10+ years crafting cinematic brand stories.", image: "https://i.pravatar.cc/400?u=abidullah", skills: "After Effects,Cinema 4D,Motion Design", linkedin: "#", twitter: "#", instagram: "#" },
-    { id: 2, name: "Ziaulhaq", role: "Lead Animator", bio: "Expert in 3D simulations, character rigging, and photorealistic rendering.", image: "https://i.pravatar.cc/400?u=ziaulhaq", skills: "Blender,Houdini,Nuke", linkedin: "#", twitter: "#", instagram: "#" },
-    { id: 3, name: "Sarah Noor", role: "Visual Designer", bio: "Brand identity specialist with a passion for typography and UI motion.", image: "https://i.pravatar.cc/400?u=sarahnoor", skills: "Figma,Illustrator,Lottie", linkedin: "#", twitter: "#", instagram: "#" },
-];
+// NOTE: team members are fetched from the backend only.
+// No hardcoded fallback is rendered — when the API is unreachable or returns
+// an empty list, the section simply shows nothing instead of fake people.
 
 const getSkills = (m: any): string[] => {
     const raw = m.skills || m.Skills || "";
@@ -176,19 +174,28 @@ const TeamCard: React.FC<{ member: any; idx: number }> = ({ member, idx }) => {
 
 const TeamSection: React.FC = () => {
     const [members, setMembers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const { t } = useLanguage();
 
     useEffect(() => {
+        let cancelled = false;
         apiService.getTeam()
             .then(res => {
+                if (cancelled) return;
                 if (res.data && Array.isArray(res.data) && res.data.length > 0) {
                     setMembers(res.data);
                 }
             })
-            .catch(err => console.error("Team fetch error:", err));
+            .catch(err => console.error("Team fetch error:", err))
+            .finally(() => { if (!cancelled) setLoading(false); });
+        return () => { cancelled = true; };
     }, []);
 
-    const list = members.length > 0 ? members : FALLBACK;
+    // Hide the whole section until we know there is real data.
+    // No more placeholder people.
+    if (loading || members.length === 0) {
+        return null;
+    }
 
     return (
         <section id="team" className="team-area default-padding">
@@ -202,7 +209,7 @@ const TeamSection: React.FC = () => {
                     </div>
                 </div>
                 <div className="row">
-                    {list.map((m, i) => <TeamCard key={m.id || m._id || i} member={m} idx={i} />)}
+                    {members.map((m, i) => <TeamCard key={m.id || m._id || i} member={m} idx={i} />)}
                 </div>
             </div>
         </section>
