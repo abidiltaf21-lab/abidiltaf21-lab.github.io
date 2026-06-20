@@ -18,14 +18,6 @@ namespace ReactApi.Controllers
             _context = context;
         }
 
-        [HttpGet("reset-db-danger")]
-        public async Task<IActionResult> ResetDbDanger()
-        {
-            await _context.Database.ExecuteSqlRawAsync("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
-            await _context.Database.EnsureCreatedAsync();
-            return Ok("Database has been successfully reset! You can now use the app.");
-        }
-
         [HttpGet]
         public async Task<ActionResult<SiteSetting>> GetSettings()
         {
