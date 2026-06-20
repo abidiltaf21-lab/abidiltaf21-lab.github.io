@@ -72,8 +72,7 @@ namespace ReactApi.Controllers
                 var signatureParams = new SortedDictionary<string, string>(StringComparer.Ordinal)
                 {
                     { "folder", targetFolder },
-                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) },
-                    { "upload_preset", uploadPreset }
+                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) }
                 };
                 var signature = ComputeCloudinarySignature(signatureParams, apiSecret);
 
@@ -94,10 +93,6 @@ namespace ReactApi.Controllers
                 var signatureContent = new StringContent(signature);
                 signatureContent.Headers.Remove("Content-Type");
                 form.Add(signatureContent, "signature");
-
-                var uploadPresetContent = new StringContent(uploadPreset);
-                uploadPresetContent.Headers.Remove("Content-Type");
-                form.Add(uploadPresetContent, "upload_preset");
 
                 var folderContent = new StringContent(targetFolder);
                 folderContent.Headers.Remove("Content-Type");
@@ -194,8 +189,7 @@ namespace ReactApi.Controllers
                 var signatureParams = new SortedDictionary<string, string>(StringComparer.Ordinal)
                 {
                     { "folder", targetFolder },
-                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) },
-                    { "upload_preset", uploadPreset }
+                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) }
                 };
 
                 var signature = ComputeCloudinarySignature(signatureParams, apiSecret!);
@@ -224,10 +218,6 @@ namespace ReactApi.Controllers
                 var signatureContent = new StringContent(signature);
                 signatureContent.Headers.Remove("Content-Type");
                 form.Add(signatureContent, "signature");
-
-                var uploadPresetContent = new StringContent(uploadPreset);
-                uploadPresetContent.Headers.Remove("Content-Type");
-                form.Add(uploadPresetContent, "upload_preset");
 
                 var folderContent = new StringContent(targetFolder);
                 folderContent.Headers.Remove("Content-Type");
