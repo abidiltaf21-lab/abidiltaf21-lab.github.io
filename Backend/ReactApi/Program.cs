@@ -7,6 +7,8 @@ using System.Net;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Identity;
+using ReactApi.Domin.identityModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -258,6 +260,48 @@ using (var scope = app.Services.CreateScope())
         await ReactApi.Infrastructer.Data.NotificationSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.SeedDefaultsAsync(db);
         await ReactApi.Infrastructer.Data.PortfolioDataSeeder.SeedAsync(db);
+
+        // Programmatically seed the admin user abidiltaf21@gmail.com
+        try
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+            
+            var adminEmail = "abidiltaf21@gmail.com";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
+            {
+                logger.LogInformation("Seeding default admin user: {Email}", adminEmail);
+                adminUser = new ApplicationUser
+                {
+                    UserName = "Abid",
+                    Email = adminEmail,
+                    EmailConfirmed = true
+                };
+                
+                // "Admin12345!" matches their password validation criteria:
+                // >= 10 chars, uppercase, lowercase, digit, non-alphanumeric.
+                var result = await userManager.CreateAsync(adminUser, "Admin12345!");
+                if (result.Succeeded)
+                {
+                    var roleName = "Admin";
+                    if (!await roleManager.RoleExistsAsync(roleName))
+                    {
+                        await roleManager.CreateAsync(new ApplicationRole { Name = roleName });
+                    }
+                    await userManager.AddToRoleAsync(adminUser, roleName);
+                    logger.LogInformation("Admin user seeded successfully with email {Email} and password Admin12345!", adminEmail);
+                }
+                else
+                {
+                    logger.LogWarning("Failed to seed admin user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+            }
+        }
+        catch (Exception seedEx)
+        {
+            logger.LogWarning(seedEx, "Error seeding admin user programmatically.");
+        }
     }
     catch (Exception ex)
     {
