@@ -127,8 +127,8 @@ const ServicesV1 = ({ sectionClass, hasTitle }: DataType) => {
                                                             <div className="icon-wrapper justify-content-center">
                                                                 <i className={service.icon || service.Icon}></i>
                                                             </div>
-                                                            <h4><Link to={`/services-details/${service.id || index}`}>{service.title || service.Title}</Link></h4>
-                                                            <p>{service.text || service.Text}</p>
+                                                            <h4><Link to={`/services-details/${service.id || index}`}>{t('service_' + (service.id || index) + '_title', service.title || service.Title)}</Link></h4>
+                                                            <p>{t('service_' + (service.id || index) + '_text', service.text || service.Text)}</p>
 
                                                             <Link to={`/services-details/${service.id || index}`} className="btn-style-four mt-30">
                                                                 <div className="icon"><img src={arrow} alt="Arrow" /></div> {t('explore')}

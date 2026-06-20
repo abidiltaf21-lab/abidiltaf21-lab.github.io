@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useSocialAccounts } from '../hooks/useSocialAccounts';
 import { apiService } from '../services/api';
 import { uploadToCloudinary } from '../lib/cloudinaryUpload';
+import { useLanguage } from '../context/LanguageContext';
 
 const SETTINGS_SECTIONS = [
     { id: 'branding' as const, icon: 'fa-fingerprint', label: 'Identity & Logo', hint: 'Site name & logo assets' },
@@ -12,6 +13,7 @@ const SETTINGS_SECTIONS = [
     { id: 'social' as const, icon: 'fa-share-alt', label: 'Social Graph', hint: 'Channels & contact links' },
     { id: 'seo' as const, icon: 'fa-search', label: 'SEO Engine', hint: 'Search & metadata' },
     { id: 'ai' as const, icon: 'fa-robot', label: 'AI Assistant', hint: 'AI Chatbot & Telegram link' },
+    { id: 'languages' as const, icon: 'fa-language', label: 'Translation Editor', hint: 'Translate dynamic site content' },
 ];
 
 type SettingsSection = (typeof SETTINGS_SECTIONS)[number]['id'];
@@ -32,6 +34,13 @@ const SiteSettings: React.FC = () => {
         isVisible: true,
         sortOrder: 0
     });
+
+    const [translatableKeys, setTranslatableKeys] = useState<any[]>([]);
+    const [translationData, setTranslationData] = useState<Record<string, Record<string, string>>>({});
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedLanguage, setSelectedLanguage] = useState<string>('ps');
+    const [selectedGroup, setSelectedGroup] = useState<string>('All');
+    const { refetchTranslations } = useLanguage();
 
     const [activeSection, setActiveSection] = useState<SettingsSection>('branding');
     const [settings, setSettings] = useState({
@@ -94,6 +103,132 @@ const SiteSettings: React.FC = () => {
             }
         } catch (err) {
             toast.error("Failed to load system settings.");
+        }
+    };
+
+    const loadTranslationData = async () => {
+        try {
+            // 1. Fetch backend translations
+            const { data: transList } = await apiClient.get('/Translations');
+            const dataMap: Record<string, Record<string, string>> = {};
+            if (transList) {
+                transList.forEach((t: any) => {
+                    const key = t.key || t.Key;
+                    const lang = t.languageCode || t.LanguageCode;
+                    const val = t.value || t.Value;
+                    if (!dataMap[key]) dataMap[key] = {};
+                    dataMap[key][lang] = val;
+                });
+            }
+
+            // 2. Fetch services, projects, and team to build automatic keys
+            const { data: servicesList } = await apiService.getServices();
+            const { data: projectsList } = await apiClient.get('/PortfolioProjects');
+            const { data: teamList } = await apiClient.get('/TeamMembers');
+
+            const keysList = [
+                { key: 'hero_title', label: 'Hero Title', defaultVal: settings.heroTitle || 'From Simple Idea to Captivating Video', group: 'Hero' },
+                { key: 'hero_subtitle', label: 'Hero Subtitle', defaultVal: settings.heroSubtitle || '', group: 'Hero' },
+                { key: 'hero_typed_text', label: 'Typewriter Phrases (comma-separated)', defaultVal: settings.heroTypedText || '', group: 'Hero' },
+                { key: 'cta_text', label: 'CTA Button Text', defaultVal: settings.ctaText || 'Hire Me Now', group: 'Hero' }
+            ];
+
+            if (servicesList) {
+                servicesList.forEach((s: any, idx: number) => {
+                    keysList.push({
+                        key: `service_${s.id || idx}_title`,
+                        label: `Service Title: ${s.title || s.Title}`,
+                        defaultVal: s.title || s.Title,
+                        group: 'Services'
+                    });
+                    keysList.push({
+                        key: `service_${s.id || idx}_text`,
+                        label: `Service Description: ${s.title || s.Title}`,
+                        defaultVal: s.text || s.Text,
+                        group: 'Services'
+                    });
+                });
+            }
+
+            if (projectsList) {
+                projectsList.forEach((p: any) => {
+                    keysList.push({
+                        key: `project_${p.id || p.Id}_title`,
+                        label: `Project Title: ${p.title || p.Title}`,
+                        defaultVal: p.title || p.Title,
+                        group: 'Projects'
+                    });
+                    keysList.push({
+                        key: `project_${p.id || p.Id}_description`,
+                        label: `Project Description: ${p.title || p.Title}`,
+                        defaultVal: p.description || p.Description,
+                        group: 'Projects'
+                    });
+                });
+            }
+
+            if (teamList) {
+                teamList.forEach((m: any) => {
+                    keysList.push({
+                        key: `team_${m.id || m.Id}_name`,
+                        label: `Team Name: ${m.name || m.Name}`,
+                        defaultVal: m.name || m.Name,
+                        group: 'Team'
+                    });
+                    keysList.push({
+                        key: `team_${m.id || m.Id}_role`,
+                        label: `Team Role: ${m.name || m.Name}`,
+                        defaultVal: m.role || m.Role,
+                        group: 'Team'
+                    });
+                    keysList.push({
+                        key: `team_${m.id || m.Id}_bio`,
+                        label: `Team Bio: ${m.name || m.Name}`,
+                        defaultVal: m.bio || m.Bio || '',
+                        group: 'Team'
+                    });
+                });
+            }
+
+            setTranslatableKeys(keysList);
+            setTranslationData(dataMap);
+        } catch (err) {
+            console.error("Failed to load translation lists:", err);
+            toast.error("Failed to load dynamic translation lists.");
+        }
+    };
+
+    useEffect(() => {
+        if (activeSection === 'languages') {
+            loadTranslationData();
+        }
+    }, [activeSection, settings]);
+
+    const handleSaveTranslations = async () => {
+        setLoading(true);
+        try {
+            const payload: any[] = [];
+            Object.keys(translationData).forEach(key => {
+                Object.keys(translationData[key]).forEach(lang => {
+                    const val = translationData[key][lang];
+                    if (val && val.trim()) {
+                        payload.push({
+                            LanguageCode: lang,
+                            Key: key,
+                            Value: val.trim()
+                        });
+                    }
+                });
+            });
+
+            await apiClient.post('/Translations/bulk', payload);
+            toast.success("Translations saved successfully!");
+            await refetchTranslations();
+        } catch (err) {
+            toast.error("Failed to save translations.");
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -165,6 +300,15 @@ const SiteSettings: React.FC = () => {
         });
 
         e.target.value = '';
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (activeSection === 'languages') {
+            await handleSaveTranslations();
+        } else {
+            await handleSave(e);
+        }
     };
 
     const handleSave = async (e: React.FormEvent) => {
@@ -250,7 +394,7 @@ const SiteSettings: React.FC = () => {
                 </aside>
 
                 <main className="site-infra-main">
-                    <form onSubmit={handleSave} className="site-infra-form glass-panel">
+                    <form onSubmit={handleSubmit} className="site-infra-form glass-panel">
                         <div className="site-infra-form-head">
                             <div>
                                 <span className="site-infra-section-kicker">{activeMeta.label}</span>
@@ -899,6 +1043,134 @@ const SiteSettings: React.FC = () => {
                                     placeholder="Tell the AI how to behave, what details about the company to highlight, etc." 
                                 />
                                 <p className="site-infra-field-hint">Define the identity, rules, and guidelines for your AI assistant.</p>
+                            </div>
+                        </section>
+                    </div>
+                )}
+
+                {activeSection === 'languages' && (
+                    <div className="site-infra-panel animate-fade-in">
+                        <section className="site-infra-card">
+                            <h3 className="site-infra-card-title"><i className="fas fa-language" /> Dynamic Translation Matrix</h3>
+                            
+                            {/* Lang selection & Group Filters */}
+                            <div className="row g-3 mb-4 mt-2">
+                                <div className="col-md-4">
+                                    <label className="site-infra-label">Target Language</label>
+                                    <select 
+                                        className="form-select site-infra-input" 
+                                        value={selectedLanguage} 
+                                        onChange={(e) => setSelectedLanguage(e.target.value)}
+                                        style={{ background: 'var(--admin-glass-input)', color: '#fff', border: '1px solid var(--admin-glass-border)' }}
+                                    >
+                                        <option value="ps">🇦🇫 Pashto (پښتو)</option>
+                                        <option value="fa">🇮🇷 Persian (فارسی)</option>
+                                        <option value="ar">🇸🇦 Arabic (العربية)</option>
+                                        <option value="de">🇩🇪 German (Deutsch)</option>
+                                        <option value="fr">🇫🇷 French (Français)</option>
+                                        <option value="en">🇬🇧 English (Overrides)</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="site-infra-label">Filter Group</label>
+                                    <select 
+                                        className="form-select site-infra-input" 
+                                        value={selectedGroup} 
+                                        onChange={(e) => setSelectedGroup(e.target.value)}
+                                        style={{ background: 'var(--admin-glass-input)', color: '#fff', border: '1px solid var(--admin-glass-border)' }}
+                                    >
+                                        <option value="All">All Groups</option>
+                                        <option value="Hero">Hero / Home</option>
+                                        <option value="Services">Services</option>
+                                        <option value="Projects">Projects</option>
+                                        <option value="Team">Team Roster</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="site-infra-label">Search Key or Default Value</label>
+                                    <input 
+                                        type="text" 
+                                        className="site-infra-input" 
+                                        value={searchQuery} 
+                                        onChange={(e) => setSearchQuery(e.target.value)} 
+                                        placeholder="Search key or default..." 
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Matrix Form List */}
+                            <div className="translation-editor-table-wrap" style={{ maxHeight: '500px', overflowY: 'auto', border: '1px solid var(--admin-glass-border)', borderRadius: '12px', background: 'rgba(0,0,0,0.2)' }}>
+                                <table className="table m-0 text-white-50" style={{ borderCollapse: 'collapse', width: '100%' }}>
+                                    <thead>
+                                        <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--admin-glass-border)' }}>
+                                            <th style={{ padding: '12px 16px', color: '#fff', fontSize: '12px', textTransform: 'uppercase', width: '45%' }}>Translation Key & Default Value</th>
+                                            <th style={{ padding: '12px 16px', color: '#fff', fontSize: '12px', textTransform: 'uppercase', width: '55%' }}>Translation ({selectedLanguage.toUpperCase()})</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {translatableKeys
+                                            .filter(item => {
+                                                const matchesSearch = item.key.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                                                      (item.defaultVal || '').toLowerCase().includes(searchQuery.toLowerCase());
+                                                const matchesGroup = selectedGroup === 'All' || item.group === selectedGroup;
+                                                return matchesSearch && matchesGroup;
+                                            })
+                                            .map((item, idx) => {
+                                                const currentVal = translationData[item.key]?.[selectedLanguage] || '';
+                                                return (
+                                                    <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                        <td style={{ padding: '16px', verticalAlign: 'top' }}>
+                                                            <div style={{ fontWeight: 700, color: '#fff', fontSize: '13px' }}>{item.key}</div>
+                                                            <div style={{ fontSize: '11px', color: 'var(--admin-text-muted)', marginTop: '4px' }}>
+                                                                Default: <span style={{ color: 'rgba(255,255,255,0.7)' }}>{item.defaultVal}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td style={{ padding: '16px', verticalAlign: 'middle' }}>
+                                                            {item.key.includes('subtitle') || item.key.includes('text') || item.key.includes('bio') || item.key.includes('description') ? (
+                                                                <textarea
+                                                                    className="site-infra-input"
+                                                                    rows={2}
+                                                                    value={currentVal}
+                                                                    onChange={(e) => {
+                                                                        const newVal = e.target.value;
+                                                                        setTranslationData(prev => ({
+                                                                            ...prev,
+                                                                            [item.key]: {
+                                                                                ...(prev[item.key] || {}),
+                                                                                [selectedLanguage]: newVal
+                                                                            }
+                                                                        }));
+                                                                    }}
+                                                                    placeholder={`Translate into ${selectedLanguage === 'ps' ? 'Pashto' : selectedLanguage}...`}
+                                                                />
+                                                            ) : (
+                                                                <input
+                                                                    type="text"
+                                                                    className="site-infra-input"
+                                                                    value={currentVal}
+                                                                    onChange={(e) => {
+                                                                        const newVal = e.target.value;
+                                                                        setTranslationData(prev => ({
+                                                                            ...prev,
+                                                                            [item.key]: {
+                                                                                ...(prev[item.key] || {}),
+                                                                                [selectedLanguage]: newVal
+                                                                            }
+                                                                        }));
+                                                                    }}
+                                                                    placeholder={`Translate into ${selectedLanguage === 'ps' ? 'Pashto' : selectedLanguage}...`}
+                                                                />
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div className="site-infra-tip mt-3">
+                                <i className="fas fa-info-circle" /> Standard site navigation links, contact form labels, and testimonials ratings UI are statically localizable inside the frontend configuration. Use this manager to translate your dynamic databases (Hero details, services, team bios, and custom portfolio project cards).
                             </div>
                         </section>
                     </div>

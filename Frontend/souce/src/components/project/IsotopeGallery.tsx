@@ -189,8 +189,8 @@ const IsotopeGallery = ({ maxItems }: IsotopeGalleryProps) => {
                                         </li>
                                     )}
                                 </ul>
-                                <h4><Link to={`/project-details/${pid}`}>{title}</Link></h4>
-                                {(portfolio.description || portfolio.Description) && <p className="portfolio-desc-modern">{portfolio.description || portfolio.Description}</p>}
+                                <h4><Link to={`/project-details/${pid}`}>{t('project_' + pid + '_title', title)}</Link></h4>
+                                {(portfolio.description || portfolio.Description) && <p className="portfolio-desc-modern">{t('project_' + pid + '_description', portfolio.description || portfolio.Description)}</p>}
                             </div>
                         </div>
                     )

@@ -52,6 +52,28 @@ public static class AiSchemaEnsurer
                 logger?.LogInformation("Added AiWelcomeMessage column to SQLite database.");
             }
             catch { /* Already exists */ }
+
+            // Create Translations table if not exists
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync("""
+                    CREATE TABLE IF NOT EXISTS "Translations" (
+                        "Id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                        "LanguageCode" TEXT NOT NULL,
+                        "Key" TEXT NOT NULL,
+                        "Value" TEXT NOT NULL,
+                        "Createdby" TEXT NULL,
+                        "CreatedbyDate" TEXT NULL,
+                        "Updatedby" TEXT NULL,
+                        "UpdatedbyDate" TEXT NULL
+                    );
+                """);
+                logger?.LogInformation("Ensured Translations table exists in SQLite database.");
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Failed to ensure Translations table exists in SQLite database.");
+            }
         }
         else
         {
@@ -93,6 +115,28 @@ public static class AiSchemaEnsurer
             catch (Exception ex)
             {
                 logger?.LogWarning(ex, "AI Assistant PostgreSQL schema ensure failed — continuing.");
+            }
+
+            // Create Translations table if not exists
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync("""
+                    CREATE TABLE IF NOT EXISTS "Translations" (
+                        "Id" SERIAL PRIMARY KEY,
+                        "LanguageCode" text NOT NULL,
+                        "Key" text NOT NULL,
+                        "Value" text NOT NULL,
+                        "Createdby" text NULL,
+                        "CreatedbyDate" date NULL,
+                        "Updatedby" text NULL,
+                        "UpdatedbyDate" date NULL
+                    );
+                """);
+                logger?.LogInformation("Ensured Translations table exists in PostgreSQL database.");
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Failed to ensure Translations table exists in PostgreSQL database.");
             }
         }
     }

@@ -250,15 +250,15 @@ const BannerV1 = () => {
                         <div className="col-lg-10 text-center">
                             <div className="banner-style-one-items">
                                 <div className="info">
-                                    <h1 className="fw-900">{settings?.heroTitle || t('banner_title')}</h1>
+                                    <h1 className="fw-900">{t('hero_title', settings?.heroTitle || t('banner_title'))}</h1>
                                     <h2>
                                         <span className="header-caption" id="page-top">
                                             <span className="cd-headline clip is-full-width">
                                                 <span className="cd-words-wrapper">
                                                     <ReactTyped
                                                         key={currentLanguage}
-                                                        strings={settings?.heroTypedText 
-                                                            ? settings.heroTypedText.split(',').map(t => `<span style="background: ${settings.heroTypedColor}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;">${t.trim()}</span>`)
+                                                        strings={t('hero_typed_text', settings?.heroTypedText) 
+                                                            ? t('hero_typed_text', settings?.heroTypedText).split(',').map(str => `<span style="background: ${settings?.heroTypedColor || 'linear-gradient(90deg, #8b5cf6, #3b82f6)'}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;">${str.trim()}</span>`)
                                                             : textLines
                                                         } 
                                                         typeSpeed={40} 
@@ -271,12 +271,12 @@ const BannerV1 = () => {
                                         </span>
                                     </h2>
                                     <p className="lead fw-500">
-                                        {settings?.heroSubtitle || t('banner_subtitle')}
+                                        {t('hero_subtitle', settings?.heroSubtitle || t('banner_subtitle'))}
                                     </p>
                                     <div className="flex-social mt-40 justify-content-center gap-3 d-flex flex-wrap align-items-center">
                                         <div className="button">
                                             <Link className="btn-style-regular shadow-lg" to={settings?.ctaLink || "/contact"}>
-                                                <span>{settings?.ctaText || t('hire_me')}</span>
+                                                <span>{t('cta_text', settings?.ctaText || t('hire_me'))}</span>
                                                 <i className="fas fa-arrow-right" />
                                             </Link>
                                         </div>

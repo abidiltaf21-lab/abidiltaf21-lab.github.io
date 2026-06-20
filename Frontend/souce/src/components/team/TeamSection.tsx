@@ -16,9 +16,9 @@ const getSkills = (m: any): string[] => {
 const TeamCard: React.FC<{ member: any; idx: number }> = ({ member, idx }) => {
     const { t } = useLanguage();
     const id      = member.id       || member.Id       || member._id;
-    const name    = member.name     || member.Name     || "Team Member";
-    const role    = member.role     || member.Role     || "Creative";
-    const bio     = member.bio      || member.Bio      || member.description || "A key creative force in our team.";
+    const name    = t('team_' + id + '_name', member.name     || member.Name     || "Team Member");
+    const role    = t('team_' + id + '_role', member.role     || member.Role     || "Creative");
+    const bio     = t('team_' + id + '_bio', member.bio      || member.Bio      || member.description || "A key creative force in our team.");
     const image   = member.image    || member.Image    || `https://i.pravatar.cc/400?u=${encodeURIComponent(name)}`;
     const skills  = getSkills(member);
     

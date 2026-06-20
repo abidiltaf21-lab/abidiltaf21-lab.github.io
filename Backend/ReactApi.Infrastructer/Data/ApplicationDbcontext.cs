@@ -29,6 +29,7 @@ namespace ReactApi.Infrastructer.Data
         public DbSet<SocialAccount> SocialAccounts { get; set; }
         public DbSet<VisitorLog> VisitorLogs { get; set; }
         public DbSet<ResumeEntry> ResumeEntries { get; set; }
+        public DbSet<Translation> Translations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
