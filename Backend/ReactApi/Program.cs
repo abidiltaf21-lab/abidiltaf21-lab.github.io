@@ -284,6 +284,36 @@ using (var scope = app.Services.CreateScope())
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             
+            // Ensure Admin role exists
+            var roleName = "Admin";
+            var adminRole = await roleManager.FindByNameAsync(roleName);
+            if (adminRole == null)
+            {
+                adminRole = new ApplicationRole { Name = roleName };
+                await roleManager.CreateAsync(adminRole);
+            }
+
+            // Programmatically assign all claims to the Admin role if they are missing
+            var allClaims = new[]
+            {
+                "ListUser", "CreateNewUser", "UpdateUser", "UpdatePassword", "AssignRole",
+                "ListRole", "CreateNewRole", "UpdateRole", "AssignPermissions",
+                "ListCompanies", "CreateCompany", "EditCompany", "SearchCompany",
+                "ViewLicences", "AddLicences", "EditLicences", "Licenceshistory",
+                "Viewlicenceshistory", "PrintJawaz", "Listcatagories", "AddCatagory", "EditCatagory"
+            };
+
+            var existingClaims = await roleManager.GetClaimsAsync(adminRole);
+            var existingClaimTypes = existingClaims.Select(c => c.Type).ToHashSet();
+
+            foreach (var claimType in allClaims)
+            {
+                if (!existingClaimTypes.Contains(claimType))
+                {
+                    await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(claimType, claimType));
+                }
+            }
+
             var adminEmail = "abidiltaf21@gmail.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
@@ -301,11 +331,6 @@ using (var scope = app.Services.CreateScope())
                 var result = await userManager.CreateAsync(adminUser, "Admin12345!");
                 if (result.Succeeded)
                 {
-                    var roleName = "Admin";
-                    if (!await roleManager.RoleExistsAsync(roleName))
-                    {
-                        await roleManager.CreateAsync(new ApplicationRole { Name = roleName });
-                    }
                     await userManager.AddToRoleAsync(adminUser, roleName);
                     logger.LogInformation("Admin user seeded successfully with email {Email} and password Admin12345!", adminEmail);
                 }
