@@ -33,7 +33,14 @@ public static class InfrastructureRegistrationServices
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-        // Configure JWT Authentication
+        var jwtKey = configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtKey) || jwtKey.Contains("#{") || jwtKey.Length < 32)
+        {
+            jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") 
+                     ?? Environment.GetEnvironmentVariable("Jwt__Key") 
+                     ?? "super_secret_development_key_32_characters_long_for_safety";
+        }
+
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -49,8 +56,7 @@ public static class InfrastructureRegistrationServices
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = configuration["Jwt:Issuer"],
                 ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                    configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key (Jwt:Key) is not configured in appsettings.")))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
             };
         });
 

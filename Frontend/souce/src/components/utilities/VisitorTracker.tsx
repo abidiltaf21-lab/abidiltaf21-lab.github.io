@@ -37,9 +37,15 @@ function getSessionId(): string {
 async function getGeo(): Promise<GeoCache> {
     if (geoCache) return geoCache;
     try {
-        const res = await fetch('http://ip-api.com/json/?fields=country,countryCode,city,regionName');
+        const res = await fetch('https://freeipapi.com/api/json');
         if (res.ok) {
-            geoCache = await res.json();
+            const data = await res.json();
+            geoCache = {
+                country: data.countryName,
+                countryCode: data.countryCode,
+                city: data.cityName,
+                regionName: data.regionName
+            };
             return geoCache!;
         }
     } catch {

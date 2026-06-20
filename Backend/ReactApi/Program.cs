@@ -220,16 +220,29 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        // For SQLite in development, we drop the DB on restart to ensure a clean slate.
-        if (db.Database.IsSqlite())
-        {
-            try { await db.Database.EnsureDeletedAsync(); } 
-            catch (Exception deleteEx) { logger.LogWarning(deleteEx, "Could not delete SQLite DB."); }
-        }
-        
-        // EnsureCreatedAsync dynamically generates the correct schema for BOTH SQLite and PostgreSQL
-        // bypassing the provider-specific Migration files which contain SQL Server types.
+        // Try to ensure database is created (creates physical SQLite file or PostgreSQL database if missing)
         await db.Database.EnsureCreatedAsync();
+
+        // Check if the main tables actually exist by querying AspNetUsers
+        bool tablesExist = false;
+        try
+        {
+            // Execute a simple query to see if the table exists
+            await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"AspNetUsers\" LIMIT 1");
+            tablesExist = true;
+        }
+        catch
+        {
+            tablesExist = false;
+        }
+
+        if (!tablesExist)
+        {
+            logger.LogInformation("Database tables do not exist. Generating and executing DDL creation script...");
+            var createScript = db.Database.GenerateCreateScript();
+            await db.Database.ExecuteSqlRawAsync(createScript);
+            logger.LogInformation("Database tables successfully created via DDL script.");
+        }
     }
     catch (Exception ex)
     {
