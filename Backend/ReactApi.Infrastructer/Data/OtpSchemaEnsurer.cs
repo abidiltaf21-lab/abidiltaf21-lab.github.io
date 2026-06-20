@@ -30,6 +30,13 @@ public static class OtpSchemaEnsurer
                 logger?.LogInformation("Added OtpExpiry column to SQLite AspNetUsers.");
             }
             catch { /* Already exists */ }
+
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE \"AspNetUsers\" ADD COLUMN \"OtpAttempts\" INTEGER NULL;");
+                logger?.LogInformation("Added OtpAttempts column to SQLite AspNetUsers.");
+            }
+            catch { /* Already exists */ }
         }
         else
         {
@@ -45,6 +52,10 @@ public static class OtpSchemaEnsurer
                         
                         IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'AspNetUsers' AND column_name = 'OtpExpiry') THEN
                             ALTER TABLE "AspNetUsers" ADD "OtpExpiry" timestamp with time zone NULL;
+                        END IF;
+                        
+                        IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'AspNetUsers' AND column_name = 'OtpAttempts') THEN
+                            ALTER TABLE "AspNetUsers" ADD "OtpAttempts" integer NULL;
                         END IF;
                     END IF;
                 END $$;
