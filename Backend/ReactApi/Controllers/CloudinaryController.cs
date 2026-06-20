@@ -120,8 +120,8 @@ namespace ReactApi.Controllers
                     headers = headers,
                     debug = new {
                         cloudName,
-                        apiKey = apiKey.Substring(0, 4) + "...",
-                        apiSecret = apiSecret.Substring(0, 4) + "...",
+                        apiKey = apiKey.Substring(0, 4) + "... (len: " + apiKey.Length + ")",
+                        apiSecret = apiSecret.Substring(0, 4) + "... (len: " + apiSecret.Length + ")",
                         uploadPreset,
                         targetFolder,
                         timestamp,
