@@ -36,21 +36,42 @@ function getSessionId(): string {
 
 async function getGeo(): Promise<GeoCache> {
     if (geoCache) return geoCache;
+
+    // Try ipwho.is (free, fast, no key needed)
     try {
-        const res = await fetch('https://freeipapi.com/api/json');
+        const res = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) });
         if (res.ok) {
             const data = await res.json();
-            geoCache = {
-                country: data.countryName,
-                countryCode: data.countryCode,
-                city: data.cityName,
-                regionName: data.regionName
-            };
-            return geoCache!;
+            if (data.success) {
+                geoCache = {
+                    country:    data.country     || 'Unknown',
+                    countryCode: data.country_code || 'XX',
+                    city:       data.city         || '',
+                    regionName: data.region       || '',
+                };
+                return geoCache!;
+            }
         }
-    } catch {
-        // ignore
-    }
+    } catch { /* try fallback */ }
+
+    // Fallback: ip-api.com (also free, HTTP only — no HTTPS for free tier)
+    try {
+        const res = await fetch('http://ip-api.com/json/?fields=status,country,countryCode,city,regionName',
+            { signal: AbortSignal.timeout(4000) });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'success') {
+                geoCache = {
+                    country:    data.country     || 'Unknown',
+                    countryCode: data.countryCode || 'XX',
+                    city:       data.city         || '',
+                    regionName: data.regionName   || '',
+                };
+                return geoCache!;
+            }
+        }
+    } catch { /* ignore */ }
+
     return {};
 }
 
