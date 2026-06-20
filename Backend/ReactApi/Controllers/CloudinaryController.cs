@@ -94,10 +94,21 @@ namespace ReactApi.Controllers
                 var response = await http.PostAsync(uploadUrl, form);
                 var body = await response.Content.ReadAsStringAsync();
 
+                var headers = new Dictionary<string, string>();
+                foreach (var h in response.Headers)
+                {
+                    headers[h.Key] = string.Join(", ", h.Value);
+                }
+                foreach (var h in response.Content.Headers)
+                {
+                    headers[h.Key] = string.Join(", ", h.Value);
+                }
+
                 return Ok(new
                 {
                     status = (int)response.StatusCode,
                     body = body,
+                    headers = headers,
                     debug = new {
                         cloudName,
                         apiKey = apiKey.Substring(0, 4) + "...",
