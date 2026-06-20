@@ -82,20 +82,39 @@ public static class InfrastructureRegistrationServices
             options.AddPolicy("AssignPermissions", policy => policy.RequireClaim("AssignPermissions"));
         });
 
-        // Password policy — single source of truth is appsettings.json (Security:*).
-        // Falls back to safe defaults (8+ chars, digit, uppercase) if the section is missing.
-        var minLength = configuration.GetValue<int?>("Security:PasswordMinLength") ?? 8;
-        var requireDigit = configuration.GetValue<bool?>("Security:RequireDigit") ?? true;
-        var requireUppercase = configuration.GetValue<bool?>("Security:RequireUppercase") ?? true;
-        var requireNonAlphanumeric = configuration.GetValue<bool?>("Security:RequireNonAlphanumeric") ?? true;
+        // ── Password Policy (appsettings.json → Security:*) ──────────────────────────────
+        var minLength             = configuration.GetValue<int?> ("Security:PasswordMinLength")       ?? 10;
+        var requireDigit          = configuration.GetValue<bool?>("Security:RequireDigit")            ?? true;
+        var requireUppercase      = configuration.GetValue<bool?>("Security:RequireUppercase")        ?? true;
+        var requireLowercase      = configuration.GetValue<bool?>("Security:RequireLowercase")        ?? true;
+        var requireNonAlphanumeric= configuration.GetValue<bool?>("Security:RequireNonAlphanumeric")  ?? true;
+        var requiredUniqueChars   = configuration.GetValue<int?> ("Security:RequiredUniqueChars")     ?? 4;
+
+        // ── Account Lockout Settings ──────────────────────────────────────────────────────
+        var maxFailedAttempts     = configuration.GetValue<int?> ("Security:MaxFailedAccessAttempts") ?? 5;
+        var lockoutMinutes        = configuration.GetValue<int?> ("Security:LockoutMinutes")          ?? 15;
 
         services.Configure<IdentityOptions>(options =>
         {
+            // Password rules
             options.Password.RequireNonAlphanumeric = requireNonAlphanumeric;
-            options.Password.RequiredLength = minLength;
-            options.Password.RequireDigit = requireDigit;
-            options.Password.RequireUppercase = requireUppercase;
+            options.Password.RequiredLength          = minLength;
+            options.Password.RequireDigit            = requireDigit;
+            options.Password.RequireUppercase        = requireUppercase;
+            options.Password.RequireLowercase        = requireLowercase;
+            options.Password.RequiredUniqueChars     = requiredUniqueChars;
+
+            // Account lockout — triggered when lockoutOnFailure:true in SignInManager
+            options.Lockout.DefaultLockoutTimeSpan  = TimeSpan.FromMinutes(lockoutMinutes);
+            options.Lockout.MaxFailedAccessAttempts = maxFailedAttempts;
+            options.Lockout.AllowedForNewUsers      = true;
+
+            // User settings
+            options.User.RequireUniqueEmail = true;
         });
+
+        // ── Rate Limiting is registered in Program.cs (needs ASP.NET Core hosting layer) ────
+        // See Program.cs → builder.Services.AddRateLimiter(...)
 
         return services;
     }

@@ -14,6 +14,7 @@ const SETTINGS_SECTIONS = [
     { id: 'seo' as const, icon: 'fa-search', label: 'SEO Engine', hint: 'Search & metadata' },
     { id: 'ai' as const, icon: 'fa-robot', label: 'AI Assistant', hint: 'AI Chatbot & Telegram link' },
     { id: 'languages' as const, icon: 'fa-language', label: 'Translation Editor', hint: 'Translate dynamic site content' },
+    { id: 'notifications' as const, icon: 'fa-bell', label: 'System Notifications', hint: 'Alerts for client requests' },
 ];
 
 type SettingsSection = (typeof SETTINGS_SECTIONS)[number]['id'];
@@ -64,7 +65,12 @@ const SiteSettings: React.FC = () => {
         aiEnabled: true,
         aiApiKey: '',
         aiSystemPrompt: '',
-        aiWelcomeMessage: ''
+        aiWelcomeMessage: '',
+        notifyEmailEnabled: false,
+        notifyEmailAddress: '',
+        notifyTelegramEnabled: false,
+        notifyTelegramBotToken: '',
+        notifyTelegramChatId: ''
     });
 
     useEffect(() => {
@@ -98,7 +104,12 @@ const SiteSettings: React.FC = () => {
                     aiEnabled: data.aiEnabled ?? data.AiEnabled ?? true,
                     aiApiKey: data.aiApiKey || data.AiApiKey || '',
                     aiSystemPrompt: data.aiSystemPrompt || data.AiSystemPrompt || '',
-                    aiWelcomeMessage: data.aiWelcomeMessage || data.AiWelcomeMessage || ''
+                    aiWelcomeMessage: data.aiWelcomeMessage || data.AiWelcomeMessage || '',
+                    notifyEmailEnabled: data.notifyEmailEnabled ?? data.NotifyEmailEnabled ?? false,
+                    notifyEmailAddress: data.notifyEmailAddress || data.NotifyEmailAddress || '',
+                    notifyTelegramEnabled: data.notifyTelegramEnabled ?? data.NotifyTelegramEnabled ?? false,
+                    notifyTelegramBotToken: data.notifyTelegramBotToken || data.NotifyTelegramBotToken || '',
+                    notifyTelegramChatId: data.notifyTelegramChatId || data.NotifyTelegramChatId || ''
                 });
             }
         } catch (err) {
@@ -338,7 +349,12 @@ const SiteSettings: React.FC = () => {
                 AiEnabled: settings.aiEnabled ?? true,
                 AiApiKey: settings.aiApiKey,
                 AiSystemPrompt: settings.aiSystemPrompt,
-                AiWelcomeMessage: settings.aiWelcomeMessage
+                AiWelcomeMessage: settings.aiWelcomeMessage,
+                NotifyEmailEnabled: settings.notifyEmailEnabled ?? false,
+                NotifyEmailAddress: settings.notifyEmailAddress,
+                NotifyTelegramEnabled: settings.notifyTelegramEnabled ?? false,
+                NotifyTelegramBotToken: settings.notifyTelegramBotToken,
+                NotifyTelegramChatId: settings.notifyTelegramChatId
             };
             await apiClient.put('/SiteSettings', payload);
             toast.success("System configurations updated successfully.");
@@ -1044,6 +1060,105 @@ const SiteSettings: React.FC = () => {
                                 />
                                 <p className="site-infra-field-hint">Define the identity, rules, and guidelines for your AI assistant.</p>
                             </div>
+                        </section>
+                    </div>
+                )}
+
+                {activeSection === 'notifications' && (
+                    <div className="site-infra-panel animate-fade-in">
+                        {/* Email Notifications */}
+                        <section className="site-infra-card mb-4">
+                            <div className="site-infra-toggle-row mb-4">
+                                <div>
+                                    <h3 className="site-infra-card-title m-0">
+                                        <i className="fas fa-envelope-open-text" /> Email Notifications
+                                    </h3>
+                                    <p className="site-infra-field-hint m-0 mt-1">
+                                        Receive an email alert when a visitor submits a contact form.
+                                    </p>
+                                </div>
+                                <label className="site-infra-switch">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={settings.notifyEmailEnabled} 
+                                        onChange={(e) => setSettings({ ...settings, notifyEmailEnabled: e.target.checked })} 
+                                    />
+                                    <span className="site-infra-switch-ui" />
+                                </label>
+                            </div>
+
+                            {settings.notifyEmailEnabled && (
+                                <div className="site-infra-field animate-fade-in">
+                                    <label className="site-infra-label">Recipient Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        name="notifyEmailAddress" 
+                                        className="site-infra-input" 
+                                        value={settings.notifyEmailAddress} 
+                                        onChange={handleChange} 
+                                        placeholder="e.g. admin@yourdomain.com" 
+                                    />
+                                    <p className="site-infra-field-hint">
+                                        All new client requests will be forwarded to this address (uses configured SMTP settings).
+                                    </p>
+                                </div>
+                            )}
+                        </section>
+
+                        {/* Telegram Notifications */}
+                        <section className="site-infra-card">
+                            <div className="site-infra-toggle-row mb-4">
+                                <div>
+                                    <h3 className="site-infra-card-title m-0">
+                                        <i className="fab fa-telegram-plane" /> Telegram Notifications
+                                    </h3>
+                                    <p className="site-infra-field-hint m-0 mt-1">
+                                        Receive an instant message alert on Telegram when a visitor submits a contact form.
+                                    </p>
+                                </div>
+                                <label className="site-infra-switch">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={settings.notifyTelegramEnabled} 
+                                        onChange={(e) => setSettings({ ...settings, notifyTelegramEnabled: e.target.checked })} 
+                                    />
+                                    <span className="site-infra-switch-ui" />
+                                </label>
+                            </div>
+
+                            {settings.notifyTelegramEnabled && (
+                                <div className="animate-fade-in">
+                                    <div className="site-infra-field">
+                                        <label className="site-infra-label">Telegram Bot Token (Optional)</label>
+                                        <input 
+                                            type="password" 
+                                            name="notifyTelegramBotToken" 
+                                            className="site-infra-input" 
+                                            value={settings.notifyTelegramBotToken} 
+                                            onChange={handleChange} 
+                                            placeholder="Paste Bot Token from BotFather..." 
+                                        />
+                                        <p className="site-infra-field-hint">
+                                            If left empty, the server will use the default system Telegram Bot Token.
+                                        </p>
+                                    </div>
+
+                                    <div className="site-infra-field mt-3">
+                                        <label className="site-infra-label">Telegram Chat ID / Channel ID</label>
+                                        <input 
+                                            type="text" 
+                                            name="notifyTelegramChatId" 
+                                            className="site-infra-input" 
+                                            value={settings.notifyTelegramChatId} 
+                                            onChange={handleChange} 
+                                            placeholder="e.g. -100123456789 or 123456789" 
+                                        />
+                                        <p className="site-infra-field-hint">
+                                            The destination user ID or group chat ID where alerts should be sent.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </section>
                     </div>
                 )}

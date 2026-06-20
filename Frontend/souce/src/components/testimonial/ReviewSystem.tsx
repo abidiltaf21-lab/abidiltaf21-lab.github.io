@@ -2426,15 +2426,15 @@ const ReviewSystem: React.FC = () => {
                 }
                 .rv-modal-website {
                     background:
-                        radial-gradient(circle at 0% 0%, rgba(255, 174, 0, 0.10) 0%, transparent 45%),
-                        radial-gradient(circle at 100% 100%, rgba(245, 66, 0, 0.12) 0%, transparent 50%),
-                        linear-gradient(160deg, #0a3a48 0%, #062028 100%) !important;
+                        radial-gradient(ellipse at 10% 0%, rgba(255, 174, 0, 0.18) 0%, transparent 50%),
+                        radial-gradient(ellipse at 90% 100%, rgba(245, 66, 0, 0.16) 0%, transparent 50%),
+                        linear-gradient(160deg, #0d1120 0%, #080c1c 100%) !important;
                     color: #fff;
-                    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+                    border: 1px solid rgba(255, 174, 0, 0.18) !important;
                     box-shadow:
-                        0 30px 80px rgba(0, 0, 0, 0.55),
-                        0 0 0 1px rgba(255, 174, 0, 0.15) inset,
-                        0 0 60px rgba(255, 174, 0, 0.08) !important;
+                        0 30px 80px rgba(0, 0, 0, 0.6),
+                        0 0 0 1px rgba(255, 174, 0, 0.12) inset,
+                        0 0 80px rgba(255, 174, 0, 0.06) !important;
                 }
                 .rv-modal-head {
                     display: flex;
@@ -2444,7 +2444,8 @@ const ReviewSystem: React.FC = () => {
                     border-bottom: 1px solid rgba(15, 23, 42, 0.06);
                 }
                 .rv-modal-website .rv-modal-head {
-                    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+                    border-bottom-color: rgba(255, 174, 0, 0.12) !important;
+                    background: linear-gradient(135deg, rgba(255, 174, 0, 0.06) 0%, rgba(245, 66, 0, 0.03) 100%);
                 }
                 .rv-modal-tabs {
                     display: inline-flex;
@@ -2455,9 +2456,9 @@ const ReviewSystem: React.FC = () => {
                     background: rgba(15, 23, 42, 0.05);
                 }
                 .rv-modal-website .rv-modal-tabs {
-                    background: rgba(0, 0, 0, 0.35);
-                    border: 1px solid rgba(255, 255, 255, 0.10);
-                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 174, 0, 0.15);
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
                 }
                 .rv-modal-tab {
                     display: inline-flex;

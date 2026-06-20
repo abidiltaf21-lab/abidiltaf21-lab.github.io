@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ReactApi.Domin.Commond_model;
 using ReactApi.Infrastructer.Data;
+using Microsoft.Extensions.Configuration;
+using System.Net.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ReactApi.Controllers
@@ -14,10 +18,12 @@ namespace ReactApi.Controllers
     public class ClientRequestsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ClientRequestsController(ApplicationDbContext context)
+        public ClientRequestsController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpGet("stats")]
@@ -109,51 +115,203 @@ namespace ReactApi.Controllers
         };
 
         [HttpPost]
+        [EnableRateLimiting("contact")]
         public async Task<ActionResult<ClientRequest>> PostRequest([FromBody] CreateInboxMessageDto dto)
         {
             if (dto == null)
                 return BadRequest(new { message = "Request body is required." });
 
-            var name = (dto.Name ?? string.Empty).Trim();
-            var email = (dto.Email ?? string.Empty).Trim();
-            var message = (dto.Message ?? string.Empty).Trim();
+            // ── Honeypot: if filled by a bot, silently reject ─────────────────────────
+            if (!string.IsNullOrEmpty(dto.HoneypotField))
+            {
+                // Return 200 to fool bots — they'll think submission succeeded
+                return Ok(new { message = "Message received." });
+            }
+
+            // ── Input Sanitization ────────────────────────────────────────────────────
+            var name    = SanitizeInput(dto.Name,    maxLength: 100);
+            var email   = SanitizeInput(dto.Email,   maxLength: 254);
+            var message = SanitizeInput(dto.Message, maxLength: 2000);
 
             if (string.IsNullOrEmpty(name))
                 return BadRequest(new { message = "Name is required." });
+
             if (string.IsNullOrEmpty(email))
                 return BadRequest(new { message = "Email is required." });
+
+            // ── Email format validation ────────────────────────────────────────────────
+            if (!IsValidEmail(email))
+                return BadRequest(new { message = "Please provide a valid email address." });
+
             if (string.IsNullOrEmpty(message))
                 return BadRequest(new { message = "Message is required." });
 
+            if (message.Length < 10)
+                return BadRequest(new { message = "Message must be at least 10 characters." });
+
             var clientRequest = new ClientRequest
             {
-                Name = name,
-                Email = email,
-                Phone = string.IsNullOrWhiteSpace(dto.Phone) ? null : dto.Phone.Trim(),
-                Telegram = NormalizeTelegram(dto.Telegram),
-                Message = message,
-                ProjectType = string.IsNullOrWhiteSpace(dto.ProjectType) ? "Inquiry from Website" : dto.ProjectType.Trim(),
-                BudgetRange = string.IsNullOrWhiteSpace(dto.BudgetRange) ? null : dto.BudgetRange.Trim(),
-                Status = string.IsNullOrWhiteSpace(dto.Status) ? "New" : dto.Status.Trim(),
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow,
+                Name        = name,
+                Email       = email,
+                Phone       = string.IsNullOrWhiteSpace(dto.Phone)       ? null : SanitizeInput(dto.Phone, 30),
+                Telegram    = NormalizeTelegram(dto.Telegram),
+                Message     = message,
+                ProjectType = string.IsNullOrWhiteSpace(dto.ProjectType) ? "Inquiry from Website" : SanitizeInput(dto.ProjectType, 100),
+                BudgetRange = string.IsNullOrWhiteSpace(dto.BudgetRange) ? null : SanitizeInput(dto.BudgetRange, 50),
+                Status      = "New",
+                IsRead      = false,
+                CreatedAt   = DateTime.UtcNow,
             };
 
             try
             {
                 _context.ClientRequests.Add(clientRequest);
                 await _context.SaveChangesAsync();
+
+                // Trigger notifications in background (non-blocking)
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var settings = await _context.SiteSettings.AsNoTracking().FirstOrDefaultAsync();
+                        if (settings != null)
+                        {
+                            if (settings.NotifyTelegramEnabled)
+                                await SendTelegramNotificationAsync(settings, clientRequest);
+
+                            if (settings.NotifyEmailEnabled)
+                                await SendEmailNotificationAsync(settings, clientRequest);
+                        }
+                    }
+                    catch (Exception notifEx)
+                    {
+                        Console.WriteLine($"[NOTIFICATION ERROR] {notifEx.Message}");
+                    }
+                });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
-                    message = "Could not save your message. Ensure database migrations are applied.",
-                    detail = ex.InnerException?.Message ?? ex.Message
+                    message = "Could not save your message.",
+                    detail  = ex.InnerException?.Message ?? ex.Message
                 });
             }
 
             return CreatedAtAction(nameof(GetRequests), new { id = clientRequest.Id }, clientRequest);
+        }
+
+        // ── Input Sanitization Helpers ─────────────────────────────────────────────────
+
+        /// <summary>Trims, limits length, and strips potentially dangerous HTML/script tags.</summary>
+        private static string SanitizeInput(string? input, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            var trimmed = input.Trim();
+
+            // Remove HTML/script tags
+            var noHtml = Regex.Replace(trimmed, @"<[^>]+>", string.Empty, RegexOptions.IgnoreCase);
+
+            // Remove common XSS vectors
+            var noScript = Regex.Replace(noHtml,
+                @"(javascript:|data:|vbscript:|on\w+\s*=)",
+                string.Empty, RegexOptions.IgnoreCase);
+
+            // Truncate to maxLength
+            return noScript.Length > maxLength ? noScript[..maxLength] : noScript;
+        }
+
+        /// <summary>Validates email format with a permissive but safe RFC-5322 subset regex.</summary>
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email) || email.Length > 254) return false;
+            return Regex.IsMatch(email,
+                @"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$",
+                RegexOptions.IgnoreCase);
+        }
+
+        private async Task SendTelegramNotificationAsync(SiteSetting settings, ClientRequest request)
+        {
+            var botToken = settings.NotifyTelegramBotToken;
+            if (string.IsNullOrEmpty(botToken))
+            {
+                botToken = _configuration["Telegram:BotToken"];
+            }
+
+            var chatId = settings.NotifyTelegramChatId;
+            if (string.IsNullOrEmpty(chatId))
+            {
+                chatId = _configuration["Telegram:ChatId"];
+            }
+
+            if (string.IsNullOrEmpty(botToken) || string.IsNullOrEmpty(chatId))
+            {
+                return;
+            }
+
+            var text = $"🔔 *New Client Request Received!*\n\n" +
+                       $"👤 *Name:* {request.Name}\n" +
+                       $"📧 *Email:* {request.Email}\n" +
+                       $"📞 *Phone:* {request.Phone ?? "N/A"}\n" +
+                       $"✈️ *Telegram:* {request.Telegram ?? "N/A"}\n" +
+                       $"💼 *Project Type:* {request.ProjectType ?? "N/A"}\n" +
+                       $"💰 *Budget:* {request.BudgetRange ?? "N/A"}\n\n" +
+                       $"💬 *Message:*\n{request.Message}";
+
+            var urlEncodedText = Uri.EscapeDataString(text);
+            var url = $"https://api.telegram.org/bot{botToken}/sendMessage?chat_id={chatId}&text={urlEncodedText}&parse_mode=Markdown";
+
+            using (var client = new HttpClient())
+            {
+                await client.GetAsync(url);
+            }
+        }
+
+        private async Task SendEmailNotificationAsync(SiteSetting settings, ClientRequest request)
+        {
+            var toEmail = settings.NotifyEmailAddress;
+            if (string.IsNullOrEmpty(toEmail))
+            {
+                return;
+            }
+
+            var smtpHost = _configuration["Smtp:Host"];
+            var smtpPortStr = _configuration["Smtp:Port"];
+            var smtpUser = _configuration["Smtp:Username"];
+            var smtpPass = _configuration["Smtp:Password"];
+            var fromEmail = _configuration["Smtp:FromEmail"] ?? "no-reply@smooothpixel.com";
+
+            if (string.IsNullOrEmpty(smtpHost) || !int.TryParse(smtpPortStr, out int smtpPort))
+            {
+                return;
+            }
+
+            using (var mail = new System.Net.Mail.MailMessage())
+            {
+                mail.From = new System.Net.Mail.MailAddress(fromEmail, "Smooothpixel Studio Notifications");
+                mail.To.Add(toEmail);
+                mail.Subject = $"New Website Inquiry from {request.Name}";
+                mail.Body = $"You have received a new message from the website contact form:\n\n" +
+                            $"Name: {request.Name}\n" +
+                            $"Email: {request.Email}\n" +
+                            $"Phone: {request.Phone ?? "N/A"}\n" +
+                            $"Telegram: {request.Telegram ?? "N/A"}\n" +
+                            $"Project Type: {request.ProjectType ?? "N/A"}\n" +
+                            $"Budget: {request.BudgetRange ?? "N/A"}\n\n" +
+                            $"Message:\n{request.Message}";
+                mail.IsBodyHtml = false;
+
+                using (var smtp = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
+                {
+                    if (!string.IsNullOrEmpty(smtpUser))
+                    {
+                        smtp.Credentials = new System.Net.NetworkCredential(smtpUser, smtpPass);
+                    }
+                    smtp.EnableSsl = _configuration.GetValue<bool>("Smtp:EnableSsl", true);
+                    await smtp.SendMailAsync(mail);
+                }
+            }
         }
 
         [HttpPut("{id}")]

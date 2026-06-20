@@ -26,5 +26,10 @@ namespace ReactApi.Domin.Commond_model
         public string? AiApiKey { get; set; }
         public string? AiSystemPrompt { get; set; } = "You are an AI Assistant for SmooothPixel Studio, a premium 3D animation, SaaS explainer, and cinematic video production agency. Be professional, concise, and helpful. Direct users to our Telegram @SmooothPixel for custom orders.";
         public string? AiWelcomeMessage { get; set; } = "Hello! Welcome to SmooothPixel Studio. How can I help you today?";
+        public bool NotifyEmailEnabled { get; set; } = false;
+        public string? NotifyEmailAddress { get; set; }
+        public bool NotifyTelegramEnabled { get; set; } = false;
+        public string? NotifyTelegramBotToken { get; set; }
+        public string? NotifyTelegramChatId { get; set; }
     }
 }

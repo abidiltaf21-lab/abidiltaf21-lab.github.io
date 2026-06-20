@@ -63,7 +63,6 @@ const FloatingChatWidget: React.FC = () => {
     }, [isOpen, hasInitiated, settings.aiWelcomeMessage]);
 
     useEffect(() => {
-        // Auto scroll to bottom
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
@@ -73,14 +72,12 @@ const FloatingChatWidget: React.FC = () => {
 
         const userMsg = input.trim();
         setInput('');
-        
-        // Append user message
+
         const updatedMessages = [...messages, { role: 'user' as const, text: userMsg }];
         setMessages(updatedMessages);
         setIsTyping(true);
 
         try {
-            // Map our client-side messages history to ChatMessage structures expected by .NET backend
             const payload = {
                 message: userMsg,
                 history: messages.map(m => ({
@@ -90,7 +87,7 @@ const FloatingChatWidget: React.FC = () => {
             };
 
             const { data } = await apiClient.post('/ai/chat', payload);
-            
+
             if (data && data.response) {
                 setMessages(prev => [...prev, { role: 'model', text: data.response }]);
             } else {
@@ -105,24 +102,28 @@ const FloatingChatWidget: React.FC = () => {
     };
 
     return (
-        <div className="floating-interaction-hub">
+        <div className="sp-chat-hub">
             {/* AI Chat Window Panel */}
             {settings.aiEnabled && isOpen && (
-                <div className="sp-ai-chat-window animate-scale-up">
-                    <header className="sp-ai-chat-header">
-                        <div className="sp-ai-chat-header-info">
-                            <div className="sp-ai-avatar">
+                <div className="sp-chat-window sp-chat-animate">
+                    {/* Header */}
+                    <header className="sp-chat-header">
+                        <div className="sp-chat-header-brand">
+                            <div className="sp-chat-avatar">
                                 <i className="fas fa-robot" />
-                                <span className="sp-ai-status-pulse" />
+                                <span className="sp-chat-pulse" />
                             </div>
-                            <div>
-                                <h4 className="sp-ai-name">SmooothPixel AI</h4>
-                                <span className="sp-ai-status">Online Assistant</span>
+                            <div className="sp-chat-brand-info">
+                                <h4 className="sp-chat-brand-name">SmooothPixel AI</h4>
+                                <div className="sp-chat-status-row">
+                                    <span className="sp-chat-status-dot" />
+                                    <span className="sp-chat-status-label">Online · Always ready</span>
+                                </div>
                             </div>
                         </div>
-                        <button 
-                            type="button" 
-                            className="sp-ai-close-btn"
+                        <button
+                            type="button"
+                            className="sp-chat-close"
                             onClick={() => setIsOpen(false)}
                             aria-label="Close Chat"
                         >
@@ -130,25 +131,26 @@ const FloatingChatWidget: React.FC = () => {
                         </button>
                     </header>
 
-                    <div className="sp-ai-chat-body">
+                    {/* Messages Body */}
+                    <div className="sp-chat-body">
                         {messages.map((msg, index) => (
-                            <div key={index} className={`sp-ai-msg-bubble-wrap ${msg.role}`}>
+                            <div key={index} className={`sp-msg-row ${msg.role}`}>
                                 {msg.role === 'model' && (
-                                    <div className="sp-ai-bubble-avatar">
+                                    <div className="sp-msg-avatar">
                                         <i className="fas fa-robot" />
                                     </div>
                                 )}
-                                <div className={`sp-ai-msg-bubble ${msg.role}`}>
+                                <div className={`sp-msg-bubble ${msg.role}`}>
                                     {msg.text}
                                 </div>
                             </div>
                         ))}
                         {isTyping && (
-                            <div className="sp-ai-msg-bubble-wrap model">
-                                <div className="sp-ai-bubble-avatar">
+                            <div className="sp-msg-row model">
+                                <div className="sp-msg-avatar">
                                     <i className="fas fa-robot" />
                                 </div>
-                                <div className="sp-ai-msg-bubble model sp-ai-typing-indicator">
+                                <div className="sp-msg-bubble model sp-typing-dots">
                                     <span />
                                     <span />
                                     <span />
@@ -158,19 +160,21 @@ const FloatingChatWidget: React.FC = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <form onSubmit={handleSendMessage} className="sp-ai-chat-footer">
+                    {/* Input Footer */}
+                    <form onSubmit={handleSendMessage} className="sp-chat-footer">
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Type a message..."
+                            placeholder="Ask anything about our services..."
                             disabled={isTyping}
-                            className="sp-ai-chat-input"
+                            className="sp-chat-input"
                         />
-                        <button 
-                            type="submit" 
-                            disabled={!input.trim() || isTyping} 
-                            className="sp-ai-chat-send"
+                        <button
+                            type="submit"
+                            disabled={!input.trim() || isTyping}
+                            className="sp-chat-send"
+                            aria-label="Send message"
                         >
                             <i className="fas fa-paper-plane" />
                         </button>
@@ -178,327 +182,424 @@ const FloatingChatWidget: React.FC = () => {
                 </div>
             )}
 
-            {/* Floating Action Trigger Buttons */}
-            <div className="floating-triggers-container">
-                {/* Telegram Widget Icon */}
+            {/* Floating Trigger Buttons — stacked vertically, clear spacing from scroll-to-top */}
+            <div className="sp-triggers">
+                {/* Telegram Button */}
                 {settings.telegramLink && (
                     <a
                         href={settings.telegramLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="sp-floating-trigger telegram-trigger"
-                        title="Quick Telegram Chat"
+                        className="sp-trigger sp-trigger-telegram"
+                        title="Chat on Telegram"
+                        aria-label="Open Telegram Chat"
                     >
                         <i className="fab fa-telegram-plane" />
+                        <span className="sp-trigger-label">Telegram</span>
                     </a>
                 )}
 
-                {/* AI Assistant Icon */}
+                {/* AI Assistant Button */}
                 {settings.aiEnabled && (
                     <button
                         type="button"
                         onClick={() => setIsOpen(!isOpen)}
-                        className={`sp-floating-trigger ai-trigger ${isOpen ? 'active' : ''}`}
-                        title="AI Assistant Chat"
+                        className={`sp-trigger sp-trigger-ai${isOpen ? ' sp-trigger-active' : ''}`}
+                        title="AI Assistant"
+                        aria-label="Toggle AI Chat"
                     >
                         <i className={isOpen ? "fas fa-times" : "fas fa-robot"} />
+                        <span className="sp-trigger-label">{isOpen ? 'Close' : 'AI Chat'}</span>
                     </button>
                 )}
             </div>
 
-            {/* Embedded styles for perfect self-contained glassmorphism */}
             <style>{`
-                .floating-interaction-hub {
+                /* =====================================================================
+                   SmooothPixel Floating Chat Hub — Brand-Consistent Premium Design
+                   Brand: #ffae00 (amber) + #f54200 (orange) gradient
+                ===================================================================== */
+
+                .sp-chat-hub {
                     position: fixed;
-                    bottom: 24px;
+                    bottom: 90px; /* sit above scroll-to-top button which is ~60px */
                     right: 24px;
                     z-index: 9999;
-                    font-family: 'Outfit', sans-serif;
-                }
-
-                .floating-triggers-container {
+                    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
                     display: flex;
                     flex-direction: column;
-                    gap: 12px;
-                    align-items: center;
+                    align-items: flex-end;
+                    gap: 0;
                 }
 
-                .sp-floating-trigger {
-                    width: 52px;
-                    height: 52px;
-                    border-radius: 50%;
-                    border: 1px solid rgba(255, 255, 255, 0.12);
+                /* ── Trigger Buttons ── */
+                .sp-triggers {
                     display: flex;
+                    flex-direction: column;
+                    align-items: flex-end;
+                    gap: 10px;
+                }
+
+                /* Each trigger is a pill shape: icon + label */
+                .sp-trigger {
+                    position: relative;
+                    display: inline-flex;
                     align-items: center;
-                    justify-content: center;
-                    font-size: 20px;
+                    gap: 8px;
+                    padding: 0 18px 0 14px;
+                    height: 48px;
+                    border-radius: 999px;
                     color: #ffffff;
                     text-decoration: none;
                     cursor: pointer;
+                    border: none;
+                    font-size: 18px;
+                    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+                    font-weight: 700;
+                    white-space: nowrap;
                     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                    box-sizing: border-box;
                 }
 
-                .telegram-trigger {
-                    background: linear-gradient(135deg, #37aee2, #1e96c8);
+                .sp-trigger-label {
+                    font-size: 12.5px;
+                    font-weight: 700;
+                    letter-spacing: 0.01em;
+                    line-height: 1;
                 }
-                .telegram-trigger:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 12px 36px rgba(30, 150, 200, 0.5);
+
+                /* Telegram */
+                .sp-trigger-telegram {
+                    background: linear-gradient(135deg, #37aee2 0%, #1e96c8 100%);
+                    box-shadow: 0 6px 22px rgba(30, 150, 200, 0.45);
+                }
+                .sp-trigger-telegram:hover {
+                    transform: translateX(-4px);
+                    box-shadow: 0 10px 32px rgba(30, 150, 200, 0.55);
                     color: #ffffff;
                 }
 
-                .ai-trigger {
-                    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+                /* AI Trigger */
+                .sp-trigger-ai {
+                    background: linear-gradient(135deg, #ffae00 0%, #f54200 100%);
+                    box-shadow: 0 6px 22px rgba(255, 174, 0, 0.45);
                 }
-                .ai-trigger:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 12px 36px rgba(139, 92, 246, 0.5);
+                .sp-trigger-ai:hover {
+                    transform: translateX(-4px);
+                    box-shadow: 0 10px 32px rgba(255, 174, 0, 0.55);
                 }
-                .ai-trigger.active {
-                    transform: rotate(90deg);
-                    background: #1e1b4b;
-                    border-color: rgba(139, 92, 246, 0.4);
+                .sp-trigger-ai.sp-trigger-active {
+                    background: rgba(15, 20, 36, 0.95);
+                    border: 1.5px solid rgba(255, 174, 0, 0.4);
+                    box-shadow: 0 6px 22px rgba(255, 174, 0, 0.2);
                 }
 
-                /* AI Chat Window */
-                .sp-ai-chat-window {
+                /* ── Chat Window ── */
+                .sp-chat-window {
                     position: absolute;
-                    bottom: 70px;
+                    bottom: calc(100% + 14px); /* always above the triggers row */
                     right: 0;
-                    width: 360px;
-                    height: 480px;
-                    border-radius: 20px;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    background: rgba(15, 23, 42, 0.85);
-                    backdrop-filter: blur(20px);
-                    -webkit-backdrop-filter: blur(20px);
-                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+                    width: 376px;
+                    max-height: 520px;
+                    border-radius: 24px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                    background: rgba(10, 14, 28, 0.92);
+                    backdrop-filter: blur(28px) saturate(180%);
+                    -webkit-backdrop-filter: blur(28px) saturate(180%);
+                    box-shadow:
+                        0 0 0 1px rgba(255, 174, 0, 0.08),
+                        0 20px 60px rgba(0, 0, 0, 0.55),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.06);
                     display: flex;
                     flex-direction: column;
                     overflow: hidden;
                     transform-origin: bottom right;
                 }
 
-                @media (max-width: 480px) {
-                    .sp-ai-chat-window {
-                        width: calc(100vw - 32px);
-                        right: -8px;
-                        height: 420px;
+                @media (max-width: 520px) {
+                    .sp-chat-window {
+                        width: calc(100vw - 36px);
+                        right: -4px;
+                        max-height: 460px;
                     }
+                    .sp-chat-hub {
+                        bottom: 80px;
+                        right: 16px;
+                    }
+                    .sp-trigger {
+                        padding: 0 14px 0 12px;
+                        height: 44px;
+                        font-size: 16px;
+                    }
+                    .sp-trigger-label { font-size: 11.5px; }
                 }
 
-                .sp-ai-chat-header {
-                    padding: 16px 20px;
-                    background: rgba(255, 255, 255, 0.03);
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                /* Chat open animation */
+                .sp-chat-animate {
+                    animation: spChatSlideUp 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                }
+                @keyframes spChatSlideUp {
+                    from { opacity: 0; transform: scale(0.85) translateY(24px); }
+                    to   { opacity: 1; transform: scale(1) translateY(0); }
+                }
+
+                /* ── Header ── */
+                .sp-chat-header {
                     display: flex;
                     align-items: center;
-                    justify-content: justify;
                     justify-content: space-between;
+                    padding: 16px 20px;
+                    background: linear-gradient(135deg, rgba(255, 174, 0, 0.08) 0%, rgba(245, 66, 0, 0.04) 100%);
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+                    flex-shrink: 0;
                 }
 
-                .sp-ai-chat-header-info {
+                .sp-chat-header-brand {
                     display: flex;
                     align-items: center;
                     gap: 12px;
                 }
 
-                .sp-ai-avatar {
-                    width: 38px;
-                    height: 38px;
+                .sp-chat-avatar {
+                    width: 42px;
+                    height: 42px;
                     border-radius: 50%;
-                    background: rgba(139, 92, 246, 0.2);
-                    border: 1px solid rgba(139, 92, 246, 0.4);
-                    color: #a78bfa;
+                    background: linear-gradient(135deg, rgba(255, 174, 0, 0.2), rgba(245, 66, 0, 0.15));
+                    border: 1.5px solid rgba(255, 174, 0, 0.3);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 16px;
+                    font-size: 18px;
+                    color: #ffae00;
                     position: relative;
+                    flex-shrink: 0;
                 }
 
-                .sp-ai-status-pulse {
+                .sp-chat-pulse {
                     position: absolute;
-                    bottom: 0;
-                    right: 0;
-                    width: 10px;
-                    height: 10px;
+                    bottom: 1px;
+                    right: 1px;
+                    width: 11px;
+                    height: 11px;
                     border-radius: 50%;
                     background: #10b981;
-                    border: 2px solid #0f172a;
-                    animation: statusPulse 2s infinite;
+                    border: 2px solid rgba(10, 14, 28, 0.92);
+                    animation: spPulse 2.2s ease-in-out infinite;
                 }
 
-                @keyframes statusPulse {
-                    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-                    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-                    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+                @keyframes spPulse {
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+                    60%       { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
                 }
 
-                .sp-ai-name {
+                .sp-chat-brand-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+                }
+
+                .sp-chat-brand-name {
                     margin: 0;
-                    font-size: 14px;
+                    font-size: 15px;
                     font-weight: 700;
                     color: #ffffff;
+                    letter-spacing: -0.01em;
+                    line-height: 1.2;
                 }
 
-                .sp-ai-status {
+                .sp-chat-status-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .sp-chat-status-dot {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: #10b981;
+                    flex-shrink: 0;
+                }
+
+                .sp-chat-status-label {
                     font-size: 11px;
-                    color: rgba(255, 255, 255, 0.5);
+                    color: rgba(255, 255, 255, 0.45);
+                    font-weight: 500;
                 }
 
-                .sp-ai-close-btn {
-                    background: transparent;
-                    border: none;
+                .sp-chat-close {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.06);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
                     color: rgba(255, 255, 255, 0.5);
-                    font-size: 18px;
                     cursor: pointer;
-                    transition: color 0.2s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    transition: all 0.2s ease;
+                    flex-shrink: 0;
                 }
-                .sp-ai-close-btn:hover {
+                .sp-chat-close:hover {
+                    background: rgba(255, 255, 255, 0.1);
                     color: #ffffff;
+                    border-color: rgba(255, 255, 255, 0.15);
                 }
 
-                .sp-ai-chat-body {
+                /* ── Messages Body ── */
+                .sp-chat-body {
                     flex: 1;
-                    padding: 20px;
+                    padding: 20px 18px;
                     overflow-y: auto;
                     display: flex;
                     flex-direction: column;
-                    gap: 16px;
+                    gap: 14px;
+                    scroll-behavior: smooth;
                 }
 
-                .sp-ai-chat-body::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .sp-ai-chat-body::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .sp-ai-chat-body::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 10px;
+                .sp-chat-body::-webkit-scrollbar { width: 4px; }
+                .sp-chat-body::-webkit-scrollbar-track { background: transparent; }
+                .sp-chat-body::-webkit-scrollbar-thumb {
+                    background: rgba(255, 174, 0, 0.15);
+                    border-radius: 99px;
                 }
 
-                .sp-ai-msg-bubble-wrap {
+                .sp-msg-row {
                     display: flex;
                     align-items: flex-end;
                     gap: 8px;
-                    max-width: 85%;
+                    max-width: 88%;
                 }
 
-                .sp-ai-msg-bubble-wrap.user {
+                .sp-msg-row.user {
                     align-self: flex-end;
                     flex-direction: row-reverse;
                 }
 
-                .sp-ai-bubble-avatar {
-                    width: 28px;
-                    height: 28px;
+                .sp-msg-row.model {
+                    align-self: flex-start;
+                }
+
+                .sp-msg-avatar {
+                    width: 30px;
+                    height: 30px;
                     border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    color: rgba(255, 255, 255, 0.6);
+                    background: linear-gradient(135deg, rgba(255, 174, 0, 0.15), rgba(245, 66, 0, 0.1));
+                    border: 1px solid rgba(255, 174, 0, 0.2);
+                    color: #ffae00;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 11px;
+                    font-size: 12px;
                     flex-shrink: 0;
                 }
 
-                .sp-ai-msg-bubble {
-                    padding: 12px 16px;
-                    border-radius: 16px;
-                    font-size: 13px;
-                    line-height: 1.5;
+                .sp-msg-bubble {
+                    padding: 11px 15px;
+                    border-radius: 18px;
+                    font-size: 13.5px;
+                    line-height: 1.55;
                     white-space: pre-line;
+                    word-break: break-word;
                 }
 
-                .sp-ai-msg-bubble.model {
+                .sp-msg-bubble.model {
                     background: rgba(255, 255, 255, 0.06);
                     border: 1px solid rgba(255, 255, 255, 0.08);
-                    color: rgba(255, 255, 255, 0.9);
-                    border-bottom-left-radius: 4px;
+                    color: rgba(255, 255, 255, 0.88);
+                    border-bottom-left-radius: 5px;
                 }
 
-                .sp-ai-msg-bubble.user {
-                    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+                .sp-msg-bubble.user {
+                    background: linear-gradient(135deg, #ffae00 0%, #f54200 100%);
                     color: #ffffff;
-                    border-bottom-right-radius: 4px;
+                    border-bottom-right-radius: 5px;
+                    box-shadow: 0 4px 16px rgba(255, 174, 0, 0.35);
                 }
 
-                /* Typing Indicator */
-                .sp-ai-typing-indicator {
+                /* Typing indicator */
+                .sp-typing-dots {
                     display: flex;
-                    gap: 4px;
-                    padding: 12px 18px !important;
+                    gap: 5px;
+                    padding: 14px 18px !important;
+                    align-items: center;
                 }
-                .sp-ai-typing-indicator span {
-                    width: 6px;
-                    height: 6px;
+                .sp-typing-dots span {
+                    width: 7px;
+                    height: 7px;
                     border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.5);
-                    animation: typingBounce 1.4s infinite ease-in-out both;
+                    background: rgba(255, 174, 0, 0.6);
+                    animation: spTypingBounce 1.4s infinite ease-in-out both;
                 }
-                .sp-ai-typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-                .sp-ai-typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+                .sp-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+                .sp-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
 
-                @keyframes typingBounce {
-                    0%, 80%, 100% { transform: scale(0); }
-                    40% { transform: scale(1.0); }
+                @keyframes spTypingBounce {
+                    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+                    40%           { transform: scale(1.0); opacity: 1; }
                 }
 
-                .sp-ai-chat-footer {
-                    padding: 12px 16px;
+                /* ── Input Footer ── */
+                .sp-chat-footer {
+                    padding: 12px 14px;
                     background: rgba(255, 255, 255, 0.02);
-                    border-top: 1px solid rgba(255, 255, 255, 0.08);
+                    border-top: 1px solid rgba(255, 255, 255, 0.06);
                     display: flex;
                     gap: 8px;
+                    align-items: center;
+                    flex-shrink: 0;
                 }
 
-                .sp-ai-chat-input {
+                .sp-chat-input {
                     flex: 1;
-                    background: rgba(255, 255, 255, 0.05);
+                    background: rgba(255, 255, 255, 0.06);
                     border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 12px;
+                    border-radius: 14px;
                     padding: 10px 14px;
                     color: #ffffff;
-                    font-size: 13px;
-                    transition: border-color 0.2s;
-                }
-                .sp-ai-chat-input:focus {
+                    font-size: 13.5px;
+                    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+                    transition: border-color 0.2s ease, background 0.2s ease;
                     outline: none;
-                    border-color: rgba(139, 92, 246, 0.5);
                 }
-
-                .sp-ai-chat-send {
-                    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
-                    border: none;
-                    border-radius: 12px;
-                    width: 38px;
-                    height: 38px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #ffffff;
-                    cursor: pointer;
-                    transition: transform 0.2s, opacity 0.2s;
+                .sp-chat-input::placeholder {
+                    color: rgba(255, 255, 255, 0.3);
                 }
-                .sp-ai-chat-send:hover:not(:disabled) {
-                    transform: scale(1.05);
+                .sp-chat-input:focus {
+                    border-color: rgba(255, 174, 0, 0.45);
+                    background: rgba(255, 174, 0, 0.04);
                 }
-                .sp-ai-chat-send:disabled {
-                    opacity: 0.5;
+                .sp-chat-input:disabled {
+                    opacity: 0.6;
                     cursor: not-allowed;
                 }
 
-                /* Animation */
-                .animate-scale-up {
-                    animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                .sp-chat-send {
+                    width: 42px;
+                    height: 42px;
+                    flex-shrink: 0;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #ffae00 0%, #f54200 100%);
+                    border: none;
+                    color: #ffffff;
+                    font-size: 14px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+                    box-shadow: 0 4px 16px rgba(255, 174, 0, 0.4);
                 }
-                @keyframes scaleUp {
-                    from { transform: scale(0.8) translateY(20px); opacity: 0; }
-                    to { transform: scale(1) translateY(0); opacity: 1; }
+                .sp-chat-send:hover:not(:disabled) {
+                    transform: scale(1.08);
+                    box-shadow: 0 8px 24px rgba(255, 174, 0, 0.5);
+                }
+                .sp-chat-send:disabled {
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                    box-shadow: none;
                 }
             `}</style>
         </div>

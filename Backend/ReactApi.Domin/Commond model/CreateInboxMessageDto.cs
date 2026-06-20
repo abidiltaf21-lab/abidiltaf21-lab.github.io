@@ -10,5 +10,7 @@ namespace ReactApi.Domin.Commond_model
         public string? ProjectType { get; set; }
         public string? BudgetRange { get; set; }
         public string? Status { get; set; }
+        /// <summary>Honeypot field — must remain empty. Filled by bots.</summary>
+        public string? HoneypotField { get; set; }
     }
 }

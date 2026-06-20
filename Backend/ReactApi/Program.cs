@@ -1,4 +1,5 @@
 // Program.cs
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactApi.Application;
 using ReactApi.Infrastructer.Data;
@@ -6,29 +7,27 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 // Register application services and infrastructure
-builder.Services.AddApplicationServices(); // Ensure this method is defined
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructure(builder.Configuration);  // includes Rate Limiter + Identity
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-    });
+builder.Services.AddControllers(options =>
+{
+    // Require HTTPS globally in production via filter (belt-and-suspenders)
+    if (!builder.Environment.IsDevelopment())
+        options.Filters.Add(new RequireHttpsAttribute());
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Register the HttpClient factory used by CloudinaryController (and any future
-// outbound HTTP integrations). AddHttpClient registers IHttpClientFactory plus
-// a typed HttpClient, with default 100s timeout and handler lifetime handled.
 builder.Services.AddHttpClient();
 
-// CORS — read allowed origins from configuration so prod and dev stay in sync.
-// Set Cors:AllowedOrigins in appsettings.json (or via env var Cors__AllowedOrigins__0..N).
-// In dev, localhost is allowed; in prod the list MUST be set explicitly or we fail-fast.
+// ── CORS ───────────────────────────────────────────────────────────────────────────────
 var configuredOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
     .Get<string[]>() ?? Array.Empty<string>();
@@ -37,8 +36,8 @@ var isDevelopment = builder.Environment.IsDevelopment();
 if (!isDevelopment && configuredOrigins.Length == 0)
 {
     throw new InvalidOperationException(
-        "Production deployment requires Cors:AllowedOrigins to be set in configuration. " +
-        "Set it via appsettings.Production.json or the Cors__AllowedOrigins__0..N env vars.");
+        "Production deployment requires Cors:AllowedOrigins to be set. " +
+        "Set Cors__AllowedOrigins__0..N env vars or appsettings.Production.json.");
 }
 
 builder.Services.AddCors(options =>
@@ -47,7 +46,6 @@ builder.Services.AddCors(options =>
     {
         if (isDevelopment)
         {
-            // Dev only — Vite/React dev server + local IPs.
             policy.SetIsOriginAllowed(origin =>
                 origin.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) ||
                 origin.StartsWith("http://127.0.0.1", StringComparison.OrdinalIgnoreCase))
@@ -57,7 +55,6 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            // Prod — strict whitelist.
             policy.WithOrigins(configuredOrigins)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
@@ -66,57 +63,109 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();  // Build the app after services have been registered
+// ── Build ──────────────────────────────────────────────────────────────────────────────
+var app = builder.Build();
 
-// Configure middleware pipeline
-// Global exception handler to return JSON error responses
+// ── Global Exception Handler ───────────────────────────────────────────────────────────
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
     {
         context.Response.ContentType = "application/json";
-        var exceptionHandlerPathFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
-        var ex = exceptionHandlerPathFeature?.Error;
-        var status = 500;
-        if (ex is UnauthorizedAccessException)
-            status = 401;
-        else if (ex is NotImplementedException)
-            status = 501;
+        var feature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
+        var ex      = feature?.Error;
+        var status  = ex switch
+        {
+            UnauthorizedAccessException => 401,
+            NotImplementedException     => 501,
+            _                           => 500
+        };
         context.Response.StatusCode = status;
-        var result = System.Text.Json.JsonSerializer.Serialize(new { error = ex?.Message });
-        await context.Response.WriteAsync(result);
+        // Do NOT expose stack traces or internal messages in production
+        var message = isDevelopment ? ex?.Message : "An internal error occurred.";
+        await context.Response.WriteAsync(
+            System.Text.Json.JsonSerializer.Serialize(new { error = message }));
     });
 });
 
-if (app.Environment.IsDevelopment())
+// ── HTTPS Redirection (production only) ───────────────────────────────────────────────
+if (!isDevelopment)
+{
+    app.UseHttpsRedirection();
+    app.UseHsts();
+}
+
+// ── Swagger (dev only unless explicitly enabled) ──────────────────────────────────────
+bool showSwagger = isDevelopment ||
+    builder.Configuration.GetValue<bool>("Security:EnableSwaggerInProduction", false);
+if (showSwagger)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Apply CORS policy
+// ── Security Headers ───────────────────────────────────────────────────────────────────
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+
+    // Prevent clickjacking
+    headers["X-Frame-Options"]        = "DENY";
+
+    // Prevent MIME-type sniffing
+    headers["X-Content-Type-Options"] = "nosniff";
+
+    // XSS protection (legacy browsers)
+    headers["X-XSS-Protection"]       = "1; mode=block";
+
+    // Referrer information control
+    headers["Referrer-Policy"]        = "strict-origin-when-cross-origin";
+
+    // Disable unnecessary browser features
+    headers["Permissions-Policy"]     = "camera=(), microphone=(), geolocation=(), payment=()";
+
+    // Content Security Policy — adjust as your frontend CDNs require
+    headers["Content-Security-Policy"] =
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
+        "font-src 'self' https://fonts.gstatic.com data:; " +
+        "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com; " +
+        "connect-src 'self'; " +
+        "frame-ancestors 'none';";
+
+    // HSTS — only sent over HTTPS, already handled by UseHsts() above but belt-and-suspenders
+    if (context.Request.IsHttps || !isDevelopment)
+        headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload";
+
+    await next();
+});
+
+// ── Rate Limiter ───────────────────────────────────────────────────────────────────────
+app.UseRateLimiter();
+
+// ── CORS ───────────────────────────────────────────────────────────────────────────────
 app.UseCors("AllowOrigin");
 
-// Authentication and Authorization middleware
+// ── Auth ───────────────────────────────────────────────────────────────────────────────
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Apply pending EF migrations + ensure inbox columns exist
+// ── Database Setup ─────────────────────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var db     = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
         if (app.Environment.IsProduction() || db.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
-            // Create schema from DbContext model directly (no migrations needed for Production or SQLite)
             await db.Database.EnsureCreatedAsync();
         else
             await db.Database.MigrateAsync();
     }
     catch (Exception ex)
     {
-        logger.LogWarning(ex, "EF MigrateAsync failed; continuing with inbox schema ensure.");
+        logger.LogWarning(ex, "EF MigrateAsync failed; continuing with schema ensurers.");
     }
 
     try
@@ -124,12 +173,14 @@ using (var scope = app.Services.CreateScope())
         await ReactApi.Infrastructer.Data.InboxSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.AiSchemaEnsurer.EnsureAsync(db, logger);
+        await ReactApi.Infrastructer.Data.OtpSchemaEnsurer.EnsureAsync(db, logger);
+        await ReactApi.Infrastructer.Data.NotificationSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.SeedDefaultsAsync(db);
         await ReactApi.Infrastructer.Data.PortfolioDataSeeder.SeedAsync(db);
     }
     catch (Exception ex)
     {
-        logger.LogWarning(ex, "Database seeding failed; backend will start without database operations.");
+        logger.LogWarning(ex, "Schema ensurers failed; backend will start without full schema.");
     }
 }
 
