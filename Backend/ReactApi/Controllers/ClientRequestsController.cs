@@ -287,20 +287,85 @@ namespace ReactApi.Controllers
                 return;
             }
 
+            var html = $@"
+<!DOCTYPE html>
+<html>
+<head><meta charset='utf-8'></head>
+<body style='font-family:Plus Jakarta Sans,sans-serif;background:#0a0b10;padding:32px;margin:0;'>
+  <div style='max-width:520px;margin:0 auto;background:#12141e;border-radius:20px;
+              box-shadow:0 8px 40px rgba(0,0,0,0.5);overflow:hidden;border:1px solid rgba(255,255,255,0.07);'>
+    <!-- Header -->
+    <div style='background:linear-gradient(135deg,#ffae00,#f54200);padding:28px 32px;text-align:center;'>
+      <h1 style='color:#fff;margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em;'>
+        🔔 SmooothPixel Studio
+      </h1>
+      <p style='color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:13px;'>New Client Inquiry Received</p>
+    </div>
+    <!-- Body -->
+    <div style='padding:28px 32px;'>
+      <p style='color:#94a3b8;font-size:14px;margin:0 0 20px;'>A new message was submitted through your website contact form:</p>
+
+      <!-- Info Table -->
+      <table style='width:100%;border-collapse:collapse;'>
+        <tr>
+          <td style='padding:10px 12px;background:#1a1d2a;border-radius:8px 8px 0 0;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.04);'>👤 Name</td>
+          <td style='padding:10px 12px;background:#1a1d2a;border-radius:8px 8px 0 0;color:#e2e8f0;font-size:14px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.04);'>{request.Name}</td>
+        </tr>
+        <tr>
+          <td style='padding:10px 12px;background:#161827;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.04);'>📧 Email</td>
+          <td style='padding:10px 12px;background:#161827;color:#ffae00;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.04);'>{request.Email}</td>
+        </tr>
+        <tr>
+          <td style='padding:10px 12px;background:#1a1d2a;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.04);'>📞 Phone</td>
+          <td style='padding:10px 12px;background:#1a1d2a;color:#e2e8f0;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.04);'>{request.Phone ?? "N/A"}</td>
+        </tr>
+        <tr>
+          <td style='padding:10px 12px;background:#161827;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.04);'>✈️ Telegram</td>
+          <td style='padding:10px 12px;background:#161827;color:#e2e8f0;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.04);'>{(request.Telegram != null ? "@" + request.Telegram : "N/A")}</td>
+        </tr>
+        <tr>
+          <td style='padding:10px 12px;background:#1a1d2a;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.04);'>💼 Project Type</td>
+          <td style='padding:10px 12px;background:#1a1d2a;color:#e2e8f0;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.04);'>{request.ProjectType ?? "N/A"}</td>
+        </tr>
+        <tr>
+          <td style='padding:10px 12px;background:#161827;border-radius:0 0 0 8px;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;'>💰 Budget</td>
+          <td style='padding:10px 12px;background:#161827;border-radius:0 0 8px 0;color:#4ade80;font-size:14px;font-weight:600;'>{request.BudgetRange ?? "N/A"}</td>
+        </tr>
+      </table>
+
+      <!-- Message -->
+      <div style='margin-top:20px;background:#1a1d2a;border-radius:12px;padding:16px 20px;border-left:3px solid #ffae00;'>
+        <p style='color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px;'>💬 Message</p>
+        <p style='color:#cbd5e1;font-size:14px;line-height:1.6;margin:0;white-space:pre-wrap;'>{request.Message}</p>
+      </div>
+
+      <!-- CTA -->
+      <div style='margin-top:24px;text-align:center;'>
+        <a href='https://abidiltaf21-lab.github.io/admin/inbox'
+           style='display:inline-block;background:linear-gradient(135deg,#ffae00,#f54200);
+                  color:#fff;font-weight:700;font-size:14px;padding:12px 28px;
+                  border-radius:10px;text-decoration:none;letter-spacing:0.01em;'>
+          View in Admin Panel →
+        </a>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style='background:#0d0f1a;padding:16px 32px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);'>
+      <p style='color:#475569;font-size:11px;margin:0;'>
+        © {DateTime.UtcNow.Year} SmooothPixel Studio · Automated Notification
+      </p>
+    </div>
+  </div>
+</body>
+</html>";
+
             using (var mail = new System.Net.Mail.MailMessage())
             {
-                mail.From = new System.Net.Mail.MailAddress(fromEmail, "Smooothpixel Studio Notifications");
+                mail.From = new System.Net.Mail.MailAddress(fromEmail, "SmooothPixel Studio");
                 mail.To.Add(toEmail);
-                mail.Subject = $"New Website Inquiry from {request.Name}";
-                mail.Body = $"You have received a new message from the website contact form:\n\n" +
-                            $"Name: {request.Name}\n" +
-                            $"Email: {request.Email}\n" +
-                            $"Phone: {request.Phone ?? "N/A"}\n" +
-                            $"Telegram: {request.Telegram ?? "N/A"}\n" +
-                            $"Project Type: {request.ProjectType ?? "N/A"}\n" +
-                            $"Budget: {request.BudgetRange ?? "N/A"}\n\n" +
-                            $"Message:\n{request.Message}";
-                mail.IsBodyHtml = false;
+                mail.Subject = $"🔔 New Inquiry from {request.Name} — SmooothPixel Studio";
+                mail.Body = html;
+                mail.IsBodyHtml = true;
 
                 using (var smtp = new System.Net.Mail.SmtpClient(smtpHost, smtpPort))
                 {
