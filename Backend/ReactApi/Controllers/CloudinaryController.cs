@@ -1,9 +1,7 @@
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace ReactApi.Controllers
 {
@@ -12,16 +10,13 @@ namespace ReactApi.Controllers
     public class CloudinaryController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<CloudinaryController> _logger;
 
         public CloudinaryController(
             IConfiguration config,
-            IHttpClientFactory httpClientFactory,
             ILogger<CloudinaryController> logger)
         {
             _config = config;
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
@@ -45,7 +40,7 @@ namespace ReactApi.Controllers
                 hasApiSecret = !string.IsNullOrWhiteSpace(apiSecret),
                 hasUploadPreset = !string.IsNullOrWhiteSpace(uploadPreset),
                 uploadPreset,
-                message = "Cloudinary signed upload is configured."
+                message = "Cloudinary SDK signed upload is configured."
             });
         }
 
@@ -60,72 +55,38 @@ namespace ReactApi.Controllers
 
             if (string.IsNullOrWhiteSpace(cloudName) ||
                 string.IsNullOrWhiteSpace(apiKey) ||
-                string.IsNullOrWhiteSpace(apiSecret) ||
-                string.IsNullOrWhiteSpace(uploadPreset))
+                string.IsNullOrWhiteSpace(apiSecret))
             {
                 return Ok(new { error = "Config missing" });
             }
 
             try
             {
-                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                var signatureParams = new SortedDictionary<string, string>(StringComparer.Ordinal)
+                var account = new Account(cloudName, apiKey, apiSecret);
+                var cloudinary = new Cloudinary(account);
+
+                var dummyBytes = System.Text.Encoding.UTF8.GetBytes("diagnostics SDK test file content");
+                using var stream = new MemoryStream(dummyBytes);
+
+                var uploadParams = new RawUploadParams
                 {
-                    { "folder", targetFolder },
-                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) }
+                    File = new FileDescription("diagnostic_test_sdk.txt", stream),
+                    Folder = targetFolder
                 };
-                var signature = ComputeCloudinarySignature(signatureParams, apiSecret);
 
-                using var form = new MultipartFormDataContent();
-                var dummyBytes = Encoding.UTF8.GetBytes("diagnostics test file content");
-                var streamContent = new ByteArrayContent(dummyBytes);
-                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");
-
-                form.Add(streamContent, "file", "diagnostic_test.txt");
-                var apiKeyContent = new StringContent(apiKey);
-                apiKeyContent.Headers.Remove("Content-Type");
-                form.Add(apiKeyContent, "api_key");
-
-                var timestampContent = new StringContent(timestamp.ToString(CultureInfo.InvariantCulture));
-                timestampContent.Headers.Remove("Content-Type");
-                form.Add(timestampContent, "timestamp");
-
-                var signatureContent = new StringContent(signature);
-                signatureContent.Headers.Remove("Content-Type");
-                form.Add(signatureContent, "signature");
-
-                var folderContent = new StringContent(targetFolder);
-                folderContent.Headers.Remove("Content-Type");
-                form.Add(folderContent, "folder");
-
-                var uploadUrl = $"https://api.cloudinary.com/v1_1/{cloudName}/raw/upload";
-                var http = _httpClientFactory.CreateClient();
-                var response = await http.PostAsync(uploadUrl, form);
-                var body = await response.Content.ReadAsStringAsync();
-
-                var headers = new Dictionary<string, string>();
-                foreach (var h in response.Headers)
-                {
-                    headers[h.Key] = string.Join(", ", h.Value);
-                }
-                foreach (var h in response.Content.Headers)
-                {
-                    headers[h.Key] = string.Join(", ", h.Value);
-                }
+                var uploadResult = await cloudinary.UploadAsync(uploadParams);
 
                 return Ok(new
                 {
-                    status = (int)response.StatusCode,
-                    body = body,
-                    headers = headers,
+                    status = (int)uploadResult.StatusCode,
+                    body = uploadResult.JsonObj?.ToString() ?? uploadResult.Error?.Message ?? "No body",
+                    success = uploadResult.Error == null,
+                    error = uploadResult.Error?.Message,
                     debug = new {
                         cloudName,
                         apiKey = apiKey.Substring(0, 4) + "... (len: " + apiKey.Length + ")",
                         apiSecret = apiSecret.Substring(0, 4) + "... (len: " + apiSecret.Length + ")",
-                        uploadPreset,
-                        targetFolder,
-                        timestamp,
-                        signature
+                        targetFolder
                     }
                 });
             }
@@ -158,12 +119,11 @@ namespace ReactApi.Controllers
 
             if (string.IsNullOrWhiteSpace(cloudName) ||
                 string.IsNullOrWhiteSpace(apiKey) ||
-                string.IsNullOrWhiteSpace(apiSecret) ||
-                string.IsNullOrWhiteSpace(uploadPreset))
+                string.IsNullOrWhiteSpace(apiSecret))
             {
                 return StatusCode(503, new
                 {
-                    error = "Cloudinary is not configured. Missing one of: Cloudinary__CloudName, Cloudinary__ApiKey, Cloudinary__ApiSecret, Cloudinary__UploadPreset."
+                    error = "Cloudinary is not configured. Missing Cloudinary__CloudName, Cloudinary__ApiKey, or Cloudinary__ApiSecret."
                 });
             }
 
@@ -171,8 +131,10 @@ namespace ReactApi.Controllers
 
             try
             {
-                var resourceType = "auto";
+                var account = new Account(cloudName, apiKey, apiSecret);
+                var cloudinary = new Cloudinary(account);
 
+                var resourceType = "auto";
                 if (!string.IsNullOrWhiteSpace(file.ContentType))
                 {
                     if (file.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
@@ -181,99 +143,58 @@ namespace ReactApi.Controllers
                         resourceType = "image";
                 }
 
-                // Compute signed-upload timestamp + signature.
-                // Cloudinary signature = SHA1("folder=...&timestamp=...&upload_preset=...&<api_secret>")
-                // Params are sorted alphabetically by key.
-                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-                var signatureParams = new SortedDictionary<string, string>(StringComparer.Ordinal)
-                {
-                    { "folder", targetFolder },
-                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) }
-                };
-
-                var signature = ComputeCloudinarySignature(signatureParams, apiSecret!);
-
-                using var form = new MultipartFormDataContent();
-
                 stream = file.OpenReadStream();
+                var fileDesc = new FileDescription(file.FileName, stream);
 
-                var streamContent = new StreamContent(stream);
+                UploadResult uploadResult;
 
-                if (!string.IsNullOrWhiteSpace(file.ContentType))
+                if (resourceType == "video")
                 {
-                    streamContent.Headers.ContentType =
-                        new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+                    var uploadParams = new VideoUploadParams
+                    {
+                        File = fileDesc,
+                        Folder = targetFolder
+                    };
+                    uploadResult = await cloudinary.UploadAsync(uploadParams);
+                }
+                else if (resourceType == "image")
+                {
+                    var uploadParams = new ImageUploadParams
+                    {
+                        File = fileDesc,
+                        Folder = targetFolder
+                    };
+                    uploadResult = await cloudinary.UploadAsync(uploadParams);
+                }
+                else
+                {
+                    var uploadParams = new RawUploadParams
+                    {
+                        File = fileDesc,
+                        Folder = targetFolder
+                    };
+                    uploadResult = await cloudinary.UploadAsync(uploadParams);
                 }
 
-                form.Add(streamContent, "file", file.FileName);
-                var apiKeyContent = new StringContent(apiKey!);
-                apiKeyContent.Headers.Remove("Content-Type");
-                form.Add(apiKeyContent, "api_key");
-
-                var timestampContent = new StringContent(timestamp.ToString(CultureInfo.InvariantCulture));
-                timestampContent.Headers.Remove("Content-Type");
-                form.Add(timestampContent, "timestamp");
-
-                var signatureContent = new StringContent(signature);
-                signatureContent.Headers.Remove("Content-Type");
-                form.Add(signatureContent, "signature");
-
-                var folderContent = new StringContent(targetFolder);
-                folderContent.Headers.Remove("Content-Type");
-                form.Add(folderContent, "folder");
-
-                _logger.LogWarning(
-                    "UPLOAD DEBUG (signed) => CloudName={CloudName}, ResourceType={ResourceType}, Preset={Preset}, Folder={Folder}, FileName={FileName}, ContentType={ContentType}, Size={Size}",
-                    cloudName,
-                    resourceType,
-                    uploadPreset,
-                    targetFolder,
-                    file.FileName,
-                    file.ContentType,
-                    file.Length
-                );
-
-                var uploadUrl =
-                    $"https://api.cloudinary.com/v1_1/{cloudName}/{resourceType}/upload";
-
-                var http = _httpClientFactory.CreateClient();
-                http.Timeout = TimeSpan.FromMinutes(5);
-
-                var response = await http.PostAsync(uploadUrl, form);
-                var body = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
+                if (uploadResult.Error != null)
                 {
-                    _logger.LogError(
-                        "Cloudinary upload failed: {Status} {Body}",
-                        response.StatusCode,
-                        body
-                    );
+                    _logger.LogError("Cloudinary upload failed: {Message} (Status: {Status})", 
+                        uploadResult.Error.Message, uploadResult.StatusCode);
 
-                    return StatusCode((int)response.StatusCode, new
+                    return StatusCode((int)uploadResult.StatusCode, new
                     {
                         error = "Cloudinary rejected the upload.",
-                        cloudinaryStatus = (int)response.StatusCode,
-                        cloudinaryBody = body,
-                        debug = new
-                        {
-                            cloudName,
-                            resourceType,
-                            uploadPreset,
-                            targetFolder,
-                            fileName = file.FileName,
-                            file.ContentType,
-                            file.Length
-                        }
+                        cloudinaryStatus = (int)uploadResult.StatusCode,
+                        cloudinaryBody = uploadResult.JsonObj?.ToString() ?? uploadResult.Error.Message
                     });
                 }
 
-                return Content(body, "application/json");
+                var rawJson = uploadResult.JsonObj?.ToString() ?? "{}";
+                return Content(rawJson, "application/json");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Cloudinary upload proxy failed");
+                _logger.LogError(ex, "Cloudinary SDK upload failed");
 
                 return StatusCode(500, new
                 {
@@ -284,33 +205,6 @@ namespace ReactApi.Controllers
             {
                 stream?.Dispose();
             }
-        }
-
-        private static string ComputeCloudinarySignature(
-            SortedDictionary<string, string> parameters,
-            string apiSecret)
-        {
-            // Build "key1=value1&key2=value2&..." (already sorted by SortedDictionary).
-            var sb = new StringBuilder();
-            var first = true;
-            foreach (var kv in parameters)
-            {
-                if (!first) sb.Append('&');
-                sb.Append(kv.Key);
-                sb.Append('=');
-                sb.Append(kv.Value);
-                first = false;
-            }
-            sb.Append(apiSecret);
-
-            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
-            var hash = SHA1.HashData(bytes);
-            var hex = new StringBuilder(hash.Length * 2);
-            foreach (var b in hash)
-            {
-                hex.Append(b.ToString("x2", CultureInfo.InvariantCulture));
-            }
-            return hex.ToString();
         }
 
         private string GetUploadPreset()
