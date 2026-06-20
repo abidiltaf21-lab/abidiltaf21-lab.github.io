@@ -229,6 +229,10 @@ using (var scope = app.Services.CreateScope())
         
         // EnsureCreatedAsync dynamically generates the correct schema for BOTH SQLite and PostgreSQL
         // bypassing the provider-specific Migration files which contain SQL Server types.
+        if (!db.Database.IsSqlite())
+        {
+            try { await db.Database.ExecuteSqlRawAsync("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"); } catch { }
+        }
         await db.Database.EnsureCreatedAsync();
     }
     catch (Exception ex)
