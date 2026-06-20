@@ -49,6 +49,72 @@ namespace ReactApi.Controllers
             });
         }
 
+        [HttpGet("test-upload")]
+        public async Task<IActionResult> TestUpload()
+        {
+            var cloudName = _config["Cloudinary:CloudName"]?.Trim().Trim('"');
+            var apiKey = _config["Cloudinary:ApiKey"]?.Trim().Trim('"');
+            var apiSecret = _config["Cloudinary:ApiSecret"]?.Trim().Trim('"');
+            var uploadPreset = GetUploadPreset();
+            var targetFolder = GetDefaultFolder();
+
+            if (string.IsNullOrWhiteSpace(cloudName) ||
+                string.IsNullOrWhiteSpace(apiKey) ||
+                string.IsNullOrWhiteSpace(apiSecret) ||
+                string.IsNullOrWhiteSpace(uploadPreset))
+            {
+                return Ok(new { error = "Config missing" });
+            }
+
+            try
+            {
+                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                var signatureParams = new SortedDictionary<string, string>(StringComparer.Ordinal)
+                {
+                    { "folder", targetFolder },
+                    { "timestamp", timestamp.ToString(CultureInfo.InvariantCulture) },
+                    { "upload_preset", uploadPreset }
+                };
+                var signature = ComputeCloudinarySignature(signatureParams, apiSecret);
+
+                using var form = new MultipartFormDataContent();
+                var dummyBytes = Encoding.UTF8.GetBytes("diagnostics test file content");
+                var streamContent = new ByteArrayContent(dummyBytes);
+                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");
+
+                form.Add(streamContent, "file", "diagnostic_test.txt");
+                form.Add(new StringContent(apiKey), "api_key");
+                form.Add(new StringContent(timestamp.ToString(CultureInfo.InvariantCulture)), "timestamp");
+                form.Add(new StringContent(signature), "signature");
+                form.Add(new StringContent(uploadPreset), "upload_preset");
+                form.Add(new StringContent(targetFolder), "folder");
+
+                var uploadUrl = $"https://api.cloudinary.com/v1_1/{cloudName}/raw/upload";
+                var http = _httpClientFactory.CreateClient();
+                var response = await http.PostAsync(uploadUrl, form);
+                var body = await response.Content.ReadAsStringAsync();
+
+                return Ok(new
+                {
+                    status = (int)response.StatusCode,
+                    body = body,
+                    debug = new {
+                        cloudName,
+                        apiKey = apiKey.Substring(0, 4) + "...",
+                        apiSecret = apiSecret.Substring(0, 4) + "...",
+                        uploadPreset,
+                        targetFolder,
+                        timestamp,
+                        signature
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { error = ex.ToString() });
+            }
+        }
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost("upload")]
         [Authorize]
