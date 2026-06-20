@@ -1493,124 +1493,132 @@ const ReviewSystem: React.FC = () => {
                                 ) : (
                                     /* WEBSITE THEME LAYOUT */
                                     <div className="rv-form-website">
-                                        <div className="rv-form-head">
+                                        <div className="rv-form-head mb-4">
                                             <h5 className="rv-form-title">
                                                 <i className="fas fa-file-signature" /> {t('submit_website_testimonial')}
                                             </h5>
                                             <p className="rv-form-desc">{t('review_deck_desc')}</p>
                                         </div>
 
-                                        <div className="rv-form-group">
-                                            <label className="rv-form-label">{t('your_name')}</label>
-                                            <input
-                                                type="text"
-                                                required
-                                                className="rv-form-input-dark"
-                                                value={author}
-                                                onChange={(e) => setAuthor(e.target.value)}
-                                                placeholder={t('enter_name_placeholder')}
-                                            />
-                                        </div>
+                                        <div className="row g-4">
+                                            {/* LEFT COLUMN: User details & uploads */}
+                                            <div className="col-lg-6">
+                                                <div className="rv-form-group">
+                                                    <label className="rv-form-label">{t('your_name')}</label>
+                                                    <input
+                                                        type="text"
+                                                        required
+                                                        className="rv-form-input-dark"
+                                                        value={author}
+                                                        onChange={(e) => setAuthor(e.target.value)}
+                                                        placeholder={t('enter_name_placeholder')}
+                                                    />
+                                                </div>
 
-                                        <div className="rv-form-group">
-                                            <label className="rv-form-label">{t('company_project_placeholder')}</label>
-                                            <input
-                                                type="text"
-                                                className="rv-form-input-dark"
-                                                value={project}
-                                                onChange={(e) => setProject(e.target.value)}
-                                                placeholder={t('company_name_placeholder')}
-                                            />
-                                        </div>
+                                                <div className="rv-form-group">
+                                                    <label className="rv-form-label">{t('company_project_placeholder')}</label>
+                                                    <input
+                                                        type="text"
+                                                        className="rv-form-input-dark"
+                                                        value={project}
+                                                        onChange={(e) => setProject(e.target.value)}
+                                                        placeholder={t('company_name_placeholder')}
+                                                    />
+                                                </div>
 
-                                        <div className="row g-3 rv-form-group">
-                                            <div className="col-md-6">
-                                                <label className="rv-form-label">{t('website_link_optional')}</label>
-                                                <input
-                                                    type="url"
-                                                    className="rv-form-input-dark"
-                                                    value={website}
-                                                    onChange={(e) => setWebsite(e.target.value)}
-                                                    placeholder={t('website_url_placeholder')}
-                                                />
+                                                <div className="row g-3 rv-form-group">
+                                                    <div className="col-6">
+                                                        <label className="rv-form-label">{t('website_link_optional')}</label>
+                                                        <input
+                                                            type="url"
+                                                            className="rv-form-input-dark"
+                                                            value={website}
+                                                            onChange={(e) => setWebsite(e.target.value)}
+                                                            placeholder="https://"
+                                                        />
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <label className="rv-form-label">{t('social_profile_optional')}</label>
+                                                        <input
+                                                            type="url"
+                                                            className="rv-form-input-dark"
+                                                            value={socialLink}
+                                                            onChange={(e) => setSocialLink(e.target.value)}
+                                                            placeholder="https://linkedin.com/..."
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="rv-form-group">
+                                                    <label className="rv-form-label">{t('profile_photo_optional')}</label>
+                                                    <div className="rv-form-upload-row">
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            id="review-image-upload-website"
+                                                            className="d-none"
+                                                            onChange={handleImageUpload}
+                                                        />
+                                                        <label htmlFor="review-image-upload-website" className="rv-btn-ghost-dark w-100 justify-content-center">
+                                                            {isUploading ? <i className="fas fa-spinner fa-spin" /> : <i className="fas fa-camera" />}
+                                                            <span>{image ? 'Change Profile Image' : 'Select Profile Image'}</span>
+                                                        </label>
+                                                        {image && (
+                                                            <span className="rv-form-upload-ready w-100 text-center mt-2 d-block">
+                                                                <i className="fas fa-check-circle" /> Image Ready
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="col-md-6">
-                                                <label className="rv-form-label">{t('social_profile_optional')}</label>
-                                                <input
-                                                    type="url"
-                                                    className="rv-form-input-dark"
-                                                    value={socialLink}
-                                                    onChange={(e) => setSocialLink(e.target.value)}
-                                                    placeholder="https://linkedin.com/in/username"
-                                                />
+
+                                            {/* RIGHT COLUMN: Rating & Text */}
+                                            <div className="col-lg-6 d-flex flex-column">
+                                                <div className="rv-form-group text-center">
+                                                    <label className="rv-form-label rv-form-label-center">{t('click_stars_to_rate')}</label>
+                                                    <div className="rv-form-stars-rating">
+                                                        {[1, 2, 3, 4, 5].map((star) => (
+                                                            <button
+                                                                type="button"
+                                                                key={star}
+                                                                className={`rv-form-star-dark ${star <= rating ? 'rv-form-star-dark-on' : ''}`}
+                                                                onClick={() => setRating(star)}
+                                                                aria-label={`Rate ${star} star`}
+                                                            >
+                                                                <i className="fas fa-star" />
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="rv-form-group flex-grow-1 d-flex flex-column">
+                                                    <label className="rv-form-label">{t('share_experience_placeholder')}</label>
+                                                    <textarea
+                                                        required
+                                                        className="rv-form-input-dark rv-form-textarea-dark flex-grow-1"
+                                                        style={{ minHeight: '180px', resize: 'none' }}
+                                                        value={text}
+                                                        onChange={(e) => setText(e.target.value)}
+                                                        placeholder={t('describe_project_placeholder')}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div className="rv-form-group">
-                                            <label className="rv-form-label rv-form-label-center">{t('click_stars_to_rate')}</label>
-                                            <div className="rv-form-stars-rating">
-                                                {[1, 2, 3, 4, 5].map((star) => (
-                                                    <button
-                                                        type="button"
-                                                        key={star}
-                                                        className={`rv-form-star-dark ${star <= rating ? 'rv-form-star-dark-on' : ''}`}
-                                                        onClick={() => setRating(star)}
-                                                        aria-label={`Rate ${star} star`}
-                                                    >
-                                                        <i className="fas fa-star" />
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="rv-form-group">
-                                            <label className="rv-form-label">{t('profile_photo_optional')}</label>
-                                            <div className="rv-form-upload-row">
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    id="review-image-upload-website"
-                                                    className="d-none"
-                                                    onChange={handleImageUpload}
-                                                />
-                                                <label htmlFor="review-image-upload-website" className="rv-btn-ghost-dark">
-                                                    {isUploading ? <i className="fas fa-spinner fa-spin" /> : <i className="fas fa-camera" />}
-                                                    <span>{image ? 'Change Profile Image' : 'Select Profile Image'}</span>
-                                                </label>
-                                                {image && (
-                                                    <span className="rv-form-upload-ready">
-                                                        <i className="fas fa-check-circle" /> Ready
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="rv-form-group">
-                                            <label className="rv-form-label">{t('share_experience_placeholder')}</label>
-                                            <textarea
-                                                required
-                                                rows={4}
-                                                className="rv-form-input-dark rv-form-textarea-dark"
-                                                value={text}
-                                                onChange={(e) => setText(e.target.value)}
-                                                placeholder={t('describe_project_placeholder')}
-                                            />
-                                        </div>
-
-                                        <div className="rv-form-actions">
+                                        <div className="rv-form-actions mt-4">
                                             <button
                                                 type="button"
-                                                className="rv-btn-ghost-dark"
+                                                className="rv-btn-ghost-dark px-5"
                                                 onClick={() => setShowModal(false)}
                                             >
                                                 {t('cancel')}
                                             </button>
                                             <button
                                                 type="submit"
-                                                className="rv-btn-primary"
+                                                className="rv-btn-primary px-5"
                                                 disabled={isSubmitting || isUploading}
                                             >
-                                                {isSubmitting ? 'Posting...' : 'Post'}
+                                                {isSubmitting ? 'Posting...' : 'Post Testimonial'}
                                             </button>
                                         </div>
                                     </div>
@@ -2423,8 +2431,10 @@ const ReviewSystem: React.FC = () => {
                     -webkit-backdrop-filter: blur(24px) saturate(180%);
                     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
                     border: 1px solid rgba(255, 255, 255, 0.5);
+                    transition: max-width 0.3s ease;
                 }
                 .rv-modal-website {
+                    max-width: 900px !important; /* WIDER FOR HORIZONTAL LAYOUT */
                     background:
                         radial-gradient(ellipse at 10% 0%, rgba(255, 174, 0, 0.18) 0%, transparent 50%),
                         radial-gradient(ellipse at 90% 100%, rgba(245, 66, 0, 0.16) 0%, transparent 50%),

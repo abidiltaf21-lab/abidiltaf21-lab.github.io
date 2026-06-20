@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ReactApi.Application;
 using ReactApi.Infrastructer.Data;
 using System.Net;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,51 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+
+// ── Rate Limiter Registration ──────────────────────────────────────────────────────────
+builder.Services.AddRateLimiter(options =>
+{
+    // Auth endpoints: 5 requests per minute per IP
+    options.AddFixedWindowLimiter("auth", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 5;
+        opt.QueueLimit = 0;
+        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+
+    // Contact form: 3 submissions per hour per IP
+    options.AddFixedWindowLimiter("contact", opt =>
+    {
+        opt.Window = TimeSpan.FromHours(1);
+        opt.PermitLimit = 3;
+        opt.QueueLimit = 0;
+        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+
+    // General API: 60 requests per minute per IP
+    options.AddFixedWindowLimiter("api", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 60;
+        opt.QueueLimit = 0;
+        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+
+    // Global fallback — 429 response
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = 429;
+        context.HttpContext.Response.ContentType = "application/json";
+        var retryAfter = context.Lease.TryGetMetadata(
+            System.Threading.RateLimiting.MetadataName.RetryAfter, out var retry)
+            ? (int)retry.TotalSeconds : 60;
+        context.HttpContext.Response.Headers["Retry-After"] = retryAfter.ToString();
+        await context.HttpContext.Response.WriteAsync(
+            $"{{\"error\":\"Too many requests. Please wait {retryAfter} seconds and try again.\"}}",
+            cancellationToken);
+    };
+});
 
 // ── CORS ───────────────────────────────────────────────────────────────────────────────
 var configuredOrigins = builder.Configuration
