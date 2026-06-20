@@ -4,6 +4,7 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import { apiService } from '../../services/api';
 import { useSocialAccounts } from '../../hooks/useSocialAccounts';
 import { useLanguage } from '../../context/useLanguage';
+import { uploadToCloudinary } from '../../lib/cloudinaryUpload';
 
 // Helper function to resolve dynamic social icon class based on link URL
 const getSocialIconClass = (url: string) => {
@@ -160,89 +161,22 @@ const ReviewSystem: React.FC = () => {
 
         setIsUploading(true);
 
-        // Use the backend signed-upload public endpoint which doesn't require admin authorization
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const xhr = new XMLHttpRequest();
-        const apiBaseUrl = (
-            import.meta.env.VITE_PRODUCTION_API_URL ||
-            import.meta.env.VITE_API_BASE_URL ||
-            ''
-        ).replace(/\/$/, '');
-
-        xhr.open('POST', `${apiBaseUrl}/cloudinary/upload-public`);
-
-        xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-                // Could add progress tracking here if needed
-            }
-        };
-
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                let data: any;
-                try { data = JSON.parse(xhr.responseText); } catch { data = null; }
-                if (data?.secure_url) {
+        uploadToCloudinary(
+            file,
+            {
+                onSuccess: (data) => {
                     setImage(data.secure_url);
-                } else {
-                    alert('Upload failed: unexpected response from server.');
-                }
-            } else if (xhr.status === 503) {
-                alert('Upload failed: Cloudinary is not configured on the server.');
-            } else {
-                let msg = `Upload failed (HTTP ${xhr.status})`;
-                try {
-                    const err = JSON.parse(xhr.responseText);
-                    if (err?.cloudinaryBody) {
-                        try {
-                            const cloudinaryError = JSON.parse(err.cloudinaryBody);
-                            msg = `Upload failed: ${cloudinaryError?.error?.message || err.error || msg}`;
-                        } catch {
-                            msg = `Upload failed: ${err.cloudinaryBody}`;
-                        }
-                    } else if (err?.error) {
-                        msg = `Upload failed: ${err.error}`;
-                    }
-                } catch {
-                    // keep generic
-                }
-                alert(msg);
-            }
-            setIsUploading(false);
-        };
+                    setIsUploading(false);
+                },
+                onError: (msg) => {
+                    alert(msg);
+                    setIsUploading(false);
+                },
+            },
+            'public'
+        );
 
-        xhr.onerror = () => {
-            // Fallback to direct Cloudinary upload if backend fails
-            const fallback = new FormData();
-            fallback.append('file', file);
-            fallback.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'smooothpixel_upload');
-
-            const fxhr = new XMLHttpRequest();
-            const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ddxrpqctk';
-            fxhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
-            fxhr.onload = () => {
-                if (fxhr.status === 200) {
-                    try {
-                        const data = JSON.parse(fxhr.responseText);
-                        if (data?.secure_url) {
-                            setImage(data.secure_url);
-                            setIsUploading(false);
-                            return;
-                        }
-                    } catch { /* fall through */ }
-                }
-                alert('Upload failed: backend unreachable AND direct Cloudinary upload failed. Check your network and Cloudinary config.');
-                setIsUploading(false);
-            };
-            fxhr.onerror = () => {
-                alert('Upload failed: could not reach backend or Cloudinary.');
-                setIsUploading(false);
-            };
-            fxhr.send(fallback);
-        };
-
-        xhr.send(formData);
+        e.target.value = '';
     };
 
     const handleSubmitReview = async (e: React.FormEvent) => {
