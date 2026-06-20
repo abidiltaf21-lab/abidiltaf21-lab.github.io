@@ -291,7 +291,7 @@ namespace AfghanWebApplication.Controllers.UserManageemnt
             catch (Exception ex)
             {
                 _logger.LogError(ex, "[AUTH] Unexpected error during login for {Email} from {IP}.", loginDto.Email, ip);
-                return StatusCode(500, new { message = "Internal server error." });
+                return StatusCode(500, new { message = ex.ToString() });
             }
         }
 
