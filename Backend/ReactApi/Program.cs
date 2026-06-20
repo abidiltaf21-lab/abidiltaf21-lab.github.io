@@ -5,6 +5,8 @@ using ReactApi.Application;
 using ReactApi.Infrastructer.Data;
 using System.Net;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,34 +25,54 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
+// ── Forwarded Headers (for Render Proxy) ─────────────────────────────────────────────
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 // ── Rate Limiter Registration ──────────────────────────────────────────────────────────
 builder.Services.AddRateLimiter(options =>
 {
     // Auth endpoints: 5 requests per minute per IP
-    options.AddFixedWindowLimiter("auth", opt =>
+    options.AddPolicy("auth", context =>
     {
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.PermitLimit = 5;
-        opt.QueueLimit = 0;
-        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(1),
+            PermitLimit = 5,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+        });
     });
 
     // Contact form: 3 submissions per hour per IP
-    options.AddFixedWindowLimiter("contact", opt =>
+    options.AddPolicy("contact", context =>
     {
-        opt.Window = TimeSpan.FromHours(1);
-        opt.PermitLimit = 3;
-        opt.QueueLimit = 0;
-        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromHours(1),
+            PermitLimit = 3,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+        });
     });
 
     // General API: 60 requests per minute per IP
-    options.AddFixedWindowLimiter("api", opt =>
+    options.AddPolicy("api", context =>
     {
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.PermitLimit = 60;
-        opt.QueueLimit = 0;
-        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(1),
+            PermitLimit = 60,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+        });
     });
 
     // Global fallback — 429 response
@@ -96,7 +118,10 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins(configuredOrigins)
+            policy.SetIsOriginAllowed(origin => 
+                    configuredOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase) ||
+                    origin.EndsWith(".onrender.com", StringComparison.OrdinalIgnoreCase) ||
+                    origin.EndsWith(".github.io", StringComparison.OrdinalIgnoreCase))
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -106,6 +131,8 @@ builder.Services.AddCors(options =>
 
 // ── Build ──────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
+
+app.UseForwardedHeaders(); // Must be first to resolve real client IP
 
 // ── Global Exception Handler ───────────────────────────────────────────────────────────
 app.UseExceptionHandler(errorApp =>
