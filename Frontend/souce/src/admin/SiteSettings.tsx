@@ -11,6 +11,7 @@ const SETTINGS_SECTIONS = [
     { id: 'gallery' as const, icon: 'fa-play-circle', label: 'Gallery', hint: 'Portfolio autoplay' },
     { id: 'social' as const, icon: 'fa-share-alt', label: 'Social Graph', hint: 'Channels & contact links' },
     { id: 'seo' as const, icon: 'fa-search', label: 'SEO Engine', hint: 'Search & metadata' },
+    { id: 'ai' as const, icon: 'fa-robot', label: 'AI Assistant', hint: 'AI Chatbot & Telegram link' },
 ];
 
 type SettingsSection = (typeof SETTINGS_SECTIONS)[number]['id'];
@@ -49,7 +50,12 @@ const SiteSettings: React.FC = () => {
         galleryAutoplay: true,
         heroVideoOpacity: 0.5,
         heroTypedText: '',
-        heroTypedColor: ''
+        heroTypedColor: '',
+        telegramLink: 'https://t.me/SmooothPixel',
+        aiEnabled: true,
+        aiApiKey: '',
+        aiSystemPrompt: '',
+        aiWelcomeMessage: ''
     });
 
     useEffect(() => {
@@ -62,6 +68,7 @@ const SiteSettings: React.FC = () => {
             if (data) {
                 // Map PascalCase from .NET to camelCase for local state
                 setSettings({
+                    id: data.id || data.Id || 0,
                     heroTitle: data.heroTitle || data.HeroTitle || '',
                     heroSubtitle: data.heroSubtitle || data.HeroSubtitle || '',
                     heroVideoUrl: data.heroVideoUrl || data.HeroVideoUrl || '',
@@ -77,7 +84,12 @@ const SiteSettings: React.FC = () => {
                     socialLinkedIn: data.socialLinkedIn || data.SocialLinkedIn || '',
                     galleryAutoplay: data.galleryAutoplay ?? data.GalleryAutoplay ?? true,
                     heroTypedText: data.heroTypedText || data.HeroTypedText || '',
-                    heroTypedColor: data.heroTypedColor || data.HeroTypedColor || ''
+                    heroTypedColor: data.heroTypedColor || data.HeroTypedColor || '',
+                    telegramLink: data.telegramLink || data.TelegramLink || 'https://t.me/SmooothPixel',
+                    aiEnabled: data.aiEnabled ?? data.AiEnabled ?? true,
+                    aiApiKey: data.aiApiKey || data.AiApiKey || '',
+                    aiSystemPrompt: data.aiSystemPrompt || data.AiSystemPrompt || '',
+                    aiWelcomeMessage: data.aiWelcomeMessage || data.AiWelcomeMessage || ''
                 });
             }
         } catch (err) {
@@ -162,22 +174,27 @@ const SiteSettings: React.FC = () => {
             // Strictly map to PascalCase for .NET
             const payload = {
                 Id: (settings as any).id || (settings as any).Id || 0,
-                HeroTitle: settings.heroTitle || (settings as any).HeroTitle,
-                HeroSubtitle: settings.heroSubtitle || (settings as any).HeroSubtitle,
-                HeroVideoUrl: settings.heroVideoUrl || (settings as any).HeroVideoUrl,
-                HeroVideoOpacity: settings.heroVideoOpacity ?? (settings as any).HeroVideoOpacity ?? 0.5,
-                CtaText: settings.ctaText || (settings as any).CtaText,
-                CtaLink: settings.ctaLink || (settings as any).CtaLink,
-                SiteName: settings.siteName || (settings as any).SiteName,
-                LogoUrl: settings.logoUrl || (settings as any).LogoUrl,
-                SeoDescription: settings.seoDescription || (settings as any).SeoDescription,
-                SocialInstagram: settings.socialInstagram || (settings as any).SocialInstagram,
-                SocialBehance: settings.socialBehance || (settings as any).SocialBehance,
-                SocialDribbble: settings.socialDribbble || (settings as any).SocialDribbble,
-                SocialLinkedIn: settings.socialLinkedIn || (settings as any).SocialLinkedIn,
-                GalleryAutoplay: settings.galleryAutoplay ?? (settings as any).GalleryAutoplay ?? true,
-                HeroTypedText: settings.heroTypedText || (settings as any).HeroTypedText,
-                HeroTypedColor: settings.heroTypedColor || (settings as any).HeroTypedColor
+                HeroTitle: settings.heroTitle,
+                HeroSubtitle: settings.heroSubtitle,
+                HeroVideoUrl: settings.heroVideoUrl,
+                HeroVideoOpacity: settings.heroVideoOpacity ?? 0.5,
+                CtaText: settings.ctaText,
+                CtaLink: settings.ctaLink,
+                SiteName: settings.siteName,
+                LogoUrl: settings.logoUrl,
+                SeoDescription: settings.seoDescription,
+                SocialInstagram: settings.socialInstagram,
+                SocialBehance: settings.socialBehance,
+                SocialDribbble: settings.socialDribbble,
+                SocialLinkedIn: settings.socialLinkedIn,
+                GalleryAutoplay: settings.galleryAutoplay ?? true,
+                HeroTypedText: settings.heroTypedText,
+                HeroTypedColor: settings.heroTypedColor,
+                TelegramLink: settings.telegramLink,
+                AiEnabled: settings.aiEnabled ?? true,
+                AiApiKey: settings.aiApiKey,
+                AiSystemPrompt: settings.aiSystemPrompt,
+                AiWelcomeMessage: settings.aiWelcomeMessage
             };
             await apiClient.put('/SiteSettings', payload);
             toast.success("System configurations updated successfully.");
@@ -806,7 +823,82 @@ const SiteSettings: React.FC = () => {
                             <div className="site-infra-field">
                                 <label className="site-infra-label">Meta description</label>
                                 <textarea name="seoDescription" className="site-infra-input" rows={6} value={settings.seoDescription} onChange={handleChange} placeholder="Brief summary for Google and social previews…" />
-                                <p className="site-infra-field-hint">{settings.seoDescription.length} characters · aim for 120–160 for best results</p>
+                                <p className="site-infra-field-hint">{(settings.seoDescription || '').length} characters · aim for 120–160 for best results</p>
+                            </div>
+                        </section>
+                    </div>
+                )}
+
+                {activeSection === 'ai' && (
+                    <div className="site-infra-panel animate-fade-in">
+                        <section className="site-infra-card">
+                            <div className="site-infra-toggle-row mb-4">
+                                <div>
+                                    <h3 className="site-infra-card-title m-0"><i className="fas fa-robot" /> AI Assistant (Gemini)</h3>
+                                    <p className="site-infra-field-hint m-0 mt-1">Enable a smart AI chatbot on the bottom-right of the screen.</p>
+                                </div>
+                                <label className="site-infra-switch">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={settings.aiEnabled} 
+                                        onChange={(e) => setSettings({ ...settings, aiEnabled: e.target.checked })} 
+                                    />
+                                    <span className="site-infra-switch-ui" />
+                                </label>
+                            </div>
+
+                            <div className="site-infra-field">
+                                <label className="site-infra-label">Telegram Link</label>
+                                <input 
+                                    type="text" 
+                                    name="telegramLink" 
+                                    className="site-infra-input" 
+                                    value={settings.telegramLink} 
+                                    onChange={handleChange} 
+                                    placeholder="e.g. https://t.me/yourusername" 
+                                />
+                                <p className="site-infra-field-hint">Hyperlink for the quick response Telegram floating button.</p>
+                            </div>
+
+                            <div className="site-infra-field mt-3">
+                                <label className="site-infra-label">Gemini API Key</label>
+                                <input 
+                                    type="password" 
+                                    name="aiApiKey" 
+                                    className="site-infra-input" 
+                                    value={settings.aiApiKey} 
+                                    onChange={handleChange} 
+                                    placeholder="Paste your Gemini API Key here..." 
+                                />
+                                <p className="site-infra-field-hint">
+                                    Your key is secured on the backend. If left blank, the chatbot automatically falls back to local database-driven smart search.
+                                </p>
+                            </div>
+
+                            <div className="site-infra-field mt-3">
+                                <label className="site-infra-label">AI Welcome Message</label>
+                                <input 
+                                    type="text" 
+                                    name="aiWelcomeMessage" 
+                                    className="site-infra-input" 
+                                    value={settings.aiWelcomeMessage} 
+                                    onChange={handleChange} 
+                                    placeholder="e.g. Hello! How can I help you today?" 
+                                />
+                                <p className="site-infra-field-hint">The first greeting message sent by the AI chatbot to visitors.</p>
+                            </div>
+
+                            <div className="site-infra-field mt-3">
+                                <label className="site-infra-label">AI System Instructions (Prompt)</label>
+                                <textarea 
+                                    name="aiSystemPrompt" 
+                                    className="site-infra-input" 
+                                    rows={5} 
+                                    value={settings.aiSystemPrompt} 
+                                    onChange={handleChange} 
+                                    placeholder="Tell the AI how to behave, what details about the company to highlight, etc." 
+                                />
+                                <p className="site-infra-field-hint">Define the identity, rules, and guidelines for your AI assistant.</p>
                             </div>
                         </section>
                     </div>

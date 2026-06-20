@@ -30,6 +30,7 @@ import { useEffect, useState } from 'react';
 import Preloader from './components/utilities/Preloader';
 import VisitorTracker from './components/utilities/VisitorTracker';
 import ThemeManager from './components/utilities/ThemeManager';
+import FloatingChatWidget from './components/FloatingChatWidget';
 
 function App() {
 
@@ -48,6 +49,7 @@ function App() {
         <>
           <ThemeManager />
           <Routers />
+          <FloatingChatWidget />
           <VisitorTracker />
           <RoutesScrollToTop />
           <ToastContainer />

@@ -123,6 +123,7 @@ using (var scope = app.Services.CreateScope())
     {
         await ReactApi.Infrastructer.Data.InboxSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.EnsureAsync(db, logger);
+        await ReactApi.Infrastructer.Data.AiSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.SeedDefaultsAsync(db);
         await ReactApi.Infrastructer.Data.PortfolioDataSeeder.SeedAsync(db);
     }
