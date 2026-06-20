@@ -220,22 +220,20 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        // For SQLite, we MUST use EnsureCreatedAsync because the migrations in the project
-        // contain SQL Server specific column types (e.g., nvarchar(max)) which cause MigrateAsync to crash.
+        // For SQLite in development, we drop the DB on restart to ensure a clean slate.
         if (db.Database.IsSqlite())
         {
-            await db.Database.EnsureDeletedAsync(); // Ensure clean slate if previous failed
-            await db.Database.EnsureCreatedAsync();
+            try { await db.Database.EnsureDeletedAsync(); } 
+            catch (Exception deleteEx) { logger.LogWarning(deleteEx, "Could not delete SQLite DB."); }
         }
-        else
-        {
-            // For PostgreSQL/SQL Server, use MigrateAsync
-            await db.Database.MigrateAsync();
-        }
+        
+        // EnsureCreatedAsync dynamically generates the correct schema for BOTH SQLite and PostgreSQL
+        // bypassing the provider-specific Migration files which contain SQL Server types.
+        await db.Database.EnsureCreatedAsync();
     }
     catch (Exception ex)
     {
-        logger.LogWarning(ex, "EF MigrateAsync failed; continuing with schema ensurers.");
+        logger.LogWarning(ex, "Database schema creation failed; continuing with schema ensurers.");
     }
 
     try
