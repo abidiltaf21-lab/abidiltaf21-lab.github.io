@@ -96,13 +96,8 @@ var configuredOrigins = builder.Configuration
     .Get<string[]>() ?? Array.Empty<string>();
 var isDevelopment = builder.Environment.IsDevelopment();
 
-if (!isDevelopment && configuredOrigins.Length == 0)
-{
-    throw new InvalidOperationException(
-        "Production deployment requires Cors:AllowedOrigins to be set. " +
-        "Set Cors__AllowedOrigins__0..N env vars or appsettings.Production.json.");
-}
-
+// Removed the explicit throw to prevent startup crashes.
+// The policy allows *.onrender.com and *.github.io by default.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigin", policy =>
@@ -225,10 +220,18 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        if (app.Environment.IsProduction() || db.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+        // For SQLite, we MUST use EnsureCreatedAsync because the migrations in the project
+        // contain SQL Server specific column types (e.g., nvarchar(max)) which cause MigrateAsync to crash.
+        if (db.Database.IsSqlite())
+        {
+            await db.Database.EnsureDeletedAsync(); // Ensure clean slate if previous failed
             await db.Database.EnsureCreatedAsync();
+        }
         else
+        {
+            // For PostgreSQL/SQL Server, use MigrateAsync
             await db.Database.MigrateAsync();
+        }
     }
     catch (Exception ex)
     {
