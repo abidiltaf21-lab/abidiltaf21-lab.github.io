@@ -12,12 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructure(builder.Configuration);  // includes Rate Limiter + Identity
 
-builder.Services.AddControllers(options =>
-{
-    // Require HTTPS globally in production via filter (belt-and-suspenders)
-    if (!builder.Environment.IsDevelopment())
-        options.Filters.Add(new RequireHttpsAttribute());
-})
+builder.Services.AddControllers()
 .AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
@@ -134,10 +129,9 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-// ── HTTPS Redirection (production only) ───────────────────────────────────────────────
+// ── HTTPS Redirection (Handled by Render at the edge) ─────────────────────────────────
 if (!isDevelopment)
 {
-    app.UseHttpsRedirection();
     app.UseHsts();
 }
 
@@ -180,8 +174,8 @@ app.Use(async (context, next) =>
         "connect-src 'self'; " +
         "frame-ancestors 'none';";
 
-    // HSTS — only sent over HTTPS, already handled by UseHsts() above but belt-and-suspenders
-    if (context.Request.IsHttps || !isDevelopment)
+    // HSTS
+    if (!isDevelopment)
         headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload";
 
     await next();
