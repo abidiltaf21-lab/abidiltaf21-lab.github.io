@@ -275,6 +275,7 @@ using (var scope = app.Services.CreateScope())
         await ReactApi.Infrastructer.Data.AiSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.OtpSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.NotificationSchemaEnsurer.EnsureAsync(db, logger);
+        await ReactApi.Infrastructer.Data.VisitorSchemaEnsurer.EnsureAsync(db, logger);
         await ReactApi.Infrastructer.Data.ResumeSchemaEnsurer.SeedDefaultsAsync(db);
         await ReactApi.Infrastructer.Data.PortfolioDataSeeder.SeedAsync(db);
 
