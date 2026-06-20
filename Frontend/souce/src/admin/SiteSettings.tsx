@@ -17,6 +17,7 @@ type SettingsSection = (typeof SETTINGS_SECTIONS)[number]['id'];
 const SiteSettings: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [logoUploadProgress, setLogoUploadProgress] = useState(0);
+    const [heroVideoUploadProgress, setHeroVideoUploadProgress] = useState(0);
     const { accounts: socialAccounts, refetch: refetchAccounts } = useSocialAccounts();
 
     const [editingAccount, setEditingAccount] = useState<any | null>(null);
@@ -97,10 +98,11 @@ const SiteSettings: React.FC = () => {
             return;
         }
 
-        const uploadData = new FormData();
-        uploadData.append('file', file);
-
         setLogoUploadProgress(10);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
         const xhr = new XMLHttpRequest();
         const apiBaseUrl = (
             import.meta.env.VITE_PRODUCTION_API_URL ||
@@ -121,45 +123,72 @@ const SiteSettings: React.FC = () => {
 
         xhr.onload = () => {
             if (xhr.status === 200) {
-                const data = JSON.parse(xhr.responseText);
-                if (data.secure_url) {
+                let data: any;
+                try { data = JSON.parse(xhr.responseText); } catch { data = null; }
+                if (data?.secure_url) {
                     setSettings((prev) => ({ ...prev, logoUrl: data.secure_url }));
                     toast.success('Logo uploaded. Click Save changes to publish.');
                 } else {
-                    toast.error('Upload failed.');
+                    toast.error('Upload failed: unexpected response from server.');
                 }
             } else if (xhr.status === 401) {
                 toast.error('Upload failed: not authorized. Please log in again.');
             } else if (xhr.status === 503) {
-                toast.error('Upload failed: Cloudinary is not configured on the server.');
+                toast.error('Upload failed: Cloudinary is not configured on the server. Set Cloudinary__* env vars in Backend/appsettings.');
             } else {
-                let errorMsg = 'Upload failed. Check Cloudinary settings.';
+                let msg = `Upload failed (HTTP ${xhr.status})`;
                 try {
                     const err = JSON.parse(xhr.responseText);
                     if (err?.cloudinaryBody) {
                         try {
-                            const cloudErr = JSON.parse(err.cloudinaryBody);
-                            errorMsg = cloudErr?.error?.message || err.error || errorMsg;
+                            const cloudinaryError = JSON.parse(err.cloudinaryBody);
+                            msg = `Upload failed: ${cloudinaryError?.error?.message || err.error || msg}`;
                         } catch {
-                            errorMsg = err.cloudinaryBody || errorMsg;
+                            msg = `Upload failed: ${err.cloudinaryBody}`;
                         }
                     } else if (err?.error) {
-                        errorMsg = err.error;
+                        msg = `Upload failed: ${err.error}`;
                     }
-                } catch { /* ignore */ }
-                toast.error(`Upload Error: ${errorMsg}`);
+                } catch {
+                    // keep generic
+                }
+                toast.error(msg);
             }
             setLogoUploadProgress(0);
             e.target.value = '';
         };
 
         xhr.onerror = () => {
-            toast.error('Upload failed. Check your network connection.');
-            setLogoUploadProgress(0);
-            e.target.value = '';
+            const fallback = new FormData();
+            fallback.append('file', file);
+            fallback.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'smooothpixel_upload');
+
+            const fxhr = new XMLHttpRequest();
+            const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ddxrpqctk';
+            fxhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
+            fxhr.onload = () => {
+                if (fxhr.status === 200) {
+                    try {
+                        const data = JSON.parse(fxhr.responseText);
+                        if (data?.secure_url) {
+                            setSettings((prev) => ({ ...prev, logoUrl: data.secure_url }));
+                            setLogoUploadProgress(0);
+                            toast.success('Logo uploaded. Click Save changes to publish.');
+                            return;
+                        }
+                    } catch { /* fall through */ }
+                }
+                toast.error('Upload failed: backend unreachable AND direct Cloudinary upload failed. Check your network and Cloudinary config.');
+                setLogoUploadProgress(0);
+            };
+            fxhr.onerror = () => {
+                toast.error('Upload failed: could not reach backend or Cloudinary.');
+                setLogoUploadProgress(0);
+            };
+            fxhr.send(fallback);
         };
 
-        xhr.send(uploadData);
+        xhr.send(formData);
     };
 
     const openCloudinaryLogoPicker = () => {
@@ -182,12 +211,109 @@ const SiteSettings: React.FC = () => {
                         toast.error('Please select an image asset for the logo.');
                         return;
                     }
-                    setSettings((prev) => ({ ...prev, logoUrl: asset.secure_url }));
+                    setSettings((prev) => ({ ...prev, logoUrl: asset.secure_url as string }));
                     toast.success('Logo selected from Cloudinary.');
                 },
             }
         );
         ml.show();
+    };
+
+    const handleHeroVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setHeroVideoUploadProgress(10);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const xhr = new XMLHttpRequest();
+        const apiBaseUrl = (
+            import.meta.env.VITE_PRODUCTION_API_URL ||
+            import.meta.env.VITE_API_BASE_URL ||
+            ''
+        ).replace(/\/$/, '');
+
+        xhr.open('POST', `${apiBaseUrl}/cloudinary/upload`);
+
+        const token = localStorage.getItem('adminToken');
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                setHeroVideoUploadProgress(Math.round((event.loaded / event.total) * 100));
+            }
+        };
+
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                let data: any;
+                try { data = JSON.parse(xhr.responseText); } catch { data = null; }
+                if (data?.secure_url) {
+                    setSettings((prev) => ({ ...prev, heroVideoUrl: data.secure_url as string }));
+                    toast.success('Video uploaded successfully.');
+                } else {
+                    toast.error('Upload failed: unexpected response from server.');
+                }
+            } else if (xhr.status === 401) {
+                toast.error('Upload failed: not authorized. Please log in again.');
+            } else if (xhr.status === 503) {
+                toast.error('Upload failed: Cloudinary is not configured on the server. Set Cloudinary__* env vars in Backend/appsettings.');
+            } else {
+                let msg = `Upload failed (HTTP ${xhr.status})`;
+                try {
+                    const err = JSON.parse(xhr.responseText);
+                    if (err?.cloudinaryBody) {
+                        try {
+                            const cloudinaryError = JSON.parse(err.cloudinaryBody);
+                            msg = `Upload failed: ${cloudinaryError?.error?.message || err.error || msg}`;
+                        } catch {
+                            msg = `Upload failed: ${err.cloudinaryBody}`;
+                        }
+                    } else if (err?.error) {
+                        msg = `Upload failed: ${err.error}`;
+                    }
+                } catch {
+                    // keep generic
+                }
+                toast.error(msg);
+            }
+            setHeroVideoUploadProgress(0);
+            e.target.value = '';
+        };
+
+        xhr.onerror = () => {
+            const fallback = new FormData();
+            fallback.append('file', file);
+            fallback.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'smooothpixel_upload');
+
+            const fxhr = new XMLHttpRequest();
+            const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ddxrpqctk';
+            fxhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
+            fxhr.onload = () => {
+                if (fxhr.status === 200) {
+                    try {
+                        const data = JSON.parse(fxhr.responseText);
+                        if (data?.secure_url) {
+                            setSettings((prev) => ({ ...prev, heroVideoUrl: data.secure_url as string }));
+                            setHeroVideoUploadProgress(0);
+                            toast.success('Video uploaded successfully.');
+                            return;
+                        }
+                    } catch { /* fall through */ }
+                }
+                toast.error('Upload failed: backend unreachable AND direct Cloudinary upload failed. Check your network and Cloudinary config.');
+                setHeroVideoUploadProgress(0);
+            };
+            fxhr.onerror = () => {
+                toast.error('Upload failed: could not reach backend or Cloudinary.');
+                setHeroVideoUploadProgress(0);
+            };
+            fxhr.send(fallback);
+        };
+
+        xhr.send(formData);
     };
 
     const handleSave = async (e: React.FormEvent) => {
@@ -400,9 +526,9 @@ const SiteSettings: React.FC = () => {
                                 <label className="form-label-premium">Hero Stream Source (Direct MP4 / YouTube / Vimeo)</label>
                                 <div className="d-flex gap-2">
                                     <input type="text" name="heroVideoUrl" className="form-input-premium" value={settings.heroVideoUrl} onChange={handleChange} placeholder="Paste YouTube link or Direct MP4 URL..." />
-                                    <button 
-                                        type="button" 
-                                        className="btn-admin-secondary px-3" 
+                                    <button
+                                        type="button"
+                                        className="btn-admin-secondary px-3"
                                         onClick={() => {
                                             toast.info("Opening Cloudinary Media Library...");
                                             const ml = (window as any).cloudinary.createMediaLibrary({
@@ -414,7 +540,7 @@ const SiteSettings: React.FC = () => {
                                             }, {
                                                 insertHandler: (data: any) => {
                                                     const asset = data.assets[0];
-                                                    setSettings({ ...settings, heroVideoUrl: asset.secure_url });
+                                                    setSettings({ ...settings, heroVideoUrl: asset.secure_url as string });
                                                     toast.success("Asset linked from Cloudinary!");
                                                 }
                                             });
@@ -424,75 +550,21 @@ const SiteSettings: React.FC = () => {
                                     >
                                         <i className="fas fa-cloud"></i>
                                     </button>
-                                    <button 
-                                        type="button" 
-                                        className="btn-admin-secondary px-3" 
+                                    <button
+                                        type="button"
+                                        className="btn-admin-secondary px-3"
                                         onClick={() => document.getElementById('hero-video-upload')?.click()}
                                         title="Upload from computer"
+                                        disabled={heroVideoUploadProgress > 0}
                                     >
-                                        <i className="fas fa-upload"></i>
+                                        {heroVideoUploadProgress > 0 ? `${heroVideoUploadProgress}%` : <><i className="fas fa-upload"></i></>}
                                     </button>
-                                    <input 
-                                         type="file" 
-                                         id="hero-video-upload" 
-                                         hidden 
-                                         accept="video/*" 
-                                         onChange={async (e) => {
-                                             const file = e.target.files?.[0];
-                                             if (!file) return;
-                                             
-                                             setLoading(true);
-                                             const formData = new FormData();
-                                             formData.append('file', file);
-                                             
-                                             try {
-                                                 const apiBaseUrl = (
-                                                     import.meta.env.VITE_PRODUCTION_API_URL ||
-                                                     import.meta.env.VITE_API_BASE_URL ||
-                                                     ''
-                                                 ).replace(/\/$/, '');
-
-                                                 const headers: Record<string, string> = {};
-                                                 const token = localStorage.getItem('adminToken');
-                                                 if (token) headers['Authorization'] = `Bearer ${token}`;
-
-                                                 const res = await fetch(`${apiBaseUrl}/cloudinary/upload`, {
-                                                     method: 'POST',
-                                                     headers,
-                                                     body: formData
-                                                 });
-
-                                                 if (res.status === 401) {
-                                                     toast.error('Upload failed: not authorized. Please log in again.');
-                                                     return;
-                                                 }
-                                                 if (res.status === 503) {
-                                                     toast.error('Upload failed: Cloudinary is not configured on the server.');
-                                                     return;
-                                                 }
-
-                                                 const data = await res.json();
-                                                 if (res.ok && data.secure_url) {
-                                                     setSettings({ ...settings, heroVideoUrl: data.secure_url });
-                                                     toast.success("Video uploaded successfully.");
-                                                 } else {
-                                                     let errorMsg = data?.error || "Upload failed.";
-                                                     if (data?.cloudinaryBody) {
-                                                         try {
-                                                             const cloudErr = JSON.parse(data.cloudinaryBody);
-                                                             errorMsg = cloudErr?.error?.message || errorMsg;
-                                                         } catch {
-                                                             errorMsg = data.cloudinaryBody;
-                                                         }
-                                                     }
-                                                     toast.error(errorMsg);
-                                                 }
-                                             } catch (err) {
-                                                 toast.error("Upload failed. Check connection.");
-                                             } finally {
-                                                 setLoading(false);
-                                             }
-                                         }}
+                                    <input
+                                         type="file"
+                                         id="hero-video-upload"
+                                         hidden
+                                         accept="video/*"
+                                         onChange={handleHeroVideoUpload}
                                      />
                                 </div>
                                 <p className="text-muted fs-11 mt-2 mb-0">Supports YouTube/Vimeo links, Cloudinary assets, and direct uploads.</p>
