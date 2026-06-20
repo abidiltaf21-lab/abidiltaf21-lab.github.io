@@ -191,9 +191,32 @@ const TeamSection: React.FC = () => {
         return () => { cancelled = true; };
     }, []);
 
-    // Hide the whole section until we know there is real data.
-    // No more placeholder people.
-    if (loading || members.length === 0) {
+    if (loading) {
+        return (
+            <section id="team" className="team-area default-padding">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-8 offset-lg-2 text-center">
+                            <div className="site-heading">
+                                <h4 className="sub-title">{t('team_sub')}</h4>
+                                <h2 className="title">{t('team_title')}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row justify-content-center">
+                        <div className="col-12 text-center py-5">
+                            <div className="spinner-border text-primary" role="status" style={{ color: '#ff5e14' }}>
+                                <span className="visually-hidden">Loading Team...</span>
+                            </div>
+                            <p className="mt-3 text-muted">Loading team members...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (members.length === 0) {
         return null;
     }
 

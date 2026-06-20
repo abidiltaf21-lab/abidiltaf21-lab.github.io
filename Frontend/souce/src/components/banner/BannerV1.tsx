@@ -6,23 +6,10 @@ import { useSettings } from '../../hooks/useSettings';
 import { useLanguage } from '../../context/useLanguage';
 
 const BannerV1 = () => {
-    const { settings } = useSettings();
+    const { settings, loading } = useSettings();
     const { t, currentLanguage } = useLanguage();
     const [particles, setParticles] = useState<any[]>([]);
     const [showreelOpen, setShowreelOpen] = useState(false);
-
-    useEffect(() => {
-        const particleCount = 12;
-        const newParticles = Array.from({ length: particleCount }).map((_, i) => ({
-            id: i,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100 + 100}%`,
-            size: `${Math.random() * 8 + 4}px`,
-            duration: `${Math.random() * 15 + 10}s`,
-            delay: `${Math.random() * 10}s`,
-        }));
-        setParticles(newParticles);
-    }, []);
 
     // Close modal on Escape key
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -42,6 +29,19 @@ const BannerV1 = () => {
             document.body.style.overflow = '';
         };
     }, [showreelOpen, handleKeyDown]);
+
+    useEffect(() => {
+        const particleCount = 12;
+        const newParticles = Array.from({ length: particleCount }).map((_, i) => ({
+            id: i,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100 + 100}%`,
+            size: `${Math.random() * 8 + 4}px`,
+            duration: `${Math.random() * 15 + 10}s`,
+            delay: `${Math.random() * 10}s`,
+        }));
+        setParticles(newParticles);
+    }, []);
 
     // Translate typing words per language
     const textLines = useMemo(() => {
@@ -133,6 +133,26 @@ const BannerV1 = () => {
 
     const modalSrc = getModalVideoSrc();
     const isDirectVideo = modalSrc === showreelUrl && !!showreelUrl;
+
+    if (loading) {
+        return (
+            <div id="home" className="banner-style-one-area overflow-hidden relative" style={{ 
+                minHeight: '100vh', 
+                display: 'flex', 
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#0a0a0c'
+            }}>
+                <div className="text-center" style={{ zIndex: 10 }}>
+                    <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem', color: '#ff5e14' }}>
+                        <span className="visually-hidden">Connecting...</span>
+                    </div>
+                    <h3 className="mt-4 text-white" style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 600 }}>Connecting to Server...</h3>
+                    <p className="text-muted">Establishing database connection, please wait.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>

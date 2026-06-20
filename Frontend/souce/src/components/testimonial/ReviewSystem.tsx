@@ -710,10 +710,9 @@ const ReviewSystem: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            )}
             </div>
-                )}
 
-            {/* UNIFIED DUAL-THEME MODAL FORM POPUP */}
             {showModal && (
                 <div className="rv-modal-overlay">
                     <div className={`rv-modal-content ${modalTab === 'google' ? 'rv-modal-google' : 'rv-modal-website'} animate-scale-up`}>
