@@ -72,22 +72,51 @@ const TeamManager: React.FC = () => {
         if (!file) return;
 
         setIsUploading(true);
-        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ddxrpqctk';
-
         const uploadData = new FormData();
         uploadData.append('file', file);
-        uploadData.append('upload_preset', 'smooothpixel_upload');
 
-        fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+        const apiBaseUrl = (
+            import.meta.env.VITE_PRODUCTION_API_URL ||
+            import.meta.env.VITE_API_BASE_URL ||
+            ''
+        ).replace(/\/$/, '');
+
+        const headers: Record<string, string> = {};
+        const token = localStorage.getItem('adminToken');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        fetch(`${apiBaseUrl}/cloudinary/upload`, {
             method: 'POST',
+            headers,
             body: uploadData
         })
-        .then(res => res.json())
+        .then(async res => {
+            if (res.status === 401) {
+                alert('Upload failed: not authorized. Please log in again.');
+                return null;
+            }
+            if (res.status === 503) {
+                alert('Upload failed: Cloudinary is not configured on the server.');
+                return null;
+            }
+            const data = await res.json();
+            if (!res.ok) {
+                let errorMsg = data?.error || 'Upload failed.';
+                if (data?.cloudinaryBody) {
+                    try {
+                        const cloudErr = JSON.parse(data.cloudinaryBody);
+                        errorMsg = cloudErr?.error?.message || errorMsg;
+                    } catch {
+                        errorMsg = data.cloudinaryBody;
+                    }
+                }
+                throw new Error(errorMsg);
+            }
+            return data;
+        })
         .then(data => {
-            if (data.secure_url) {
+            if (data?.secure_url) {
                 setFormData(prev => ({ ...prev, image: data.secure_url }));
-            } else {
-                alert("Upload failed: " + (data.error?.message || JSON.stringify(data)));
             }
         })
         .catch(err => alert("Upload error: " + err.message))

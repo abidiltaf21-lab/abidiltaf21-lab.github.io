@@ -160,9 +160,7 @@ const ReviewSystem: React.FC = () => {
 
         setIsUploading(true);
 
-        // Use the backend signed-upload endpoint so we never expose the
-        // Cloudinary API secret in the browser and we don't hit the
-        // "Upload preset must be whitelisted for unsigned uploads" error.
+        // Use the backend signed-upload public endpoint which doesn't require admin authorization
         const formData = new FormData();
         formData.append('file', file);
 
@@ -172,20 +170,11 @@ const ReviewSystem: React.FC = () => {
             ''
         ).replace(/\/$/, '');
 
-        const headers: Record<string, string> = {};
-        const token = localStorage.getItem('adminToken');
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-
-        fetch(`${apiBaseUrl}/cloudinary/upload`, {
+        fetch(`${apiBaseUrl}/cloudinary/upload-public`, {
             method: 'POST',
-            headers,
             body: formData
         })
         .then(async res => {
-            if (res.status === 401) {
-                alert('Image upload failed: not authorized.');
-                return null;
-            }
             if (res.status === 503) {
                 alert('Image upload failed: Cloudinary is not configured on the server.');
                 return null;

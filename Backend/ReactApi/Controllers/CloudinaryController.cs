@@ -109,6 +109,36 @@ namespace ReactApi.Controllers
                 return BadRequest(new { error = "No file provided." });
             }
 
+            return await PerformUploadInternal(file, folder);
+        }
+
+        [HttpPost("upload-public")]
+        [RequestSizeLimit(10_000_000)] // Limit to 10MB for public uploads
+        public async Task<IActionResult> UploadPublic(
+            [FromForm] IFormFile file,
+            [FromQuery] string folder = "")
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { error = "No file provided." });
+            }
+
+            // Public uploads are restricted to images only
+            if (string.IsNullOrWhiteSpace(file.ContentType) || !file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { error = "Only image uploads are allowed for reviews." });
+            }
+
+            if (file.Length > 10 * 1024 * 1024)
+            {
+                return BadRequest(new { error = "Image size cannot exceed 10MB." });
+            }
+
+            return await PerformUploadInternal(file, folder);
+        }
+
+        private async Task<IActionResult> PerformUploadInternal(IFormFile file, string folder)
+        {
             var cloudName = _config["Cloudinary:CloudName"]?.Trim().Trim('"');
             var apiKey = _config["Cloudinary:ApiKey"]?.Trim().Trim('"');
             var apiSecret = _config["Cloudinary:ApiSecret"]?.Trim().Trim('"');

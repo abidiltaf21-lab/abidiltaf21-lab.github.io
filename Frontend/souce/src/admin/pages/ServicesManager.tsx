@@ -191,13 +191,20 @@ const ServicesManager: React.FC = () => {
 
         const uploadData = new FormData();
         uploadData.append('file', file);
-        uploadData.append('upload_preset', 'smooothpixel_upload');
 
         setUploadProgress(10); // Start progress
 
         const xhr = new XMLHttpRequest();
-        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ddxrpqctk';
-        xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
+        const apiBaseUrl = (
+            import.meta.env.VITE_PRODUCTION_API_URL ||
+            import.meta.env.VITE_API_BASE_URL ||
+            ''
+        ).replace(/\/$/, '');
+
+        xhr.open('POST', `${apiBaseUrl}/cloudinary/upload`);
+
+        const token = localStorage.getItem('adminToken');
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
         xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
@@ -215,8 +222,26 @@ const ServicesManager: React.FC = () => {
                 } else {
                     toast.error('Upload failed.');
                 }
+            } else if (xhr.status === 401) {
+                toast.error('Upload failed: not authorized. Please log in again.');
+            } else if (xhr.status === 503) {
+                toast.error('Upload failed: Cloudinary is not configured on the server.');
             } else {
-                toast.error('Upload Error: Please check Cloudinary configuration.');
+                let errorMsg = 'Upload failed. Check Cloudinary settings.';
+                try {
+                    const err = JSON.parse(xhr.responseText);
+                    if (err?.cloudinaryBody) {
+                        try {
+                            const cloudErr = JSON.parse(err.cloudinaryBody);
+                            errorMsg = cloudErr?.error?.message || err.error || errorMsg;
+                        } catch {
+                            errorMsg = err.cloudinaryBody || errorMsg;
+                        }
+                    } else if (err?.error) {
+                        errorMsg = err.error;
+                    }
+                } catch { /* ignore */ }
+                toast.error(`Upload Error: ${errorMsg}`);
             }
             setUploadProgress(0);
         };
@@ -236,20 +261,48 @@ const ServicesManager: React.FC = () => {
         setUploading(true);
         const uploadData = new FormData();
         uploadData.append('file', file);
-        uploadData.append('upload_preset', 'smooothpixel_upload');
 
         try {
-            const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ddxrpqctk';
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+            const apiBaseUrl = (
+                import.meta.env.VITE_PRODUCTION_API_URL ||
+                import.meta.env.VITE_API_BASE_URL ||
+                ''
+            ).replace(/\/$/, '');
+
+            const headers: Record<string, string> = {};
+            const token = localStorage.getItem('adminToken');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const res = await fetch(`${apiBaseUrl}/cloudinary/upload`, {
                 method: 'POST',
+                headers,
                 body: uploadData
             });
+
+            if (res.status === 401) {
+                toast.error('Upload failed: not authorized. Please log in again.');
+                return;
+            }
+            if (res.status === 503) {
+                toast.error('Upload failed: Cloudinary is not configured on the server.');
+                return;
+            }
+
             const data = await res.json();
-            if (data.secure_url) {
+            if (res.ok && data.secure_url) {
                 setFormData(prev => ({ ...prev, videoUrl: data.secure_url }));
                 toast.success("Video uploaded successfully.");
             } else {
-                toast.error(data.error?.message || "Upload failed.");
+                let errorMsg = data?.error || "Upload failed.";
+                if (data?.cloudinaryBody) {
+                    try {
+                        const cloudErr = JSON.parse(data.cloudinaryBody);
+                        errorMsg = cloudErr?.error?.message || errorMsg;
+                    } catch {
+                        errorMsg = data.cloudinaryBody;
+                    }
+                }
+                toast.error(errorMsg);
             }
         } catch (err) {
             toast.error("Upload failed. Check connection.");
