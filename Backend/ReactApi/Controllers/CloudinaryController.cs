@@ -83,11 +83,25 @@ namespace ReactApi.Controllers
                 streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");
 
                 form.Add(streamContent, "file", "diagnostic_test.txt");
-                form.Add(new StringContent(apiKey), "api_key");
-                form.Add(new StringContent(timestamp.ToString(CultureInfo.InvariantCulture)), "timestamp");
-                form.Add(new StringContent(signature), "signature");
-                form.Add(new StringContent(uploadPreset), "upload_preset");
-                form.Add(new StringContent(targetFolder), "folder");
+                var apiKeyContent = new StringContent(apiKey);
+                apiKeyContent.Headers.Remove("Content-Type");
+                form.Add(apiKeyContent, "api_key");
+
+                var timestampContent = new StringContent(timestamp.ToString(CultureInfo.InvariantCulture));
+                timestampContent.Headers.Remove("Content-Type");
+                form.Add(timestampContent, "timestamp");
+
+                var signatureContent = new StringContent(signature);
+                signatureContent.Headers.Remove("Content-Type");
+                form.Add(signatureContent, "signature");
+
+                var uploadPresetContent = new StringContent(uploadPreset);
+                uploadPresetContent.Headers.Remove("Content-Type");
+                form.Add(uploadPresetContent, "upload_preset");
+
+                var folderContent = new StringContent(targetFolder);
+                folderContent.Headers.Remove("Content-Type");
+                form.Add(folderContent, "folder");
 
                 var uploadUrl = $"https://api.cloudinary.com/v1_1/{cloudName}/raw/upload";
                 var http = _httpClientFactory.CreateClient();
@@ -199,11 +213,25 @@ namespace ReactApi.Controllers
                 }
 
                 form.Add(streamContent, "file", file.FileName);
-                form.Add(new StringContent(apiKey!), "api_key");
-                form.Add(new StringContent(timestamp.ToString(CultureInfo.InvariantCulture)), "timestamp");
-                form.Add(new StringContent(signature), "signature");
-                form.Add(new StringContent(uploadPreset), "upload_preset");
-                form.Add(new StringContent(targetFolder), "folder");
+                var apiKeyContent = new StringContent(apiKey!);
+                apiKeyContent.Headers.Remove("Content-Type");
+                form.Add(apiKeyContent, "api_key");
+
+                var timestampContent = new StringContent(timestamp.ToString(CultureInfo.InvariantCulture));
+                timestampContent.Headers.Remove("Content-Type");
+                form.Add(timestampContent, "timestamp");
+
+                var signatureContent = new StringContent(signature);
+                signatureContent.Headers.Remove("Content-Type");
+                form.Add(signatureContent, "signature");
+
+                var uploadPresetContent = new StringContent(uploadPreset);
+                uploadPresetContent.Headers.Remove("Content-Type");
+                form.Add(uploadPresetContent, "upload_preset");
+
+                var folderContent = new StringContent(targetFolder);
+                folderContent.Headers.Remove("Content-Type");
+                form.Add(folderContent, "folder");
 
                 _logger.LogWarning(
                     "UPLOAD DEBUG (signed) => CloudName={CloudName}, ResourceType={ResourceType}, Preset={Preset}, Folder={Folder}, FileName={FileName}, ContentType={ContentType}, Size={Size}",
