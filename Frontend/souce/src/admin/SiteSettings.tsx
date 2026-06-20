@@ -134,8 +134,8 @@ const SiteSettings: React.FC = () => {
 
             // 2. Fetch services, projects, and team to build automatic keys
             const { data: servicesList } = await apiService.getServices();
-            const { data: projectsList } = await apiClient.get('/PortfolioProjects');
-            const { data: teamList } = await apiClient.get('/TeamMembers');
+            const { data: projectsList } = await apiClient.get('/projects');
+            const { data: teamList } = await apiClient.get('/team');
 
             const keysList = [
                 { key: 'hero_title', label: 'Hero Title', defaultVal: settings.heroTitle || 'From Simple Idea to Captivating Video', group: 'Hero' },
