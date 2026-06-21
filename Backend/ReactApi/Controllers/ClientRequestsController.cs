@@ -168,13 +168,13 @@ namespace ReactApi.Controllers
                 _context.ClientRequests.Add(clientRequest);
                 await _context.SaveChangesAsync();
 
-                // Trigger notifications in background (non-blocking)
-                _ = Task.Run(async () =>
+                // Retrieve settings BEFORE launching the background task to avoid disposed DbContext issues
+                var settings = await _context.SiteSettings.AsNoTracking().FirstOrDefaultAsync();
+                if (settings != null)
                 {
-                    try
+                    _ = Task.Run(async () =>
                     {
-                        var settings = await _context.SiteSettings.AsNoTracking().FirstOrDefaultAsync();
-                        if (settings != null)
+                        try
                         {
                             if (settings.NotifyTelegramEnabled)
                                 await SendTelegramNotificationAsync(settings, clientRequest);
@@ -182,12 +182,12 @@ namespace ReactApi.Controllers
                             if (settings.NotifyEmailEnabled)
                                 await SendEmailNotificationAsync(settings, clientRequest);
                         }
-                    }
-                    catch (Exception notifEx)
-                    {
-                        Console.WriteLine($"[NOTIFICATION ERROR] {notifEx.Message}");
-                    }
-                });
+                        catch (Exception notifEx)
+                        {
+                            Console.WriteLine($"[NOTIFICATION ERROR] {notifEx.Message}");
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {
