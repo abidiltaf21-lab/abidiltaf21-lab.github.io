@@ -1,0 +1,92 @@
+name: 🚀 Deploy to Oracle Cloud
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Step 1: کوډ ترلاسه کول ──────────────────────────────────────────────
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # ── Step 2: Docker Hub ته login ─────────────────────────────────────────
+      - name: 🔑 Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # ── Step 3: ARM64 Build Setup ───────────────────────────────────────────
+      - name: 🔧 Set up QEMU (ARM64 support)
+        uses: docker/setup-qemu-action@v3
+
+      - name: 🔧 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── Step 4: Docker Image Build & Push ───────────────────────────────────
+      - name: 🐳 Build and push ARM64 image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Backend
+          file: ./Backend/Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/smooothpixel-api:latest
+            ${{ secrets.DOCKER_USERNAME }}/smooothpixel-api:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ── Step 5: Oracle Cloud ته Deploy ──────────────────────────────────────
+      - name: 🚀 Deploy to Oracle Cloud
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/smooothpixel
+            
+            # نوی image ترلاسه کول
+            docker pull ${{ secrets.DOCKER_USERNAME }}/smooothpixel-api:latest
+            
+            # زوړ container بندول
+            docker stop smooothpixel-api || true
+            docker rm smooothpixel-api || true
+            
+            # نوی container پیلول
+            docker run -d \
+              --name smooothpixel-api \
+              --restart always \
+              -p 8080:8080 \
+              -e ASPNETCORE_ENVIRONMENT=Production \
+              -e ASPNETCORE_URLS=http://+:8080 \
+              -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+              -e JWT_KEY="${{ secrets.JWT_KEY }}" \
+              -e JWT_ISSUER=SmooothPixel \
+              -e JWT_AUDIENCE=SmooothPixelClients \
+              -e JWT_SUBJECT=SmooothPixelAuth \
+              -e Cloudinary__CloudName=ddxrpqctk \
+              -e Cloudinary__ApiKey=963385473771588 \
+              -e Cloudinary__ApiSecret="${{ secrets.CLOUDINARY_SECRET }}" \
+              -e Cloudinary__UploadPreset=smooothpixel_upload \
+              -e Cloudinary__Folder=smooothpixel \
+              ${{ secrets.DOCKER_USERNAME }}/smooothpixel-api:latest
+            
+            # زوړ images پاکول
+            docker image prune -f
+            
+            echo "✅ Deploy بریالی شو!"
+
+      # ── Step 6: Health Check ─────────────────────────────────────────────────
+      - name: 🏥 Health Check
+        run: |
+          sleep 15
+          curl -f http://${{ secrets.ORACLE_HOST }}/api/health || echo "⚠️ Health check failed"

@@ -1,5 +1,8 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+# Multi-platform: د x86 (Render) او ARM64 (Oracle Cloud) دواړو لپاره
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 WORKDIR /src
 
 # Copy solution & csproj files first for layer caching
@@ -16,12 +19,13 @@ COPY . .
 RUN dotnet publish "ReactApi/ReactApi.csproj" -c Release -o /app/publish --no-restore
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
+# ARM64 (Oracle Cloud Ampere) او x86 دواړو سره مطابق
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Railway injects PORT env var at runtime
+# PORT env var — Render, Railway, Oracle Cloud ټول کار کوي
 ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
 ENV ASPNETCORE_ENVIRONMENT=Production
 
