@@ -10,6 +10,13 @@ namespace ReactApi.Infrastructer.Data
     {
         public static async Task SeedAsync(ApplicationDbContext db)
         {
+            // If SiteSettings is already populated, the database has been seeded.
+            // Return early to avoid running 8 additional sequential database checks.
+            if (await db.SiteSettings.AnyAsync())
+            {
+                return;
+            }
+
             // 1. Site Settings
             if (!await db.SiteSettings.AnyAsync())
             {

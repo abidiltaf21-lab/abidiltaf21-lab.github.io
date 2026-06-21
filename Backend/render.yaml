@@ -36,16 +36,6 @@ services:
           name: smooothpixel-db
           property: connectionString
 
-  # ── Keep-Alive Cron Job ────────────────────────────────────────────────────────────────
-  # دا cron job هر ۱۰ دقیقو کی سرور ته ping کوي چی Render Free Plan کی بیده نه شي.
-  # د Cold Start ستونزه له مینځه وړي.
-  - type: cron
-    name: keep-alive-ping
-    env: native
-    plan: free
-    schedule: "*/10 * * * *"
-    startCommand: "curl -fs https://smooothpixel-api.onrender.com/api/health || true"
-
 databases:
   - name: smooothpixel-db
     databaseName: reactapi

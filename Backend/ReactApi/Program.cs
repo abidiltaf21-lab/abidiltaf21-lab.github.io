@@ -215,10 +215,12 @@ app.UseCors("AllowOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ── Database Setup ─────────────────────────────────────────────────────────────────────
-using (var scope = app.Services.CreateScope())
+// ── Asynchronous Database Setup (Background Task) ──────────────────────────────────────
+// This prevents cold starts from timing out on platforms like Render by starting the web server immediately.
+_ = Task.Run(async () =>
 {
-    var db     = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
@@ -350,7 +352,7 @@ using (var scope = app.Services.CreateScope())
     {
         logger.LogWarning(ex, "Schema ensurers failed; backend will start without full schema.");
     }
-}
+});
 
 app.UseStaticFiles();
 

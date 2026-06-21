@@ -2,28 +2,21 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { apiService } from '../../services/api';
 
+// All trackable home sections (must match element IDs in DOM)
 const HOME_SECTION_IDS = [
-    'home',
-    'services',
-    'showreel',
-    'portfolio',
-    'stats',
-    'team',
-    'reviews',
-    'calculator',
-    'pricing',
-    'about',
-    'contact',
+    'home', 'services', 'showreel', 'portfolio',
+    'stats', 'team', 'reviews', 'calculator', 'pricing', 'about', 'contact',
 ];
 
-type GeoCache = {
-    country?: string;
-    countryCode?: string;
-    city?: string;
-    regionName?: string;
+type GeoInfo = {
+    country: string;
+    countryCode: string;
+    city: string;
+    region: string;
 };
 
-let geoCache: GeoCache | null = null;
+// Module-level promise so geo is fetched ONCE and reused across all calls
+let geoPromise: Promise<GeoInfo | null> | null = null;
 
 function getSessionId(): string {
     let sid = sessionStorage.getItem('_vsid');
@@ -34,104 +27,119 @@ function getSessionId(): string {
     return sid;
 }
 
-async function getGeo(): Promise<GeoCache> {
-    if (geoCache) return geoCache;
-
-    // Try ipwho.is (free, fast, no key needed)
+async function fetchGeo(): Promise<GeoInfo | null> {
+    // Try ipwho.is — free, HTTPS, reliable
     try {
-        const res = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) });
+        const res = await fetch('https://ipwho.is/', {
+            signal: AbortSignal.timeout(5000),
+        });
         if (res.ok) {
-            const data = await res.json();
-            if (data.success) {
-                geoCache = {
-                    country:    data.country     || 'Unknown',
-                    countryCode: data.country_code || 'XX',
-                    city:       data.city         || '',
-                    regionName: data.region       || '',
+            const d = await res.json();
+            if (d.success && d.country) {
+                return {
+                    country:     d.country      ?? 'Unknown',
+                    countryCode: d.country_code  ?? 'XX',
+                    city:        d.city          ?? '',
+                    region:      d.region        ?? '',
                 };
-                return geoCache!;
             }
         }
-    } catch { /* try fallback */ }
+    } catch { /* fall through */ }
 
-    // Fallback: ip-api.com (also free, HTTP only — no HTTPS for free tier)
+    // Fallback: geoip-lite via a free public API
     try {
-        const res = await fetch('http://ip-api.com/json/?fields=status,country,countryCode,city,regionName',
-            { signal: AbortSignal.timeout(4000) });
+        const res = await fetch('https://get.geojs.io/v1/ip/geo.json', {
+            signal: AbortSignal.timeout(4000),
+        });
         if (res.ok) {
-            const data = await res.json();
-            if (data.status === 'success') {
-                geoCache = {
-                    country:    data.country     || 'Unknown',
-                    countryCode: data.countryCode || 'XX',
-                    city:       data.city         || '',
-                    regionName: data.regionName   || '',
+            const d = await res.json();
+            if (d.country) {
+                return {
+                    country:     d.country       ?? 'Unknown',
+                    countryCode: d.country_code   ?? 'XX',
+                    city:        d.city           ?? '',
+                    region:      d.region         ?? '',
                 };
-                return geoCache!;
             }
         }
-    } catch { /* ignore */ }
+    } catch { /* give up */ }
 
-    return {};
+    return null;
+}
+
+function getGeo(): Promise<GeoInfo | null> {
+    if (!geoPromise) geoPromise = fetchGeo();
+    return geoPromise;
 }
 
 async function logVisit(page: string, section?: string) {
-    const storageKey = section ? `_vl_${page}_${section}` : `_vl_${page}`;
-    if (sessionStorage.getItem(storageKey)) return;
+    // De-duplicate within the same browser session
+    const key = section ? `_vl_${page}__${section}` : `_vl_${page}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');   // mark immediately to avoid race duplicates
 
     try {
+        // Geo is fetched in parallel — await it here so country is always included
         const geo = await getGeo();
         await apiService.logVisit({
-            country: geo.country,
-            countryCode: geo.countryCode,
-            city: geo.city,
-            region: geo.regionName,
+            country:     geo?.country     ?? undefined,
+            countryCode: geo?.countryCode ?? undefined,
+            city:        geo?.city        ?? undefined,
+            region:      geo?.region      ?? undefined,
             page,
-            section: section || undefined,
-            sessionId: getSessionId(),
+            section:     section || undefined,
+            sessionId:   getSessionId(),
         });
-        sessionStorage.setItem(storageKey, '1');
     } catch {
-        // analytics must never break the site
+        // Analytics must NEVER break the user experience
     }
 }
 
 const VisitorTracker = () => {
-    const location = useLocation();
+    const location    = useLocation();
     const observerRef = useRef<IntersectionObserver | null>(null);
 
+    // ── Prefetch geo as soon as the tracker mounts ──────────────────────────
+    useEffect(() => { getGeo(); }, []);
+
+    // ── Log page view on every route change ─────────────────────────────────
     useEffect(() => {
         const page = location.pathname || '/';
+        // Skip admin panel pages — only track public site visitors
+        if (page.startsWith('/admin') || page.startsWith('/login')) return;
         logVisit(page);
     }, [location.pathname]);
 
+    // ── Track which home sections are viewed ────────────────────────────────
     useEffect(() => {
-        const isHome = location.pathname === '/' || location.pathname === '/home-dark';
         observerRef.current?.disconnect();
 
-        if (!isHome) return;
+        const isTrackedPage =
+            location.pathname === '/' || location.pathname === '/home-dark';
+        if (!isTrackedPage) return;
 
-        const seen = new Set<string>();
+        const seenInPage = new Set<string>();
 
+        // Delay slightly so the DOM is fully rendered
         const timer = window.setTimeout(() => {
             observerRef.current = new IntersectionObserver(
                 (entries) => {
                     entries.forEach((entry) => {
                         if (!entry.isIntersecting) return;
                         const id = entry.target.id;
-                        if (!id || seen.has(id)) return;
-                        seen.add(id);
+                        if (!id || seenInPage.has(id)) return;
+                        seenInPage.add(id);
                         logVisit(location.pathname || '/', id);
                     });
                 },
-                { threshold: 0.3, rootMargin: '-80px 0px -80px 0px' }
+                { threshold: 0.3, rootMargin: '-60px 0px -60px 0px' }
             );
 
             HOME_SECTION_IDS.forEach((id) => {
                 const el = document.getElementById(id);
                 if (el) observerRef.current?.observe(el);
             });
-        }, 800);
+        }, 600);
 
         return () => {
             window.clearTimeout(timer);
