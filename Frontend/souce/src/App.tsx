@@ -31,6 +31,7 @@ import Preloader from './components/utilities/Preloader';
 import VisitorTracker from './components/utilities/VisitorTracker';
 import ThemeManager from './components/utilities/ThemeManager';
 import FloatingChatWidget from './components/FloatingChatWidget';
+import ServerWakeUp from './components/utilities/ServerWakeUp';
 
 function App() {
 
@@ -40,13 +41,14 @@ function App() {
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false)
-    }, 1500)
+    }, 800)
   }, [])
 
   return (
     <>
       {isLoading ? <Preloader /> :
         <>
+          <ServerWakeUp />
           <ThemeManager />
           <Routers />
           <FloatingChatWidget />

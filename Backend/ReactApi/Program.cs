@@ -353,5 +353,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseStaticFiles();
+
+// ── Health Check Endpoint ──────────────────────────────────────────────────────────────
+// دا endpoint د Render Free Plan د "Cold Start" ستونزې لپاره کار کوي.
+// Frontend دا endpoint ping کوي چی سرور بیده نه شي.
+app.MapGet("/api/health", () => Results.Ok(new {
+    status  = "healthy",
+    service = "smooothpixel-api",
+    time    = DateTime.UtcNow
+})).AllowAnonymous();
+
 app.MapControllers();
 app.Run();
