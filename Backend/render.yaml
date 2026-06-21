@@ -5,8 +5,6 @@ services:
     env: docker
     plan: free
     rootDir: ./Backend
-    dockerfilePath: ./Backend/Dockerfile
-    dockerContext: ./Backend
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
