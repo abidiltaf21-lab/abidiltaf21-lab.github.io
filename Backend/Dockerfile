@@ -1,16 +1,13 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
-# Multi-platform: د x86 (Render) او ARM64 (Oracle Cloud) دواړو لپاره
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy solution & csproj files first for layer caching
-COPY ["ReactApi/ReactApi.sln", "ReactApi/"]
-COPY ["ReactApi/ReactApi.csproj",                                 "ReactApi/"]
-COPY ["ReactApi.Application/ReactApi.Application.csproj",         "ReactApi.Application/"]
-COPY ["ReactApi.Domin/ReactApi.Domin.csproj",                     "ReactApi.Domin/"]
-COPY ["ReactApi.Infrastructer/ReactApi.Infrastructer.csproj",     "ReactApi.Infrastructer/"]
+COPY ["ReactApi/ReactApi.sln",                                        "ReactApi/"]
+COPY ["ReactApi/ReactApi.csproj",                                     "ReactApi/"]
+COPY ["ReactApi.Application/ReactApi.Application.csproj",            "ReactApi.Application/"]
+COPY ["ReactApi.Domin/ReactApi.Domin.csproj",                        "ReactApi.Domin/"]
+COPY ["ReactApi.Infrastructer/ReactApi.Infrastructer.csproj",        "ReactApi.Infrastructer/"]
 
 RUN dotnet restore "ReactApi/ReactApi.sln"
 
@@ -19,13 +16,12 @@ COPY . .
 RUN dotnet publish "ReactApi/ReactApi.csproj" -c Release -o /app/publish --no-restore
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
-# ARM64 (Oracle Cloud Ampere) او x86 دواړو سره مطابق
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# PORT env var — Render, Railway, Oracle Cloud ټول کار کوي
+# PORT env var — Render uses $PORT automatically
 ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
 ENV ASPNETCORE_ENVIRONMENT=Production
 
